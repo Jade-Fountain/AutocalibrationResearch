@@ -238,7 +238,8 @@ void Tracker::savePoses(){
              << m[2] << m[6] << m[10] << m[14] << arma::endr
              << m[3] << m[7] << m[11] << m[15] << arma::endr;
 
-        //TODO:invert? units?
+        //TODO:
+        // units = decimeters
         poses.push_back(pose);
         // std::cout << pose << std::endl;
     }
