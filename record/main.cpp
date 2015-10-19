@@ -51,29 +51,38 @@
   #include <GL/glut.h>
 #endif 
 
+#include "opencv2/core/core_c.h"
+#include "opencv2/highgui/highgui_c.h"
+
+
 #include "PSMoveUtils.h"
 #include "GraphicsTools.h"
 
 int main( void )  
 {  
-    
+    int width = 640;
+    int height = 480;
+
     //Declare a window object  
-    GLFWwindow* window = setUpGLWindow(640, 480);
+    GLFWwindow* window = setUpGLWindow(width, height);
 
     Tracker psmoveTracker;
+
     psmoveTracker.init();
 
+    //TODO: use opencv c++ bindings
+    CvVideoWriter *writer = cvCreateVideoWriter("out.avi",
+        CV_FOURCC('M','J','P','G'), 30, cvSize(width, height), 1);
     //Main Loop  
     do  
     {  
         //Clear color buffer  
         glClear(GL_COLOR_BUFFER_BIT); 
         
-        //TODO: Draw the graphics
         psmoveTracker.update();
         psmoveTracker.render();
+        psmoveTracker.saveFrame(writer);
 
-        
         //Swap buffers  
         glfwSwapBuffers(window);  
         //Get and organize events, like keyboard and mouse input, window resizing, etc...  

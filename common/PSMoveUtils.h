@@ -23,6 +23,9 @@
   #include <GL/glut.h>
 #endif 
 
+#include "opencv2/core/core_c.h"
+#include "opencv2/highgui/highgui_c.h"
+
 #include "psmoveapi/psmove.h"
 #include "psmoveapi/psmove_tracker.h"
 #include "psmoveapi/psmove_fusion.h"
@@ -55,6 +58,7 @@ class Tracker {
 
         void init();
         void render();
+        void saveFrame(CvVideoWriter *writer);
 
     private:
         PSMove **m_moves;

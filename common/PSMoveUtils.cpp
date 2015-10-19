@@ -216,3 +216,12 @@ Tracker::render()
         }
     }
 }
+
+void Tracker::saveFrame(CvVideoWriter *writer){
+    void* frame = psmove_tracker_get_frame(m_tracker);
+    if (frame) {
+        cvWriteFrame(writer, (const IplImage *)frame);
+    } else {
+        std::cout << "Frame failed to save" << std::endl;
+    }
+}
