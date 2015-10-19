@@ -82,6 +82,7 @@ int main( void )
         psmoveTracker.update();
         psmoveTracker.render();
         psmoveTracker.saveFrame(writer);
+        psmoveTracker.savePoses();
 
         //Swap buffers  
         glfwSwapBuffers(window);  

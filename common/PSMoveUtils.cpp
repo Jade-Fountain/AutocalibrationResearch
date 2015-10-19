@@ -5,7 +5,8 @@ Tracker::Tracker()
     : m_moves(NULL),
       m_count(psmove_count_connected()),
       m_tracker(psmove_tracker_new()),
-      m_fusion(psmove_fusion_new(m_tracker, 1., 1000.))
+      m_fusion(psmove_fusion_new(m_tracker, 1., 1000.)),
+      mocapRecorder("mocapdata")
 {
     // PSMove *move;
     // move = psmove_connect();
@@ -187,7 +188,8 @@ Tracker::render()
 
     for (int i=0; i<m_count; i++) {
         glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf(psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]));
+        GLfloat* modelview = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
+        glLoadMatrixf(modelview);
 
         if (m_items[i] == WIRE_CUBE) {
             glColor3f(1., 0., 0.);
@@ -224,4 +226,21 @@ void Tracker::saveFrame(CvVideoWriter *writer){
     } else {
         std::cout << "Frame failed to save" << std::endl;
     }
+}
+
+void Tracker::savePoses(){
+    std::vector<Transform3D> poses;
+    for (int i=0; i<m_count; i++) {
+        GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
+        Transform3D pose;
+        pose << m[0] << m[4] << m[8] << m[12] << arma::endr
+             << m[1] << m[5] << m[9] << m[13] << arma::endr
+             << m[2] << m[6] << m[10] << m[14] << arma::endr
+             << m[3] << m[7] << m[11] << m[15] << arma::endr;
+
+        //TODO:invert? units?
+        poses.push_back(pose);
+        // std::cout << pose << std::endl;
+    }
+    mocapRecorder.saveFrame(poses);
 }

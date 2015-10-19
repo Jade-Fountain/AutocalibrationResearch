@@ -8,9 +8,7 @@
 #include <math.h>
 
 #include <vector>
-
 #include <chrono>
-
 
 #ifdef __APPLE__
     // #include <OpenGL/gl.h>
@@ -30,8 +28,14 @@
 #include "psmoveapi/psmove_tracker.h"
 #include "psmoveapi/psmove_fusion.h"
 
+#include "MocapRecorder.h"
+
+#include "utility/math/matrix/Transform3D.h"
+
 #ifndef PSMOVE_UTILS_H
 #define PSMOVE_UTILS_H
+
+using utility::math::matrix::Transform3D;
 
 enum {
     NOTHING,
@@ -59,6 +63,7 @@ class Tracker {
         void init();
         void render();
         void saveFrame(CvVideoWriter *writer);
+        void savePoses();
 
     private:
         PSMove **m_moves;
@@ -74,6 +79,9 @@ class Tracker {
         PSMoveTracker *m_tracker;
         PSMoveFusion *m_fusion;
         GLuint m_texture;
+
+        //Jake added:
+        MocapRecorder mocapRecorder;
 };
 
 
