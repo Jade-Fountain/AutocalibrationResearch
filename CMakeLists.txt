@@ -110,26 +110,21 @@ INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR} REQUIRED)
 INCLUDE_DIRECTORIES(${PSMOVEAPI_INCLUDE_DIR} REQUIRED)
 INCLUDE_DIRECTORIES(${PSMOVEAPI_TRACKER_INCLUDE_DIR} REQUIRED)
 
-# ADD_SUBDIRECTORY(src/NUGL)
 
-# Include directories
-INCLUDE_DIRECTORIES("src/" ".")
-
-FILE(GLOB_RECURSE src_files
-      "src/**.cpp"
+FILE(GLOB_RECURSE COMMON_SRC
+      "common/**.cpp"
     )
 
-set(src_files ${src_files} 
-              utility/math/matrix/Transform3D.cpp
-              utility/math/matrix/Rotation3D.cpp
-              utility/math/geometry/UnitQuaternion.cpp
-              )
+set(COMMON_SRC  ${COMMON_SRC}
+                utility/math/matrix/Transform3D.cpp
+                utility/math/matrix/Rotation3D.cpp
+                utility/math/geometry/UnitQuaternion.cpp)
 
-# Add Executables
-SET(fusion_src ${inc_files} ${src_files})
-ADD_EXECUTABLE (fusion ${fusion_src})
-SET_TARGET_PROPERTIES(fusion PROPERTIES LINKER_LANGUAGE CXX)
-TARGET_LINK_LIBRARIES(fusion
+INCLUDE_DIRECTORIES(".")
+add_library(COMMON_LIB ${COMMON_SRC})
+
+set(COMMON_LIBRARIES
+    COMMON_LIB
     ${OPENGL_gl_LIBRARY}
     ${GLEW_LIBRARY}
     ${GLFW_LIBRARIES}
@@ -145,8 +140,13 @@ TARGET_LINK_LIBRARIES(fusion
     ${PSMOVEAPI_LIBRARY}
     ${PSMOVEAPI_TRACKER_LIBRARY}
     ${ARMADILLO_LIBRARY}
-    ${PSMOVEAPI_REQUIRED_LIBS}
-    )
+    ${PSMOVEAPI_REQUIRED_LIBS})
 
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#Add subdirectories
+FILE(GLOB EXECUTABLES
+      "*"
+    )
+message(EXECUTABLES = ${EXECUTABLES})
+set(CURRENT_FOLDER record)
+add_subdirectory(${CURRENT_FOLDER})
 
