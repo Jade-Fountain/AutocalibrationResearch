@@ -6,7 +6,7 @@ Tracker::Tracker()
       m_count(psmove_count_connected()),
       m_tracker(psmove_tracker_new()),
       m_fusion(psmove_fusion_new(m_tracker, 1., 1000.)),
-      mocapRecorder("mocapdata")
+      mocapRecorder("psmovedata")
 {
     // PSMove *move;
     // move = psmove_connect();
@@ -233,13 +233,14 @@ void Tracker::savePoses(){
     for (int i=0; i<m_count; i++) {
         GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
         Transform3D pose;
-        pose << m[0] << m[4] << m[8] << m[12] << arma::endr
-             << m[1] << m[5] << m[9] << m[13] << arma::endr
-             << m[2] << m[6] << m[10] << m[14] << arma::endr
+        // units = decimeters
+        float unit_factor = 0.1;
+        pose << m[0] << m[4] << m[8] << unit_factor * m[12] << arma::endr
+             << m[1] << m[5] << m[9] << unit_factor * m[13] << arma::endr
+             << m[2] << m[6] << m[10] << unit_factor * m[14] << arma::endr
              << m[3] << m[7] << m[11] << m[15] << arma::endr;
 
         //TODO:
-        // units = decimeters
         poses.push_back(pose);
         // std::cout << pose << std::endl;
     }

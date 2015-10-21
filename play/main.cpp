@@ -40,6 +40,12 @@
 
 #include <chrono>
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/ext.hpp"
+
 #ifdef __APPLE__
     // #include <OpenGL/gl.h>
     #include <GL/glew.h>  
@@ -55,6 +61,8 @@
 
 #include "PSMoveUtils.h"
 #include "GraphicsTools.h"
+#include "SensorPlant.h"
+#include "MocapStream.h"
 
 int main(int argc, char* argv[])  
 {  
@@ -64,23 +72,23 @@ int main(int argc, char* argv[])
     }
     std::cout << "Loading video file " << video_filename << std::endl;
 
-    int width = 640;
-    int height = 480;
-
-    //Declare a window object  
-    GLFWwindow* window = setUpGLWindow(width, height);
-
     CvCapture* video = cvCaptureFromFile(video_filename.c_str());
-    int fps;
+    int fps, width, height;
     if(video == NULL){
         std::cout << "Video load failed... Exiting" << std::endl;
         return -1;
     } else {
         fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS ); 
+        width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
+        height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
         std::cout << "Video load successful... FPS = " << fps << std::endl;
     }
     float frame_duration = 1.0 / float(fps);
+    
 
+    //Declare a window object  
+    GLFWwindow* window = setUpGLWindow(width, height);
+    //Some GL options to configure for drawing
     glEnable(GL_TEXTURE_2D);
     GLuint texture;
     glGenTextures(1, &texture);
@@ -89,18 +97,30 @@ int main(int argc, char* argv[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+
+    //Mocap stream stuff
+    //Start timestamp
+    std::string timeString = video_filename.substr(0,video_filename.size() - 4); //Remove .avi from filename
+    autocal::TimeStamp videoStartTime = std::stoll(timeString);
+    std::cout << "videoStartTime = " << videoStartTime << " ms" << std::endl;
+    //Mocap stream
+    autocal::MocapStream psmoveStream("psmove");
+    psmoveStream.loadMocapData("psmovedata", videoStartTime,std::chrono::system_clock::now());
+
+    // autocal::SensorPlant sensorPlant;
+
     //Main Loop
     auto start = std::chrono::steady_clock::now();  
     int video_frames = 0; 
-
     do  
     {  
-        // frames++;   
+        // frames++;
         auto now = std::chrono::steady_clock::now();    
-        double frame_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
-            
+        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
 
-        if(video_frames * frame_duration < frame_time){
+        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
+        
+        if(video_frames * frame_duration < frame_time_since_start){
             video_frames++;
         } else {
             continue;
@@ -152,6 +172,31 @@ int main(int argc, char* argv[])
         glTexCoord2f(0., 0.);
         glVertex2f(-1., 1.);
         glEnd();
+        
+        //setup overgraphics
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        glMatrixMode(GL_PROJECTION);
+        glm::mat4 proj = glm::perspective(  50.0f,            //VERTICAL FOV
+                                            float(width) / float(height),  //aspect ratio
+                                            0.1f,         //near plane distance (min z)
+                                            10.0f           //Far plane distance (max z)
+                                            );
+        glLoadMatrixf(glm::value_ptr(proj));
+
+        autocal::MocapStream::Frame frame = psmoveStream.getFrame(current_timestamp);
+        for(auto& pair : frame.rigidBodies){
+            auto& rigidBodyID = pair.first;
+            auto& rigidBody = pair.second;
+            Transform3D pose = rigidBody.pose;
+            std::cout << pose << std::endl;
+            glMatrixMode(GL_MODELVIEW);
+            glLoadMatrixd(pose.memptr());  
+            glEnable(GL_LIGHTING);
+            glutSolidCube(2.);
+            glDisable(GL_LIGHTING);
+        } 
+
 
         //Swap buffers  
         glfwSwapBuffers(window);  

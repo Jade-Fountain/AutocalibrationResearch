@@ -155,13 +155,13 @@ namespace autocal {
 		std::map<TimeStamp,Frame>::iterator end(){return stream.end();}
 		
 		//Frame retrieval
-		Frame getFrame(const std::chrono::system_clock::time_point& start_time);
-		Frame getInterpolatedFrame(const TimeStamp& start_time);
-		Frame getFrame(const TimeStamp& start_time);
-		TimeStamp getFrameTime(const TimeStamp& start_time);
+		Frame getFrame(const std::chrono::system_clock::time_point& t);
+		Frame getInterpolatedFrame(const TimeStamp& t);
+		Frame getFrame(const TimeStamp& t);
+		TimeStamp getFrameTime(const TimeStamp& t);
 
-		std::map<TimeStamp,Frame>::iterator getUpperBoundIter(const TimeStamp& start_time);
-		std::map<TimeStamp,Frame>::iterator getLowerBoundIter(const TimeStamp& start_time);
+		std::map<TimeStamp,Frame>::iterator getUpperBoundIter(const TimeStamp& t);
+		std::map<TimeStamp,Frame>::iterator getLowerBoundIter(const TimeStamp& t);
 		
 
 		//Heavy functions
