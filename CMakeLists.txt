@@ -149,6 +149,6 @@ FILE(GLOB EXECUTABLES
       "*"
     )
 message(EXECUTABLES = ${EXECUTABLES})
-set(CURRENT_FOLDER record)
-add_subdirectory(${CURRENT_FOLDER})
-
+foreach(CURRENT_FOLDER record view play)
+  add_subdirectory(${CURRENT_FOLDER})
+endforeach()

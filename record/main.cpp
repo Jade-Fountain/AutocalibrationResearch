@@ -69,9 +69,13 @@ int main( void )
     Tracker psmoveTracker;
 
     psmoveTracker.init();
+    
+    std::stringstream filename;
+    auto start_time = std::chrono::high_resolution_clock::now();
+    filename << std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count()) << ".avi";
 
     //TODO: use opencv c++ bindings
-    CvVideoWriter *writer = cvCreateVideoWriter("out.avi",
+    CvVideoWriter *writer = cvCreateVideoWriter(filename.str().c_str(),
         CV_FOURCC('M','J','P','G'), 30, cvSize(width, height), 1);
     //Main Loop  
     do  
