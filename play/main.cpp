@@ -177,9 +177,9 @@ int main(int argc, char* argv[])
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
-        glm::mat4 proj = glm::perspective(  50.0f,            //VERTICAL FOV
+        glm::mat4 proj = glm::perspective(   1.0f,            //VERTICAL FOV
                                             float(width) / float(height),  //aspect ratio
-                                            0.1f,         //near plane distance (min z)
+                                            0.01f,         //near plane distance (min z)
                                             10.0f           //Far plane distance (max z)
                                             );
         glLoadMatrixf(glm::value_ptr(proj));
@@ -189,12 +189,26 @@ int main(int argc, char* argv[])
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
             Transform3D pose = rigidBody.pose;
-            std::cout << pose << std::endl;
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  
+            
             glEnable(GL_LIGHTING);
-            glutSolidCube(2.);
+            glutSolidCube(0.1);
             glDisable(GL_LIGHTING);
+            // glDisable(GL_LIGHTING);
+
+            // glColor3f(1., 0., 0.);
+            // glutWireCube(1.);
+            // glColor3f(0., 1., 0.);
+
+            // glPushMatrix();
+            // glScalef(1., 1., 4.5);
+            // glTranslatef(0., 0., -.5);
+            // glutWireCube(1.);
+            // glPopMatrix();
+
+            // glColor3f(0., 0., 1.);
+            // glutWireCube(3.);
         } 
 
 

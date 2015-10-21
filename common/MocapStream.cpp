@@ -39,28 +39,36 @@ namespace autocal {
 			
 			arma::vec3 pos = data.rows(1,3);
 			//Change back to mocap coords from nubots coords (sigh...)
-			r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
+			if(stream_name.compare("mocap") == 0){
+				r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
+			} else {
+				r.pose.translation() = pos;
+			}
 			
 			Rotation3D rot;
 			int start = 4;
 			for(int i = 0; i < 3; i++){
 				rot.row(i) = data.rows(start + 3 * i, start + 3 * i + 2).t();
 			}
-			UnitQuaternion q(rot);
-			//Change back to mocap coords from nubots coords (sigh...)
-			UnitQuaternion q_(arma::vec4{
-				 q.kX(),
-				-q.kZ(),
-				 q.kW(),
-				-q.kY(),
-				});
-			//Turn back into rotation
-			r.pose.rotation() = Rotation3D(q_);
+			if(stream_name.compare("mocap") == 0){
+				UnitQuaternion q(rot);
+				//Change back to mocap coords from nubots coords (sigh...)
+				UnitQuaternion q_(arma::vec4{
+					 q.kX(),
+					-q.kZ(),
+					 q.kW(),
+					-q.kY(),
+					});
+				//Turn back into rotation
+				r.pose.rotation() = Rotation3D(q_);
+			}else{
+				r.pose.rotation() = rot;
+			}
 
 			// std::cout << "data: " <<  data << std::endl;
 			// std::cout << "id:" << int(data[0]) << std::endl;
-			// std::cout << "position:" << r.position << std::endl;
-			// std::cout << "rotation:" << r.rotation << std::endl;
+			// std::cout << "position:" << r.pose.translation() << std::endl;
+			// std::cout << "rotation:" << r.pose.rotation() << std::endl;
 			
 			f.rigidBodies[int(data[0])] = r;
 		}

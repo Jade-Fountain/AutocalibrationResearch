@@ -242,7 +242,7 @@ void Tracker::savePoses(){
 
         //TODO:
         poses.push_back(pose);
-        // std::cout << pose << std::endl;
+        std::cout << pose << std::endl;
     }
     mocapRecorder.saveFrame(poses);
 }
