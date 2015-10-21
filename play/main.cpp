@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
-        glm::mat4 proj = glm::perspective(   1.0f,            //VERTICAL FOV
+        glm::mat4 proj = glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
                                             float(width) / float(height),  //aspect ratio
                                             0.01f,         //near plane distance (min z)
                                             10.0f           //Far plane distance (max z)
