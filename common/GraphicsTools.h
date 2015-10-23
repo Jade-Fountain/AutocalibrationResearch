@@ -149,7 +149,9 @@ static void drawBasis(float scale){
     float coneRadius = 0.3 * scale;
     float coneHeight = 0.6 * scale;
     int numberOfConeSegments = 10;
-
+    
+    glDisable(GL_TEXTURE_2D);
+    
     glEnable(GL_LIGHTING);
     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.0f);
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.0f);

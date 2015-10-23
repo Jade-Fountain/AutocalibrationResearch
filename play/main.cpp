@@ -78,7 +78,8 @@ int main(int argc, char* argv[])
         std::cout << "Video load failed... Exiting" << std::endl;
         return -1;
     } else {
-        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS ); 
+        // fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
+        fps = 15; 
         width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
         height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
         std::cout << "Video load successful... FPS = " << fps << std::endl;
