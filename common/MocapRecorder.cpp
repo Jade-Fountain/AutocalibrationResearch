@@ -18,7 +18,7 @@ bool MocapRecorder::saveFrame(const std::vector<Transform3D>& poses){
             										r.row(2)[0],r.row(2)[1],r.row(2)[2]});
 
     }
-    auto now = std::chrono::high_resolution_clock::now();
+    auto now = std::chrono::system_clock::now();
     std::stringstream filename;
     filename << folder << "/" << std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count());
     std::cout << "Saving MotionCapture data to " << filename.str() << std::endl;

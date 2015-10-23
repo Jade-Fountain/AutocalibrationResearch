@@ -28,17 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <stdio.h>
 #include <iostream>
-
-#include <time.h>
-#include <unistd.h>
-#include <assert.h>
-#include <math.h>
 
 #include <vector>
 
 #include <chrono>
+#include <iostream>
 
 #ifdef __APPLE__
     // #include <OpenGL/gl.h>
@@ -71,15 +66,22 @@ int main( void )
     psmoveTracker.init();
     
     std::stringstream filename;
-    auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::system_clock::now();
     filename << std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count()) << ".avi";
+    int video_frames = 0; 
+
 
     //TODO: use opencv c++ bindings
     CvVideoWriter *writer = cvCreateVideoWriter(filename.str().c_str(),
         CV_FOURCC('M','J','P','G'), 30, cvSize(width, height), 1);
     //Main Loop  
     do  
-    {  
+    {   
+        video_frames++;
+        auto now = std::chrono::system_clock::now();    
+        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
+        std::cout << "Frame time = " << frame_time_since_start << std::endl;
+
         //Clear color buffer  
         glClear(GL_COLOR_BUFFER_BIT); 
         
@@ -88,6 +90,8 @@ int main( void )
         psmoveTracker.saveFrame(writer);
         psmoveTracker.savePoses();
 
+        drawCrossHair();
+
         //Swap buffers  
         glfwSwapBuffers(window);  
         //Get and organize events, like keyboard and mouse input, window resizing, etc...  
@@ -95,5 +99,9 @@ int main( void )
   
     } //Check if the ESC key had been pressed or if the window had been closed  
     while (!glfwWindowShouldClose(window));  
+    auto now = std::chrono::system_clock::now();    
+    double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);     
+    // std::cout << "average draw framerate = " << double(frames) / finish_time << " Hz " << std::endl; 
+    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
     destroyGLWindow(window);
 }  

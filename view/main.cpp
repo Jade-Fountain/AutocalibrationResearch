@@ -81,6 +81,8 @@ int main( void )
         
         psmoveTracker.update();
         psmoveTracker.render();
+        
+        drawCrossHair();
 
         //Swap buffers  
         glfwSwapBuffers(window);  

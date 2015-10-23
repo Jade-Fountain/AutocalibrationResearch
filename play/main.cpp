@@ -192,23 +192,7 @@ int main(int argc, char* argv[])
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  
             
-            glEnable(GL_LIGHTING);
-            glutSolidCube(0.1);
-            glDisable(GL_LIGHTING);
-            // glDisable(GL_LIGHTING);
-
-            // glColor3f(1., 0., 0.);
-            // glutWireCube(1.);
-            // glColor3f(0., 1., 0.);
-
-            // glPushMatrix();
-            // glScalef(1., 1., 4.5);
-            // glTranslatef(0., 0., -.5);
-            // glutWireCube(1.);
-            // glPopMatrix();
-
-            // glColor3f(0., 0., 1.);
-            // glutWireCube(3.);
+            drawBasis(0.1);
         } 
 
 
