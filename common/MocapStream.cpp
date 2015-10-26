@@ -39,7 +39,7 @@ namespace autocal {
 			
 			arma::vec3 pos = data.rows(1,3);
 			//Change back to mocap coords from nubots coords (sigh...)
-			if(stream_name.compare("mocap") == 0){
+			if(correctForNUbotsCoordinateSystem){
 				r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
 			} else {
 				r.pose.translation() = pos;
@@ -50,7 +50,7 @@ namespace autocal {
 			for(int i = 0; i < 3; i++){
 				rot.row(i) = data.rows(start + 3 * i, start + 3 * i + 2).t();
 			}
-			if(stream_name.compare("mocap") == 0){
+			if(correctForNUbotsCoordinateSystem){
 				UnitQuaternion q(rot);
 				//Change back to mocap coords from nubots coords (sigh...)
 				UnitQuaternion q_(arma::vec4{

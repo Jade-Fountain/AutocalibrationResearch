@@ -18,7 +18,7 @@ namespace autocal {
 		//Create a new stream if one with this name doesnt exist
 		if(streams.count(name) == 0){
 			std::cout << "Initialising mocap stream: " << name << std::endl;
-			streams[name] = MocapStream(name);
+			streams[name] = MocapStream(name, false);
 		}
 		//Set the data
 		streams[name].setRigidBodyInFrame(timeStamp, rigidBodyId, pose);

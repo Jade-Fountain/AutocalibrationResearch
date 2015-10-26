@@ -105,8 +105,30 @@ int main(int argc, char* argv[])
     autocal::TimeStamp videoStartTime = std::stoll(timeString);
     std::cout << "videoStartTime = " << videoStartTime << " ms" << std::endl;
     //Mocap stream
-    autocal::MocapStream psmoveStream("psmove");
+    autocal::MocapStream psmoveStream("psmove", false);
     psmoveStream.loadMocapData("psmovedata", videoStartTime,std::chrono::system_clock::now());
+
+    autocal::MocapStream optitrackStream("mocap", true);
+    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now());
+    Transform3D psmoveToMocap;
+
+    arma::vec3 centre =     {   1.0205,    0.6637,  0.025500};
+    arma::vec3 frontRight = { 1.007544,  0.662266, -0.141178};
+    arma::vec3 frontLeft =  { 1.016013,  0.661523,  0.196680};
+    arma::vec3 backRight =  { 1.024875,  0.659862, -0.144267};
+    arma::vec3 backLeft =   { 1.032640,  0.658253,  0.191176};
+    // arma::vec3 top =        { 1.022050,  0.677163,  0.026080};
+    arma::vec3 viewPoint =  {-1.092194,  0.977327,  0.076759};
+
+    psmoveToMocap.translation() = centre;
+    psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
+
+    arma::vec3 psuedoX =  - (frontRight + backRight) / 2 + (frontLeft + backLeft) / 2;
+    psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
+    psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+
+
+    std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
     // autocal::SensorPlant sensorPlant;
 
@@ -185,14 +207,27 @@ int main(int argc, char* argv[])
                                             );
         glLoadMatrixf(glm::value_ptr(proj));
 
-        autocal::MocapStream::Frame frame = psmoveStream.getFrame(current_timestamp);
-        for(auto& pair : frame.rigidBodies){
+        autocal::MocapStream::Frame psmoveFrame = psmoveStream.getFrame(current_timestamp);
+        for(auto& pair : psmoveFrame.rigidBodies){
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
             Transform3D pose = rigidBody.pose;
+            // std::cout << "psmove pose = \n" << pose << std::endl;
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  
             
+            drawBasis(0.1);
+        } 
+
+        autocal::MocapStream::Frame optitrackFrame = optitrackStream.getFrame(current_timestamp);
+        for(auto& pair : optitrackFrame.rigidBodies){
+            auto& rigidBodyID = pair.first;
+            auto& rigidBody = pair.second;
+            Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
+            if(rigidBodyID == 2) std::cout << "mocap pose = \n" << rigidBody.pose << std::endl;
+            // pose = pose.i();
+            glMatrixMode(GL_MODELVIEW);
+            glLoadMatrixd(pose.memptr());  
             drawBasis(0.1);
         } 
 
