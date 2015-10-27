@@ -38,8 +38,8 @@ namespace autocal {
 
 		MocapRecording mocapRecording;
 
-		void addStream(const std::string& name, const MocapStream& s){
-			mocapRecording.getStream(name) = s;
+		void addStream(const MocapStream& s){
+			mocapRecording.getStream(s.name()) = s;
 		}
 
 		bool isRunning(){return !simulate || simParams.size()!=0;}

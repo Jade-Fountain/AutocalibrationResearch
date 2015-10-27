@@ -10,6 +10,7 @@ This code is part of mocap-kinect experiments*/
 namespace autocal {
 	using utility::math::matrix::Transform3D;
 
+	//match each rigid body in stream 1 with a rigid body in stream 2
 	std::vector<std::pair<int,int>> SensorPlant::matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now){
 		// std::cout << "FRAME BEGIN"  << std::endl;
 		auto start = std::chrono::high_resolution_clock::now();

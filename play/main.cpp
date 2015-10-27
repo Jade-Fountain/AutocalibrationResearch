@@ -110,6 +110,13 @@ int main(int argc, char* argv[])
 
     autocal::MocapStream optitrackStream("mocap", true);
     optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now());
+
+    bool useSimulation = false;
+    autocal::SensorPlant sensorPlant(useSimulation);
+    sensorPlant.addStream(psmoveStream);
+    sensorPlant.addStream(optitrackStream);
+
+    //Ground Truth
     Transform3D psmoveToMocap;
 
     arma::vec3 centre =     {   1.0205,    0.6637,  0.025500};
@@ -127,10 +134,10 @@ int main(int argc, char* argv[])
     psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
     psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
 
-
     std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
-    // autocal::SensorPlant sensorPlant;
+    bool useTruthForMatching = false;
+    sensorPlant.setGroundTruthTransform("psmove", "mocap", psmoveToMocap, useTruthForMatching);
 
     //Main Loop
     auto start = std::chrono::steady_clock::now();  
@@ -200,21 +207,24 @@ int main(int argc, char* argv[])
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
-        glm::mat4 proj = glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
+        glm::mat4 proj = glm::perspective(  float(39.11 * 3.14159 / 180.0),            //VERTICAL FOV
                                             float(width) / float(height),  //aspect ratio
                                             0.01f,         //near plane distance (min z)
                                             10.0f           //Far plane distance (max z)
                                             );
         glLoadMatrixf(glm::value_ptr(proj));
 
+        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp);
+
         autocal::MocapStream::Frame psmoveFrame = psmoveStream.getFrame(current_timestamp);
+        Transform3D psmovePose;
         for(auto& pair : psmoveFrame.rigidBodies){
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
-            Transform3D pose = rigidBody.pose;
+            psmovePose = rigidBody.pose;
             // std::cout << "psmove pose = \n" << pose << std::endl;
             glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixd(pose.memptr());  
+            glLoadMatrixd(psmovePose.memptr());  
             
             drawBasis(0.1);
         } 
@@ -224,10 +234,13 @@ int main(int argc, char* argv[])
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
             Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
-            if(rigidBodyID == 2) std::cout << "mocap pose = \n" << rigidBody.pose << std::endl;
             // pose = pose.i();
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  
+            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
+                glutSolidSphere(0.05, 10, 10);
+                std::cout << "matches RB" << rigidBodyID << std::endl; 
+            }
             drawBasis(0.1);
         } 
 
