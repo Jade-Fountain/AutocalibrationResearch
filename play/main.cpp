@@ -77,8 +77,8 @@ int main(int argc, char* argv[])
         std::cout << "Video load failed... Exiting" << std::endl;
         return -1;
     } else {
-        // fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
-        fps = 15; 
+        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
+        // fps = 15; 
         width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
         height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
         std::cout << "Video load successful... FPS = " << fps << std::endl;
@@ -118,20 +118,38 @@ int main(int argc, char* argv[])
     //Ground Truth
     Transform3D psmoveToMocap;
 
-    arma::vec3 centre =     {   1.0205,    0.6637,  0.025500};
-    arma::vec3 frontRight = { 1.007544,  0.662266, -0.141178};
-    arma::vec3 frontLeft =  { 1.016013,  0.661523,  0.196680};
-    arma::vec3 backRight =  { 1.024875,  0.659862, -0.144267};
-    arma::vec3 backLeft =   { 1.032640,  0.658253,  0.191176};
-    // arma::vec3 top =        { 1.022050,  0.677163,  0.026080};
-    arma::vec3 viewPoint =  {-1.092194,  0.977327,  0.076759};
-
+    arma::vec3 right = { 1.198981,  0.129528, 0.200404};
+    arma::vec3 left =  { 1.202117,  0.133606,  0.297056};
+    arma::vec3 centre1 =  { 1.164790,  0.0117017, 0.267929};
+    arma::vec3 centre2 =   { 1.162927,  0.116876,  0.230719};
+    arma::vec3 viewPoint =  {-1.835153,  1.196957,  0.274641};
+    
+    arma::vec3 centre = 0.5*(centre2 + centre1);
+    
     psmoveToMocap.translation() = centre;
     psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
-
-    arma::vec3 psuedoX =  - (frontRight + backRight) / 2 + (frontLeft + backLeft) / 2;
+    
+    arma::vec3 psuedoX =  arma::normalise(left - right);
     psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
     psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+
+//--------------------------------------------------------------------
+    // Ground truth exp 1
+    // arma::vec3 centre =     {   1.0205,    0.6637,  0.025500};
+    // arma::vec3 frontRight = { 1.007544,  0.662266, -0.141178};
+    // arma::vec3 frontLeft =  { 1.016013,  0.661523,  0.196680};
+    // arma::vec3 backRight =  { 1.024875,  0.659862, -0.144267};
+    // arma::vec3 backLeft =   { 1.032640,  0.658253,  0.191176};
+    // // arma::vec3 top =        { 1.022050,  0.677163,  0.026080};
+    // arma::vec3 viewPoint =  {-1.092194,  0.977327,  0.076759};
+
+    // psmoveToMocap.translation() = centre;
+    // psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
+
+    // arma::vec3 psuedoX =  - (frontRight + backRight) / 2 + (frontLeft + backLeft) / 2;
+    // psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
+    // psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+//--------------------------------------------------------------------
 
     std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
@@ -206,7 +224,7 @@ int main(int argc, char* argv[])
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
-        glm::mat4 proj = glm::perspective(  float(39.11 * 3.14159 / 180.0),            //VERTICAL FOV
+        glm::mat4 proj = glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
                                             float(width) / float(height),  //aspect ratio
                                             0.01f,         //near plane distance (min z)
                                             10.0f           //Far plane distance (max z)
