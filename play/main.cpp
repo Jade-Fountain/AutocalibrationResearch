@@ -255,6 +255,7 @@ int main(int argc, char* argv[])
     double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);     
     // std::cout << "average draw framerate = " << double(frames) / finish_time << " Hz " << std::endl; 
     std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
+    sensorPlant.next();
     cvReleaseCapture(&video);  
     destroyGLWindow(window);
 }  

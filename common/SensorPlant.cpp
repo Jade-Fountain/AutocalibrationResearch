@@ -72,9 +72,8 @@ namespace autocal {
 		for (auto& cor : correlations){
 			if(correctGuesses.count(cor.first) == 0) correctGuesses[cor.first] = 0;
 			if(totalGuesses.count(cor.first) == 0) totalGuesses[cor.first] = 0;
-			correctGuesses[cor.first] += int(cor.first == 1 && cor.second == 18 ) +
-							  			int(cor.first == 2 && cor.second == 12 );
-			totalGuesses[cor.first] += int(cor.first == 1) + int(cor.first == 2);
+			correctGuesses[cor.first] += int(cor.first == 0 && cor.second == 2);
+			totalGuesses[cor.first] ++;
 		}
 		
 
