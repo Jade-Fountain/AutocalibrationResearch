@@ -47,7 +47,6 @@
 #include "glm/ext.hpp"
 
 #ifdef __APPLE__
-    // #include <OpenGL/gl.h>
     #include <GL/glew.h>  
 
     #include <GLFW/glfw3.h>  
@@ -239,7 +238,7 @@ int main(int argc, char* argv[])
             glLoadMatrixd(pose.memptr());  
             if(matches.size() > 0 && matches[0].second == rigidBodyID) {
                 glutSolidSphere(0.05, 10, 10);
-                std::cout << "matches RB" << rigidBodyID << std::endl; 
+                // std::cout << "matches RB" << rigidBodyID << std::endl; 
             }
             drawBasis(0.1);
         } 
