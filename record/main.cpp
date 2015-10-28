@@ -53,6 +53,14 @@
 #include "PSMoveUtils.h"
 #include "GraphicsTools.h"
 
+//Define the key input callback  
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
+{  
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)  
+    glfwSetWindowShouldClose(window, GL_TRUE);  
+   
+} 
+
 int main( void )  
 {  
     int width = 640;
@@ -60,7 +68,10 @@ int main( void )
 
     //Declare a window object  
     GLFWwindow* window = setUpGLWindow(width, height);
+    //Sets the key callback  
+    glfwSetKeyCallback(window, key_callback); 
 
+    
     Tracker psmoveTracker;
 
     psmoveTracker.init();

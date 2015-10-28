@@ -30,7 +30,7 @@ namespace autocal {
 	}
 
 
-	MocapStream::Frame MocapStream::createFrame(arma::mat m){
+	MocapStream::Frame MocapStream::createFrame(arma::mat m, bool reflectZ){
 		Frame f;
 		for(int n = 0; n < m.n_cols; n++){
 			arma::vec data = m.col(n);
@@ -63,6 +63,10 @@ namespace autocal {
 				r.pose.rotation() = Rotation3D(q_);
 			}else{
 				r.pose.rotation() = rot;
+			}
+
+			if(reflectZ){
+				r.pose.z() = -r.pose.z();
 			}
 
 			// std::cout << "data: " <<  data << std::endl;
@@ -125,7 +129,7 @@ namespace autocal {
 		return stream.lower_bound(t);
 	}
 	
-	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time){
+	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ){
 		std::cout << "Loading data ..." << std::endl;
 		std::cerr << "Loading data ..." << std::endl;
 
@@ -161,7 +165,7 @@ namespace autocal {
 				if(success){ 
 					//Do not store frame if it has no info
 					if(frame.n_cols!=0){
-						stream[timestamp] = createFrame(frame);
+						stream[timestamp] = createFrame(frame, reflectZ);
 					}
 				} else {
 					continue;

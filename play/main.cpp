@@ -63,6 +63,28 @@
 #include "SensorPlant.h"
 #include "MocapStream.h"
 
+
+autocal::TimeStamp latency = 1400;
+bool paused = false;
+//Define the key input callback  
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
+{  
+    if(action == GLFW_PRESS){
+        if (key == GLFW_KEY_ESCAPE) {
+            glfwSetWindowShouldClose(window, GL_TRUE);  
+        } else if(key == GLFW_KEY_COMMA) {
+            latency = latency - 1000;
+            std::cout << "latency = " << latency << std::endl;
+        } else if(key == GLFW_KEY_PERIOD){
+            latency = latency + 1000;
+            std::cout << "latency = " << latency << std::endl;
+        } else if(key == GLFW_KEY_P){
+            paused = !paused;
+        }
+    }
+        
+} 
+
 int main(int argc, char* argv[])  
 {  
     std::string video_filename;
@@ -78,7 +100,7 @@ int main(int argc, char* argv[])
         return -1;
     } else {
         fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
-        // fps = 15; 
+        // fps = 30; 
         width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
         height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
         std::cout << "Video load successful... FPS = " << fps << std::endl;
@@ -88,6 +110,9 @@ int main(int argc, char* argv[])
 
     //Declare a window object  
     GLFWwindow* window = setUpGLWindow(width, height);
+    //Sets the key callback  
+    glfwSetKeyCallback(window, key_callback);  
+  
     //Some GL options to configure for drawing
     glEnable(GL_TEXTURE_2D);
     GLuint texture;
@@ -102,16 +127,30 @@ int main(int argc, char* argv[])
     //Start timestamp
     std::string timeString = video_filename.substr(0,video_filename.size() - 4); //Remove .avi from filename
     autocal::TimeStamp videoStartTime = std::stoll(timeString);
-    std::cout << "videoStartTime = " << videoStartTime << " ms" << std::endl;
+    std::cout << "videoStartTime = " << videoStartTime << " micro sec" << std::endl;
     //Mocap stream
     autocal::MocapStream psmoveStream("psmove", false);
     psmoveStream.loadMocapData("psmovedata", videoStartTime,std::chrono::system_clock::now());
 
     autocal::MocapStream optitrackStream("mocap", true);
-    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now());
+    bool optitrackReflectZ = true;
+    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ);
 
     bool useSimulation = false;
     autocal::SensorPlant sensorPlant(useSimulation);
+    if(useSimulation){
+        //Exp 4 -...
+        autocal::MocapStream::SimulationParameters a1; 
+        autocal::MocapStream::SimulationParameters a2;
+        autocal::MocapStream::SimulationParameters d1; 
+        autocal::MocapStream::SimulationParameters d2; 
+        a2.noise.angle_stddev = 1;
+        d1.noise.disp_stddev = 2;
+        d2.noise.disp_stddev = 10;
+        int aN = 10;
+        int dN = 10;
+        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
+    }
     sensorPlant.addStream(psmoveStream);
     sensorPlant.addStream(optitrackStream);
 
@@ -153,21 +192,24 @@ int main(int argc, char* argv[])
 
     std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
-    bool useTruthForMatching = false;
-    sensorPlant.setGroundTruthTransform("psmove", "mocap", psmoveToMocap, useTruthForMatching);
+    // bool useTruthForMatching = false;
+    // sensorPlant.setGroundTruthTransform("psmove", "mocap", psmoveToMocap, useTruthForMatching);
 
     //Main Loop
     auto start = std::chrono::steady_clock::now();  
     int video_frames = 0; 
     do  
     {  
+        //Get and organize events, like keyboard and mouse input, window resizing, etc...  
+        glfwPollEvents(); 
+
         // frames++;
         auto now = std::chrono::steady_clock::now();    
         double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
 
         autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
         
-        if(video_frames * frame_duration < frame_time_since_start){
+        if(video_frames * frame_duration < frame_time_since_start && !paused){
             video_frames++;
         } else {
             continue;
@@ -224,8 +266,13 @@ int main(int argc, char* argv[])
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
-        glm::mat4 proj = glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
-                                            float(width) / float(height),  //aspect ratio
+        glm::mat4 proj =
+
+            // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
+            // image->width, image->height, 0.01f, 10.0f);
+
+         glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
+                                            float(image->width) / float(image->height),  //aspect ratio
                                             0.01f,         //near plane distance (min z)
                                             10.0f           //Far plane distance (max z)
                                             );
@@ -246,7 +293,7 @@ int main(int argc, char* argv[])
             drawBasis(0.1);
         } 
 
-        autocal::MocapStream::Frame optitrackFrame = optitrackStream.getFrame(current_timestamp);
+        autocal::MocapStream::Frame optitrackFrame = optitrackStream.getFrame(current_timestamp + latency);
         for(auto& pair : optitrackFrame.rigidBodies){
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
@@ -255,6 +302,9 @@ int main(int argc, char* argv[])
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  
             if(matches.size() > 0 && matches[0].second == rigidBodyID) {
+                glEnable(GL_LIGHTING);
+                GLfloat z_diff[4] = {1.0, 1.0, 1.0, 1.0};
+                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, z_diff);
                 glutSolidSphere(0.05, 10, 10);
                 // std::cout << "matches RB" << rigidBodyID << std::endl; 
             }
@@ -264,8 +314,7 @@ int main(int argc, char* argv[])
 
         //Swap buffers  
         glfwSwapBuffers(window);  
-        //Get and organize events, like keyboard and mouse input, window resizing, etc...  
-        glfwPollEvents();  
+ 
   
     } while (!glfwWindowShouldClose(window));   //Check if the ESC key had been pressed or if the window had been closed
     auto now = std::chrono::steady_clock::now();    

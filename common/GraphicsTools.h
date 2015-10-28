@@ -15,14 +15,7 @@ static void error_callback(int error, const char* description)
     fputs(description, stderr);  
     getchar();  
 }  
-  
-//Define the key input callback  
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
-{  
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)  
-    glfwSetWindowShouldClose(window, GL_TRUE);  
-   
-} 
+
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -110,9 +103,6 @@ static GLFWwindow* setUpGLWindow(int w, int h)
   
     //This function makes the context of the specified window current on the calling thread.   
     glfwMakeContextCurrent(window);  
-  
-    //Sets the key callback  
-    glfwSetKeyCallback(window, key_callback);  
   
     //Initialize GLEW  
     glewExperimental = GL_TRUE;
