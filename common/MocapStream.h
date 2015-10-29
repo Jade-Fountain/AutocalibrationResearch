@@ -5,6 +5,7 @@ This code is part of mocap-kinect experiments*/
 #include <chrono>
 #include <dirent.h>
 #include <map>
+#include <set>
 #include "utility/math/matrix/Transform3D.h"
 #include "utility/math/matrix/Rotation3D.h"
 #include "utility/math/geometry/UnitQuaternion.h"
@@ -125,7 +126,7 @@ namespace autocal {
 			return std::chrono::duration_cast<std::chrono::microseconds>(t.time_since_epoch()).count();
 		}
 
-		Frame createFrame(arma::mat m, bool reflectZ);
+		Frame createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs);
 
 		TimeStamp streamStart;
 
@@ -166,7 +167,7 @@ namespace autocal {
 		
 
 		//Heavy functions
-		bool loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ = false);
+		bool loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ = false, const std::set<int>& allowedIDs = std::set<int>());
 
 		bool setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose);
 		

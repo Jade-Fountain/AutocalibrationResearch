@@ -134,7 +134,8 @@ int main(int argc, char* argv[])
 
     autocal::MocapStream optitrackStream("mocap", true);
     bool optitrackReflectZ = true;
-    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ);
+    std::set<int> mocapAllowedIDs = {1,2};
+    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ, mocapAllowedIDs);
 
     bool useSimulation = false;
     autocal::SensorPlant sensorPlant(useSimulation);

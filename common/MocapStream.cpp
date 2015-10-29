@@ -30,7 +30,7 @@ namespace autocal {
 	}
 
 
-	MocapStream::Frame MocapStream::createFrame(arma::mat m, bool reflectZ){
+	MocapStream::Frame MocapStream::createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs){
 		Frame f;
 		// std::cout << "Loading " << m.n_cols << " rigid bodies" << std::endl;
 		// std::cout << m << std::endl;
@@ -80,7 +80,10 @@ namespace autocal {
 				continue;
 			}
 			
-			f.rigidBodies[int(data[0])] = r;
+			if(allowedIDs.empty() //empty allowed IDs means allow any
+			|| allowedIDs.count(int(data[0])) > 0){
+				f.rigidBodies[int(data[0])] = r;
+			}
 		}
 		return f;
 	}
@@ -135,7 +138,7 @@ namespace autocal {
 		return stream.lower_bound(t);
 	}
 	
-	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ){
+	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ, const std::set<int>& allowedIDs){
 		std::cout << "Loading data ..." << std::endl;
 		std::cerr << "Loading data ..." << std::endl;
 
@@ -171,7 +174,7 @@ namespace autocal {
 				if(success){ 
 					//Do not store frame if it has no info
 					if(frame.n_cols!=0){
-						stream[timestamp] = createFrame(frame, reflectZ);
+						stream[timestamp] = createFrame(frame, reflectZ, allowedIDs);
 					}
 				} else {
 					continue;
