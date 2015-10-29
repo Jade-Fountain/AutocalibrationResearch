@@ -55,9 +55,9 @@ namespace psmove {
 		autocal::SensorPlant sensorPlant;
 
 		//TODO: make better callback system
-		static autocal::TimeStamp psMoveLatency;
-		static bool paused;
- 		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods); 
+		int psMoveLatency;
+		bool paused;
+ 		void handleInput(GLFWwindow* window, double time_since_start); 
 		
 
     public:

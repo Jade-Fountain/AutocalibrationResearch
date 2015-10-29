@@ -16,6 +16,7 @@ FUNCTION(ToolchainLibraryFinder)
         # Find our include path
         FIND_PATH("${PACKAGE_NAME}_INCLUDE_DIR"
                   NAMES ${PACKAGE_HEADER}
+                  PATHS "/usr/local/opt/${PACKAGE_LIBRARY}/include"
                   DOC "The ${PACKAGE_NAME} (${PACKAGE_LIBRARY}) include directory"
         )
 
@@ -30,6 +31,7 @@ FUNCTION(ToolchainLibraryFinder)
     IF(PACKAGE_LIBRARY)
         FIND_LIBRARY("${PACKAGE_NAME}_LIBRARY"
                      NAMES ${PACKAGE_LIBRARY}
+                     PATHS "/usr/local/opt/${PACKAGE_LIBRARY}/lib"
                      DOC "The ${PACKAGE_NAME} (${PACKAGE_LIBRARY}) library"
         )
 

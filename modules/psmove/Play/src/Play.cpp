@@ -52,24 +52,46 @@ namespace psmove {
     using messages::support::Configuration;
 
     //Define the key input callback  
- 	void Play::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
-	{  
+	void Play::handleInput(GLFWwindow* window, double time_since_start){
 
-	    if(action == GLFW_PRESS){
-	        if (key == GLFW_KEY_ESCAPE) {
-	            glfwSetWindowShouldClose(window, GL_TRUE);  
-	        } else if(key == GLFW_KEY_COMMA) {
-	            psMoveLatency = psMoveLatency - 1000;
-	            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
-	        } else if(key == GLFW_KEY_PERIOD){
-	            psMoveLatency = psMoveLatency + 1000;
-	            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
-	        } else if(key == GLFW_KEY_P){
-	            paused = !paused;
-	        }
-	    }
-	        
-	} 
+        if(glfwGetKey(window,GLFW_KEY_COMMA)){
+            psMoveLatency = psMoveLatency - 1000;
+            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
+        }
+        if(glfwGetKey(window,GLFW_KEY_PERIOD)){
+            psMoveLatency = psMoveLatency + 1000;
+            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
+        }
+        if(glfwGetKey(window,GLFW_KEY_ESCAPE)){
+            glfwSetWindowShouldClose(window, GL_TRUE);
+        }
+        if(glfwGetKey(window,GLFW_KEY_P)){
+        	paused = !paused;
+        }
+
+        //TODO: better camera
+        // if(glfwGetKey(window,GLFW_KEY_S)){
+        //     cam.moveLocal(glm::vec3(0,0,velocity));
+        // }
+        // if(glfwGetKey(window,GLFW_KEY_D)){
+        //     cam.moveLocal(glm::vec3(velocity,0.0,0));
+        // }
+        // if(glfwGetKey(window,GLFW_KEY_E)){
+        //     cam.moveLocal(glm::vec3(0.0,velocity,0));
+        // }
+        // if(glfwGetKey(window,GLFW_KEY_Q)){
+        //     cam.moveLocal(glm::vec3(0.0,-velocity,0));
+        // }
+
+
+        // double xpos, ypos;
+        // double rotation_vel_x = 0.01;
+        // double rotation_vel_y = 0.01;
+        // glfwGetCursorPos(window, &xpos, &ypos);
+        // float yaw = rotation_vel_x * xpos;
+        // float pitch = rotation_vel_y * ypos;
+        // cam.updateRotation(-yaw,-pitch);
+    }
 
     Play::Play(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)) {
@@ -103,8 +125,6 @@ namespace psmove {
 
 		    //Declare a window object  
 		    window = setUpGLWindow(width, height);
-		    //Sets the key callback  
-		    glfwSetKeyCallback(window, key_callback);  
 		  
 		    //Some GL options to configure for drawing
 		    glEnable(GL_TEXTURE_2D);
@@ -194,14 +214,15 @@ namespace psmove {
 		    video_frames = 0; 
         });
 
-        on<Every<60,Per<std::chrono::seconds>>>().then([this]{
+        on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
+	        // frames++;
+	        auto now = std::chrono::steady_clock::now();    
+	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
 
 	        //Get and organize events, like keyboard and mouse input, window resizing, etc...  
 	        glfwPollEvents(); 
 
-	        // frames++;
-	        auto now = std::chrono::steady_clock::now();    
-	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
+	        handleInput(window, frame_time_since_start);
 
 	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
 	        
