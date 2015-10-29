@@ -49,31 +49,32 @@ namespace geometry {
             kY() = ( a(0,2) - a(2,0) ) * s;
             kZ() = ( a(1,0) - a(0,1) ) * s;
         } else {
-        if ( a(0,0) > a(1,1) && a(0,0) > a(2,2) ) {
-            float s = 2.0f * sqrtf( 1.0f + a(0,0) - a(1,1) - a(2,2));
-            kW() = (a(2,1) - a(1,2) ) / s;
-            kX() = 0.25f * s;
-            kY() = (a(0,1) + a(1,0) ) / s;
-            kZ() = (a(0,2) + a(2,0) ) / s;
-        } else if (a(1,1) > a(2,2)) {
-            float s = 2.0f * sqrtf( 1.0f + a(1,1) - a(0,0) - a(2,2));
-            kW() = (a(0,2) - a(2,0) ) / s;
-            kX() = (a(0,1) + a(1,0) ) / s;
-            kY() = 0.25f * s;
-            kZ() = (a(1,2) + a(2,1) ) / s;
-        } else {
-            float s = 2.0f * sqrtf( 1.0f + a(2,2) - a(0,0) - a(1,1) );
-            kW() = (a(1,0) - a(0,1) ) / s;
-            kX() = (a(0,2) + a(2,0) ) / s;
-            kY() = (a(1,2) + a(2,1) ) / s;
-            kZ() = 0.25f * s;
+            if ( a(0,0) > a(1,1) && a(0,0) > a(2,2) ) {
+                float s = 2.0f * sqrtf( 1.0f + a(0,0) - a(1,1) - a(2,2));
+                kW() = (a(2,1) - a(1,2) ) / s;
+                kX() = 0.25f * s;
+                kY() = (a(0,1) + a(1,0) ) / s;
+                kZ() = (a(0,2) + a(2,0) ) / s;
+            } else if (a(1,1) > a(2,2)) {
+                float s = 2.0f * sqrtf( 1.0f + a(1,1) - a(0,0) - a(2,2));
+                kW() = (a(0,2) - a(2,0) ) / s;
+                kX() = (a(0,1) + a(1,0) ) / s;
+                kY() = 0.25f * s;
+                kZ() = (a(1,2) + a(2,1) ) / s;
+            } else {
+                float s = 2.0f * sqrtf( 1.0f + a(2,2) - a(0,0) - a(1,1) );
+                kW() = (a(1,0) - a(0,1) ) / s;
+                kX() = (a(0,2) + a(2,0) ) / s;
+                kY() = (a(1,2) + a(2,1) ) / s;
+                kZ() = 0.25f * s;
+            }
         }
-
+        
         if(!is_finite()){
             std::cout << "Quaternion is not finite!" << std::endl;
         }
-  }
     }
+    
 
     UnitQuaternion::UnitQuaternion(double realPart, const arma::vec3& imaginaryPart) {
         real() = realPart;

@@ -47,6 +47,11 @@ namespace autocal {
 					diff1 > difference_threshold || 
 					diff2 > difference_threshold)
 				{
+					//Check if bad sample:	
+					UnitQuaternion q1(Rotation3D(T1.rotation()));
+					UnitQuaternion q2(Rotation3D(T2.rotation()));
+					if(q1.kW() == 0 || q2.kW() == 0) return;
+
 					if(recordedStates[key].first.size() >= number_of_samples){
 						recordedStates[key].first.erase(recordedStates[key].first.begin());
 						recordedStates[key].first.push_back(T1);
@@ -57,7 +62,6 @@ namespace autocal {
 					} else {
 						recordedStates[key].first.push_back(T1);
 						recordedStates[key].second.push_back(T2);
-						return;
 					}
 				}
 
@@ -77,8 +81,8 @@ namespace autocal {
 					score = score / totalScores[id1];
 					//Eliminate
 					if(score < elimination_score_threshold && eliminatedHypotheses.count(pairID) == 0){
-						// eliminatedHypotheses.insert(pairID);
-						// std::cout << "Eliminated: [" << pairID.first << "," << pairID.second << "]" << std::endl;
+						eliminatedHypotheses.insert(pairID);
+						std::cout << "Eliminated: [" << pairID.first << "," << pairID.second << "]" << std::endl;
 					}						
 				}
 			}
