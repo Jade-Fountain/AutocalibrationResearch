@@ -1,154 +1,100 @@
-##cmake_minimum_required(VERSION 2.6)
-##project(NUGRAPICS)
-##
-##SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-##
-##SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -O2 -Wpedantic -Wextra -Wall -Wno-unused-parameter -std=c++11" )
-##
-###There are lots of scripts with cmake
-###for finding external libraries. 
-###see /usr/local/share/cmake-2.6/Modules/Find*.cmake for more examples
-##find_package(GLUT)
-##find_package(OpenGL)
-##find_package(GLM)
-##find_package(GLFW)
-##find_package(GLM)
-##find_package(assimp)
-##
-##set(SOIL_INCLUDE_DIR /usr/local/include)
-##set(SOIL_LIBRARY /usr/local/lib/libSOIL.a)
-##
-##INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR} REQUIRED)
-##INCLUDE_DIRECTORIES(${GLUT_INCLUDE_DIR} REQUIRED)
-##INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR} REQUIRED)
-##INCLUDE_DIRECTORIES(${GLFW_INCLUDE_DIR} REQUIRED)
-##INCLUDE_DIRECTORIES(${GLM_INCLUDE_DIR} REQUIRED)
-##INCLUDE_DIRECTORIES(${ASSIMP_INCLUDE_DIR} REQUIRED)
-##INCLUDE_DIRECTORIES(${SOIL_INCLUDE_DIR} REQUIRED)
-##
-### TODO copy over shader folders
-##
-### Get our configuration files
-##
-##add_subdirectory(src)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(NUGRAPHICS_project)
+PROJECT(Autocalibration)
+
 SET(VERSION_MAJOR 0)
-SET(VERSION_MINOR 1)
+SET(VERSION_MINOR 2)
 SET(VERSION_PATCH 0)
 
-# Tell CMake where to find our CMake modules
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+# Set to off to ignore building tests
+OPTION(BUILD_TESTS "Builds all of the tests for each module." OFF)
 
-set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_OSX_ARCHITECTURES "x86_64")
+# Set to on to build the report
+OPTION(BUILD_REPORT "Builds the report from the latex source files." OFF)
 
-# Compiler settings
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -O0 -Wpedantic -Wextra -Wall -Wno-unused-parameter -std=c++11" )
-ADD_DEFINITIONS(-DGLEW_STATIC)
-ADD_DEFINITIONS(-DGLM_FORCE_RADIANS)
-ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+# Set to on to build as shared libraries
+OPTION(SHARED_BUILD "Build the binaries by linking to shared libraries." ON)
 
-# Shared libraries
-FIND_PACKAGE(OpenGL REQUIRED)
-FIND_PACKAGE(GLEW REQUIRED)
-FIND_PACKAGE(GLFW REQUIRED)
-FIND_PACKAGE(GLM REQUIRED)
-FIND_PACKAGE(GLUT REQUIRED)
-FIND_PACKAGE(JPEG REQUIRED)
-FIND_PACKAGE(PNG REQUIRED)
-FIND_PACKAGE(png++ REQUIRED)
-FIND_PACKAGE(Boost COMPONENTS system filesystem REQUIRED)
-FIND_PACKAGE(assimp REQUIRED)
-FIND_PACKAGE(armadillo REQUIRED)
-FIND_PACKAGE(OPENCV REQUIRED)
-FIND_PACKAGE(LIBUSB REQUIRED)
+# Set on to prefer .a files over .so files for linking
+OPTION(STATIC_LIBRARIES "Prefer using static .a files rather than .so files. NOTE: This must be enabled from the start!" OFF)
 
-find_library(FOUNDATION Foundation)
-find_library(AVFOUNDATION AVFoundation)
-find_library(IOKIT IOKit)
-find_library(COREFOUNDATION CoreFoundation)
-find_library(IOBLUETOOTH IOBluetooth)
-list(APPEND PSMOVEAPI_REQUIRED_LIBS ${FOUNDATION})
-list(APPEND PSMOVEAPI_REQUIRED_LIBS ${AVFOUNDATION})
-list(APPEND PSMOVEAPI_REQUIRED_LIBS ${IOKIT})
-list(APPEND PSMOVEAPI_REQUIRED_LIBS ${COREFOUNDATION})
-list(APPEND PSMOVEAPI_REQUIRED_LIBS ${IOBLUETOOTH})
+IF(STATIC_LIBRARIES)
+    SET(CMAKE_FIND_LIBRARY_SUFFIXES
+        ${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${CMAKE_SHARED_LIBRARY_SUFFIX})
+ENDIF()
 
-message(PSMOVEAPI_REQUIRED_LIBS= ${PSMOVEAPI_REQUIRED_LIBS})
+# Set some of our variables which we never use as advanced
+MARK_AS_ADVANCED(CMAKE_INSTALL_PREFIX
+                 CURSES_CURSES_H_PATH
+                 CURSES_FORM_LIBRARY
+                 CURSES_HAVE_CURSES_H
+                 OMPLAPP_LIBRARY
+                 OMPL_CONFIG
+                 OMPL_DIR
+                 OMPL_INCLUDE_DIRS
+                 OMPL_LIBRARIES
+                 OMPL_LIBRARY)
 
-#psmove
-set(PSMOVEAPI_INCLUDE_DIR /usr/local/psmoveapi/include)
-set(PSMOVEAPI_LIBRARY #/usr/local/psmoveapi/lib64/libpsmoveapi.dylib
-                      /usr/local/psmoveapi/lib64/libpsmoveapi_static.a
-                      #/usr/local/psmoveapi/lib64/libpsmoveapi.3.1.0.dylib
-    ) 
-set(PSMOVEAPI_TRACKER_LIBRARY #/usr/local/psmoveapi/lib64/libpsmoveapi_tracker.dylib
-                              /usr/local/psmoveapi/lib64/libpsmoveapi_tracker_static.a
-                              #/usr/local/psmoveapi/lib64/libpsmoveapi_tracker.3.1.0.dylib
-                              )
+# We use additional modules that cmake needs to know about
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/tools/cmake/")
 
-#soil image lib
-set(SOIL_INCLUDE_DIR /usr/local/include)
-set(SOIL_LIBRARY /usr/local/lib/libSOIL.a)
+# Setup our compiler settings
+INCLUDE(Compiler)
 
-INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${GLFW_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${GLM_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${GLUT_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${JPEG_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${libpng++_INCLUDE_DIRS} REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${SOIL_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${ARMADILLO_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${LibUSB_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${ASSIMP_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${PSMOVEAPI_INCLUDE_DIR} REQUIRED)
-INCLUDE_DIRECTORIES(${PSMOVEAPI_TRACKER_INCLUDE_DIR} REQUIRED)
+# Setup our shared includes
+INCLUDE(SharedLibraries)
 
+# Include our module builder
+INCLUDE(NUClearModuleBuilder)
 
-FILE(GLOB_RECURSE COMMON_SRC
-      "common/**.cpp"
-    )
+# Include our shared messages etc headers
+INCLUDE_DIRECTORIES("shared")
+INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/shared")
 
-set(COMMON_SRC  ${COMMON_SRC}
-                utility/math/matrix/Transform3D.cpp
-                utility/math/matrix/Rotation3D.cpp
-                utility/math/geometry/UnitQuaternion.cpp)
+# This will generate any .proto files in the messages folder
+ADD_SUBDIRECTORY(shared/messages)
+# This will build our Utilities library (common functionality)
+ADD_SUBDIRECTORY(shared/utility)
 
-INCLUDE_DIRECTORIES(".")
-add_library(COMMON_LIB ${COMMON_SRC})
-SET_PROPERTY(TARGET COMMON_LIB PROPERTY ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+# Add these to our shared libraries (started in our shared libraries cmake)
+# We include utility again at the end for any "shim" functions that are needed in libraries
+SET(NUBOTS_SHARED_LIBRARIES messages utility ${NUBOTS_SHARED_LIBRARIES} utility)
 
+# Build tests in test mode
+IF(BUILD_TESTS)
+    ENABLE_TESTING()
 
-set(LIBRARIES
-    COMMON_LIB
-    ${OPENGL_gl_LIBRARY}
-    ${GLEW_LIBRARY}
-    ${GLFW_LIBRARIES}
-    ${GLUT_LIBRARIES}
-    ${JPEG_LIBRARIES}
-    ${PNG_LIBRARIES}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${ASSIMP_LIBRARIES}
-    ${SOIL_LIBRARY}
-    ${LibUSB_LIBRARIES}
-    ${OpenCV_LIBS}
-    ${PSMOVEAPI_LIBRARY}
-    ${PSMOVEAPI_TRACKER_LIBRARY}
-    ${ARMADILLO_LIBRARY}
-    ${PSMOVEAPI_REQUIRED_LIBS})
+    # Add the tests subdirectories
+    ADD_SUBDIRECTORY("tests/shared/utility")
+ENDIF()
 
-#Add subdirectories
-FILE(GLOB EXECUTABLES
-      "*"
-    )
-message(EXECUTABLES = ${EXECUTABLES})
-foreach(CURRENT_FOLDER record view play)
-  add_subdirectory(${CURRENT_FOLDER})
-endforeach()
+# Clear or NUClear Modules cache variable
+UNSET(NUCLEAR_MODULES CACHE)
+
+# Find and build all our roles
+ADD_SUBDIRECTORY(roles)
+
+# Remove any duplicate modules (used in more then one role)
+SET(modules ${NUCLEAR_MODULES})
+LIST(REMOVE_DUPLICATES modules)
+SET(NUCLEAR_MODULES ${modules} CACHE INTERNAL "A list of the modules in use by the system" FORCE)
+
+# Clear our report files before reading (cmake scopes suck... could be fixed one day but who cares!)
+UNSET(report_tex_files CACHE)
+UNSET(report_bib_files CACHE)
+
+# Build each of our modules and their corresponding tests
+FOREACH(module ${NUCLEAR_MODULES})
+    STRING(REPLACE "::" "/" modulepath "${module}")
+    STRING(REPLACE "::" "" modulename "${module}")
+
+    # Add the subdirectories
+    ADD_SUBDIRECTORY(modules/${modulepath})
+ENDFOREACH()
+
+IF(BUILD_REPORT)
+    ADD_SUBDIRECTORY(report)
+ENDIF(BUILD_REPORT)
+
+# Include our scp darwin sender
+INCLUDE(DarwinSend)
