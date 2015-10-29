@@ -11,7 +11,7 @@ namespace autocal {
 	using utility::math::matrix::Transform3D;
 
 	//match each rigid body in stream 1 with a rigid body in stream 2
-	std::vector<std::pair<int,int>> SensorPlant::matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now){
+	std::vector<std::pair<int,int>> SensorPlant::matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1){
 		// std::cout << "FRAME BEGIN"  << std::endl;
 		auto start = std::chrono::high_resolution_clock::now();
 
@@ -37,11 +37,11 @@ namespace autocal {
 		
 		//if we simulate the data, derive it from the second stream
 		if(simulate){
-			currentState1 = stream2.getCompleteSimulatedStates(now, {18,12}, simParams.front());
+			currentState1 = stream2.getCompleteSimulatedStates(now + latencyOfStream1, {18,12}, simParams.front());
 		} else {
 			MocapStream& stream1 = mocapRecording.getStream(stream_name_1);
 			if(stream1.size() == 0) return empty_result;
-     		currentState1 = stream1.getCompleteStates(now);
+     		currentState1 = stream1.getCompleteStates(now + latencyOfStream1);
 		}
 
 		//Update statistics
@@ -107,8 +107,8 @@ namespace autocal {
 
 	void SensorPlant::setGroundTruthTransform(std::string streamA, std::string streamB, Transform3D mapAtoB, bool useTruth){
 		groundTruthTransforms[std::make_pair(streamA, streamB)] = mapAtoB;
-		//HACK CORRECTION
-		groundTruthTransforms[std::make_pair(streamA, streamB)].translation() += arma::vec3{-0.38,0,0};
+		//HACK CORRECTION (for kinect, no longer necessary)
+		// groundTruthTransforms[std::make_pair(streamA, streamB)].translation() += arma::vec3{-0.38,0,0};
 		// std::cout << "groundTruthTransforms \n" << groundTruthTransforms[std::make_pair(streamA, streamB)]<<  std::endl;
 
 		if(useTruth){
@@ -140,8 +140,8 @@ namespace autocal {
 	}
 
 	
-	std::map<int, Transform3D> SensorPlant::getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now){
-		std::map<int, Transform3D> truth;
+	autocal::MocapStream::Frame SensorPlant::getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now){
+		autocal::MocapStream::Frame truth;
 		auto key = std::make_pair(stream, desiredBasis);
 		if(groundTruthTransforms.count(key) != 0 && mocapRecording.streamPresent(stream)){
 			//Get the transform between coordinate systems
@@ -152,7 +152,7 @@ namespace autocal {
 
 			//Loop through and record transformed rigid body poses
 			for (auto& rb : latestFrame.rigidBodies){
-				truth[rb.first] = streamToDesiredBasis * rb.second.pose;
+				truth.rigidBodies[rb.first].pose = streamToDesiredBasis * rb.second.pose;
 			}
 		} else {
 			std::cout << "WARNING: ATTEMPTING TO ACCESSING GROUND TRUTH WHEN NONE EXISTS!!!" << std::endl;

@@ -32,9 +32,11 @@ namespace autocal {
 
 	MocapStream::Frame MocapStream::createFrame(arma::mat m, bool reflectZ){
 		Frame f;
+		// std::cout << "Loading " << m.n_cols << " rigid bodies" << std::endl;
+		// std::cout << m << std::endl;
 		for(int n = 0; n < m.n_cols; n++){
 			arma::vec data = m.col(n);
-			
+
 			RigidBody r;
 			
 			arma::vec3 pos = data.rows(1,3);
@@ -73,6 +75,10 @@ namespace autocal {
 			// std::cout << "id:" << int(data[0]) << std::endl;
 			// std::cout << "position:" << r.pose.translation() << std::endl;
 			// std::cout << "rotation:" << r.pose.rotation() << std::endl;
+			if(!r.pose.is_finite()) {
+				std::cout << __FILE__ << " - " << __LINE__ << "Warning: nan data not loaded for RB " << int(data[0]) << std::endl;
+				continue;
+			}
 			
 			f.rigidBodies[int(data[0])] = r;
 		}

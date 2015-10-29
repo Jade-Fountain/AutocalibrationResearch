@@ -31,14 +31,48 @@ namespace geometry {
         imaginary().zeros();
     }
 
-    UnitQuaternion::UnitQuaternion(const Rotation3D& rotation) {
-        real() = std::sqrt(1.0 + rotation(0,0) + rotation(1,1) + rotation(2,2)) / 2;
-        double w4 = 4.0 * real();
-        imaginary() = arma::vec3({
-            (rotation(2,1) - rotation(1,2)) / w4,
-            (rotation(0,2) - rotation(2,0)) / w4,
-            (rotation(1,0) - rotation(0,1)) / w4
-        });
+    UnitQuaternion::UnitQuaternion(const Rotation3D& a) {
+        // real() = std::sqrt(1.0 + rotation(0,0) + rotation(1,1) + rotation(2,2)) / 2;
+        // double w4 = 4.0 * real();
+        // imaginary() = arma::vec3({
+        //     (rotation(2,1) - rotation(1,2)) / w4,
+        //     (rotation(0,2) - rotation(2,0)) / w4,
+        //     (rotation(1,0) - rotation(0,1)) / w4
+        // });
+
+        //Code from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+        float trace = a(0,0) + a(1,1) + a(2,2); // I removed + 1.0f; see discussion with Ethan
+        if( trace > 0 ) {// I changed M_EPSILON to 0
+            float s = 0.5f / sqrtf(trace+ 1.0f);
+            kW() = 0.25f / s;
+            kX() = ( a(2,1) - a(1,2) ) * s;
+            kY() = ( a(0,2) - a(2,0) ) * s;
+            kZ() = ( a(1,0) - a(0,1) ) * s;
+        } else {
+        if ( a(0,0) > a(1,1) && a(0,0) > a(2,2) ) {
+            float s = 2.0f * sqrtf( 1.0f + a(0,0) - a(1,1) - a(2,2));
+            kW() = (a(2,1) - a(1,2) ) / s;
+            kX() = 0.25f * s;
+            kY() = (a(0,1) + a(1,0) ) / s;
+            kZ() = (a(0,2) + a(2,0) ) / s;
+        } else if (a(1,1) > a(2,2)) {
+            float s = 2.0f * sqrtf( 1.0f + a(1,1) - a(0,0) - a(2,2));
+            kW() = (a(0,2) - a(2,0) ) / s;
+            kX() = (a(0,1) + a(1,0) ) / s;
+            kY() = 0.25f * s;
+            kZ() = (a(1,2) + a(2,1) ) / s;
+        } else {
+            float s = 2.0f * sqrtf( 1.0f + a(2,2) - a(0,0) - a(1,1) );
+            kW() = (a(1,0) - a(0,1) ) / s;
+            kX() = (a(0,2) + a(2,0) ) / s;
+            kY() = (a(1,2) + a(2,1) ) / s;
+            kZ() = 0.25f * s;
+        }
+
+        if(!is_finite()){
+            std::cout << "Quaternion is not finite!" << std::endl;
+        }
+  }
     }
 
     UnitQuaternion::UnitQuaternion(double realPart, const arma::vec3& imaginaryPart) {

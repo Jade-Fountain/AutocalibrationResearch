@@ -110,7 +110,11 @@ namespace autocal{
 
 			//Compute G in Gw = C
 			if(std::fabs(a0) < 1e-10){
-				std::cout << "\n\n\n\n\nBAD SAMPLE\n\n\n\n" << std::endl; 
+				std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: BAD SAMPLED ROTATION - RETURNING IDENTITY" << std::endl;
+				std::cout << " A = \n" << A <<  std::endl;
+				std::cout << " A * A.i() = \n" << A * A.i() <<  std::endl;
+				std::cout << " quat_a = \n" << quat_a <<  std::endl;
+				success = false;
 				return std::pair<Transform3D, Transform3D>(); 
 			}
 
@@ -136,6 +140,16 @@ namespace autocal{
 		if(!wSuccess){
 			//If SVD fails, return identity
 			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;
+			std::cout << "combinedG = " << combinedG << std::endl;
+			std::cout << "combinedC = " << combinedC << std::endl;
+			int sampleNum = 0;
+			for(auto& sample : samplesA){
+				std::cout << " sampleA[" << sampleNum++ << "] =\n" << sample << std::endl;
+			}
+			sampleNum = 0;
+			for(auto& sample : samplesB){
+				std::cout << " sampleB[" << sampleNum++ << "] =\n" << sample << std::endl;
+			}
 			success = false;
 			return std::pair<Transform3D, Transform3D>(X,Y);
 		}
@@ -145,6 +159,7 @@ namespace autocal{
 		y[0] = 1 / std::sqrt(1 + w[3]*w[3] + w[4]*w[4] + w[5]*w[5]); 
 		if (std::fabs(y[0])< 1e-3){
 			std::cout << "\n\n\n\n\n\n\ny[0] == 0 so you need to rotate the ref base with respect to the base\n\n\n\n\n\n\n" << std::endl; 
+			success = false;
 			return std::pair<Transform3D, Transform3D>(); 
 		}
 		y.rows(1,3) = y[0] * w.rows(3,5); 

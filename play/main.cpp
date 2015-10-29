@@ -64,7 +64,7 @@
 #include "MocapStream.h"
 
 
-autocal::TimeStamp latency = 1400;
+autocal::TimeStamp psMoveLatency = -1400;
 bool paused = false;
 //Define the key input callback  
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
@@ -73,11 +73,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         if (key == GLFW_KEY_ESCAPE) {
             glfwSetWindowShouldClose(window, GL_TRUE);  
         } else if(key == GLFW_KEY_COMMA) {
-            latency = latency - 1000;
-            std::cout << "latency = " << latency << std::endl;
+            psMoveLatency = psMoveLatency - 1000;
+            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
         } else if(key == GLFW_KEY_PERIOD){
-            latency = latency + 1000;
-            std::cout << "latency = " << latency << std::endl;
+            psMoveLatency = psMoveLatency + 1000;
+            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
         } else if(key == GLFW_KEY_P){
             paused = !paused;
         }
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
     std::cout << "videoStartTime = " << videoStartTime << " micro sec" << std::endl;
     //Mocap stream
     autocal::MocapStream psmoveStream("psmove", false);
-    psmoveStream.loadMocapData("psmovedata", videoStartTime,std::chrono::system_clock::now());
+    psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
 
     autocal::MocapStream optitrackStream("mocap", true);
     bool optitrackReflectZ = true;
@@ -192,8 +192,8 @@ int main(int argc, char* argv[])
 
     std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
-    // bool useTruthForMatching = false;
-    // sensorPlant.setGroundTruthTransform("psmove", "mocap", psmoveToMocap, useTruthForMatching);
+    bool useTruthForMatching = false;
+    sensorPlant.setGroundTruthTransform("mocap","psmove", psmoveToMocap.i(), useTruthForMatching);
 
     //Main Loop
     auto start = std::chrono::steady_clock::now();  
@@ -278,26 +278,30 @@ int main(int argc, char* argv[])
                                             );
         glLoadMatrixf(glm::value_ptr(proj));
 
-        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp);
+        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, psMoveLatency);
 
-        autocal::MocapStream::Frame psmoveFrame = psmoveStream.getFrame(current_timestamp);
+        autocal::MocapStream::Frame psmoveFrame = sensorPlant.getStream("psmove").getFrame(current_timestamp + psMoveLatency);
+        // autocal::MocapStream::Frame psmoveFrame = psmoveStream.getFrame(current_timestamp + psMoveLatency);
         Transform3D psmovePose;
         for(auto& pair : psmoveFrame.rigidBodies){
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
             psmovePose = rigidBody.pose;
-            // std::cout << "psmove pose = \n" << pose << std::endl;
+            // std::cout << "psmove pose = \n" << psmovePose << std::endl;
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(psmovePose.memptr());  
             
             drawBasis(0.1);
         } 
 
-        autocal::MocapStream::Frame optitrackFrame = optitrackStream.getFrame(current_timestamp + latency);
+        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
+        // autocal::MocapStream::Frame optitrackFrame = sensorPlant.getStream("mocap").getFrame(current_timestamp);
         for(auto& pair : optitrackFrame.rigidBodies){
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
-            Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
+            Transform3D pose = rigidBody.pose;
+            // std::cout << "mocap RB" << rigidBodyID << " pose = \n" << pose << std::endl;
+            // Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
             // pose = pose.i();
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  

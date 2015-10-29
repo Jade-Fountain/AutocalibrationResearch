@@ -38,6 +38,10 @@ namespace autocal {
 
 		MocapRecording mocapRecording;
 
+		MocapStream& getStream(std::string name){
+			return mocapRecording.getStream(name);
+		}
+
 		void addStream(const MocapStream& s){
 			mocapRecording.getStream(s.name()) = s;
 		}
@@ -48,7 +52,7 @@ namespace autocal {
 		
 		std::vector<std::pair<int,int>> getCorrelationsOfInvariants(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
 		
-		std::vector<std::pair<int,int>> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
+		std::vector<std::pair<int,int>> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1 = 0);
 
 		std::map<MocapStream::RigidBodyID,float> multiply(std::map<MocapStream::RigidBodyID,float> m1, std::map<MocapStream::RigidBodyID,float> m2);
 
@@ -62,7 +66,7 @@ namespace autocal {
 
 		void convertToGroundTruth(std::string streamA, std::string streamB);
 
-		std::map<int, utility::math::matrix::Transform3D> getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now);
+		autocal::MocapStream::Frame getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now);
 
 	};
 
