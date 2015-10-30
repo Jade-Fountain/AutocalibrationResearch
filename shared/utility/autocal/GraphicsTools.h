@@ -24,6 +24,13 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 static void handle_input(GLFWwindow* window, double time_since_start){
 
 }
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
+{  
+    if (key == GLFW_KEY_ESCAPE) {
+        glfwSetWindowShouldClose(window, GL_TRUE);  
+    }
+        
+} 
 
 static void checkGLError(){
 
@@ -103,6 +110,9 @@ static GLFWwindow* setUpGLWindow(int w, int h)
   
     //This function makes the context of the specified window current on the calling thread.   
     glfwMakeContextCurrent(window);  
+
+    glfwSetKeyCallback(window, key_callback); 
+
   
     //Initialize GLEW  
     glewExperimental = GL_TRUE;
@@ -111,7 +121,7 @@ static GLFWwindow* setUpGLWindow(int w, int h)
     //If GLEW hasn't initialized  
     if (err != GLEW_OK)   
     {  
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));  
+        std::cout << "stderr, Error: " << glewGetErrorString(err) <<  std::endl;  
         return nullptr;  
     }
 
@@ -119,6 +129,7 @@ static GLFWwindow* setUpGLWindow(int w, int h)
     glClearColor(0.0f, 0.0f, 1.0f, 0.0f);  
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     return window;
 }

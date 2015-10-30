@@ -20,12 +20,33 @@
 #ifndef MODULES_PSMOVE_RECORD_H
 #define MODULES_PSMOVE_RECORD_H
 
+#ifdef __APPLE__
+    // #include <OpenGL/gl.h>
+    #include <GL/glew.h>  
+
+    #include <GLFW/glfw3.h>  
+    #include <GLUT/glut.h>
+#else
+  #include <GL/gl.h>
+  #include <GL/glut.h>
+#endif 
 #include <nuclear>
+#include "utility/autocal/PSMoveUtils.h"
+
 
 namespace modules {
 namespace psmove {
 
     class Record : public NUClear::Reactor {
+		Tracker psmoveTracker;
+		GLFWwindow* window;
+		int width;
+		int height;
+		int video_frames;
+    	NUClear::clock::time_point start_time;
+		CvVideoWriter *writer;
+		
+		void handleInput(GLFWwindow* window, double time_since_start);
 
     public:
         /// @brief Called by the powerplant to build and setup the Record reactor.

@@ -206,25 +206,34 @@ namespace psmove {
 
 		    std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
+	        std::cout << __LINE__ << std::endl;
 		    bool useTruthForMatching = false;
+	        std::cout << __LINE__ << std::endl;
 		    sensorPlant.setGroundTruthTransform("mocap","psmove", psmoveToMocap.i(), useTruthForMatching);
 
+	        std::cout << __LINE__ << std::endl;
 		    //Main Loop
 		    start = std::chrono::steady_clock::now();  
+	        std::cout << __LINE__ << std::endl;
 		    video_frames = 0; 
         });
 
         on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
 	        // frames++;
+	        std::cout << __LINE__ << std::endl;
 	        auto now = std::chrono::steady_clock::now();    
+	        std::cout << __LINE__ << std::endl;
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
 
 	        //Get and organize events, like keyboard and mouse input, window resizing, etc...  
 	        glfwPollEvents(); 
+	        std::cout << __LINE__ << std::endl;
 
 	        handleInput(window, frame_time_since_start);
+	        std::cout << __LINE__ << std::endl;
 
 	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
+	        std::cout << __LINE__ << std::endl;
 	        
 	        if(video_frames * frame_duration < frame_time_since_start && !paused){
 	            video_frames++;
@@ -233,9 +242,11 @@ namespace psmove {
 	        }
 
 	        //Clear color buffer  
+	        std::cout << __LINE__ << std::endl;
 	        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	        
 	        glEnable(GL_TEXTURE_2D);
+	        std::cout << __LINE__ << std::endl;
 
 	        IplImage* image = cvQueryFrame(video);
 	        if(image == NULL){
@@ -244,6 +255,7 @@ namespace psmove {
 	            return;
 	        }
 	      
+	        std::cout << __LINE__ << std::endl;
 	        GLenum format;
 	        switch(image->nChannels) {
 	            case 1:
@@ -258,6 +270,7 @@ namespace psmove {
 	            default:
 	                break;
 	        }
+	        std::cout << __LINE__ << std::endl;
 
 	        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
 	                0, format, GL_UNSIGNED_BYTE, image->imageData);
@@ -267,6 +280,7 @@ namespace psmove {
 	        glMatrixMode(GL_MODELVIEW);
 	        glLoadIdentity();
 
+	        std::cout << __LINE__ << std::endl;
 	        /* Draw the camera image, filling the screen */
 	        glColor3f(1., 1., 1.);
 	        glBegin(GL_QUADS);
@@ -280,6 +294,7 @@ namespace psmove {
 	        glVertex2f(-1., 1.);
 	        glEnd();
 	        
+	        std::cout << __LINE__ << std::endl;
 	        //setup overgraphics
 	        glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -296,6 +311,7 @@ namespace psmove {
 	                                            );
 	        glLoadMatrixf(glm::value_ptr(proj));
 
+	        std::cout << __LINE__ << std::endl;
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, psMoveLatency);
 
 	        autocal::MocapStream::Frame psmoveFrame = sensorPlant.getStream("psmove").getFrame(current_timestamp + psMoveLatency);
@@ -312,6 +328,7 @@ namespace psmove {
 	            drawBasis(0.1);
 	        } 
 
+	        std::cout << __LINE__ << std::endl;
 	        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
 	        // autocal::MocapStream::Frame optitrackFrame = sensorPlant.getStream("mocap").getFrame(current_timestamp);
 	        for(auto& pair : optitrackFrame.rigidBodies){
@@ -334,12 +351,15 @@ namespace psmove {
 	        } 
 
 
+	        std::cout << __LINE__ << std::endl;
 	        //Swap buffers  
 	        glfwSwapBuffers(window);  
 
+	        std::cout << __LINE__ << std::endl;
 	        if(glfwWindowShouldClose(window)) {
 	            powerplant.shutdown();
 	        }
+	        std::cout << __LINE__ << std::endl;
 
         });
 
