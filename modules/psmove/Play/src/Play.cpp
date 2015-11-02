@@ -87,7 +87,7 @@ namespace psmove {
 	}
 
     Play::Play(std::unique_ptr<NUClear::Environment> environment)
-    : Reactor(std::move(environment)),window(sf::VideoMode(640*2, 480*2), "OpenGL") {
+    : Reactor(std::move(environment)),window(sf::VideoMode(640*2, 480*2), "OpenGL", sf::Style::Default, sf::ContextSettings(32)) {
 
         on<Configuration>("Play.yaml").then([this] (const Configuration& config) {
         	psMoveLatency = config["psmove_start_latency"].as<long long int>();
@@ -228,7 +228,7 @@ namespace psmove {
 	        
 	        window.setActive(true);
 	        handleInput(window, frame_time_since_start);
-	        
+
 	        if(video_frames * frame_duration < frame_time_since_start && !paused){
 	            video_frames++;
 	        } else {
@@ -329,8 +329,8 @@ namespace psmove {
 	            glLoadMatrixd(pose.memptr());  
 	            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
 	                glEnable(GL_LIGHTING);
-	                GLfloat z_diff[4] = {1.0, 1.0, 1.0, 1.0};
-	                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, z_diff);
+	                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
+	                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 	                glutSolidSphere(0.05, 10, 10);
 	                // std::cout << "matches RB" << rigidBodyID << std::endl; 
 	            }

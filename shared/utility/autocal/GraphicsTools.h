@@ -81,16 +81,16 @@ static void drawBasis(float scale){
     glDisable(GL_TEXTURE_2D);
     
     glEnable(GL_LIGHTING);
-    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.0f);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.0f);
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0f);
+    // glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.0f);
+    // glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.0f);
+    // glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0f);
     GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);    
-    glLightfv(GL_LIGHT0, GL_AMBIENT, diff);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, diff);
+    // glLightfv(GL_LIGHT0, GL_AMBIENT, diff);
+    // glLightfv(GL_LIGHT0, GL_SPECULAR, diff);
     //mat x
     GLfloat x_diff[4] = {1.0, 0.0, 0.0, 1.0};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, x_diff);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, x_diff);
     //cylinder x
     glRotatef(90,0,1,0);
     gluCylinder(quadratic,coneRadius / 2, coneRadius / 2, scale, numberOfConeSegments,1);
@@ -104,7 +104,7 @@ static void drawBasis(float scale){
 
     //Material y
     GLfloat y_diff[4] = {0.0, 1.0, 0.0, 1.0};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, y_diff);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, y_diff);
     
     //cylinder y
     glRotatef(-90,1,0,0);
@@ -120,7 +120,7 @@ static void drawBasis(float scale){
     
     //mat z
     GLfloat z_diff[4] = {0.0, 0.0, 1.0, 1.0};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, z_diff);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, z_diff);
     //cylinder z
     gluCylinder(quadratic,coneRadius / 2, coneRadius / 2, scale, numberOfConeSegments,1);
     
