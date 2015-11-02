@@ -1,0 +1,9 @@
+ADD_ROLE(
+    #Support
+    support::SignalCatcher
+    support::logging::ConsoleLogHandler
+    support::extension::FileWatcher
+
+    
+    psmove::Record
+)
