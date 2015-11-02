@@ -50,6 +50,7 @@ namespace psmove {
 		std::string video_filename;
 
 		float frame_duration;
+        bool use_simulation = false;
 
 		sf::Window window;
 		// GLFWwindow* window;

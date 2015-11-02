@@ -33,12 +33,6 @@
 
 #include <chrono>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/matrix_inverse.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/ext.hpp"
-
 #include "utility/autocal/PSMoveUtils.h"
 #include "utility/autocal/GraphicsTools.h"
 
@@ -93,14 +87,16 @@ namespace psmove {
             // log("loading config: ", config["test"].as<std::string>());
 			video_filename = config["video_filename"].as<std::string>();
 
+		    use_simulation = config["use_simulation"].as<std::string>();
+
         });
 
         on<Startup>().then([this]{
-
+        	//Set window active
 	        window.setActive(true);
 
+	        //Load video file and paramters
 		    std::cout << "Loading video file " << video_filename << std::endl;
-
 		    video = cvCaptureFromFile(video_filename.c_str());
 		    int fps, width, height;
 		    if(video == NULL){
@@ -114,14 +110,19 @@ namespace psmove {
 		        std::cout << "Video load successful... FPS = " << fps << std::endl;
 		    }
 		    frame_duration = 1.0 / float(fps);
+		    //Start timestamp
+		    std::string timeString = video_filename.substr(0,video_filename.size() - 4); //Remove .avi from filename
+		    videoStartTime = std::stoll(timeString);
 		  
+		  	//Init opengl
    		    bool success = setUpOpenGL();
 	  	    if(!success){
 	  	    	std::cout << "OpenGL Setup Failed! Shutting down" << std::endl; 
 			    powerplant.shutdown();
 			}
 			
-		    //Some GL options to configure for drawing
+		    //Some GL options particular to this role
+		    //enables textures
 		    glEnable(GL_TEXTURE_2D);
 		    GLuint texture;
 		    glGenTextures(1, &texture);
@@ -130,24 +131,21 @@ namespace psmove {
 		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-
-		    //Mocap stream stuff
-		    //Start timestamp
-		    std::string timeString = video_filename.substr(0,video_filename.size() - 4); //Remove .avi from filename
-		    videoStartTime = std::stoll(timeString);
-		    std::cout << "videoStartTime = " << videoStartTime << " micro sec" << std::endl;
-		    //Mocap stream
+		    //PSmove pose stream
 		    autocal::MocapStream psmoveStream("psmove", false);
 		    psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
 
+		    //Mocap pose stream
 		    autocal::MocapStream optitrackStream("mocap", true);
+		    //coordinate system is LH while psmove is RH
 		    bool optitrackReflectZ = true;
 		    std::set<int> mocapAllowedIDs = {1,2};
 		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ, mocapAllowedIDs);
 
-		    bool useSimulation = false;
-		    sensorPlant = SensorPlant(useSimulation);
-		    if(useSimulation){
+		    //Initialise sensor plant
+		    sensorPlant = SensorPlant(use_simulation);
+		    //Optional simulation parameters
+		    if(use_simulation){
 		        //Exp 4 -...
 		        autocal::MocapStream::SimulationParameters a1; 
 		        autocal::MocapStream::SimulationParameters a2;
@@ -160,10 +158,12 @@ namespace psmove {
 		        int dN = 10;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 		    }
+
+		    //Push back the loaded streams
 		    sensorPlant.addStream(psmoveStream);
 		    sensorPlant.addStream(optitrackStream);
 
-		    //Ground Truth
+		    //Ground Truth computation
 		    Transform3D psmoveToMocap;
 
 		    arma::vec3 right = { 1.198981,  0.129528, 0.200404};
@@ -201,136 +201,89 @@ namespace psmove {
 
 		    std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
+		    //Ground truth pass through to sensor plant
 		    bool useTruthForMatching = false;
 		    sensorPlant.setGroundTruthTransform("mocap","psmove", psmoveToMocap.i(), useTruthForMatching);
 
-		    //Main Loop
+		    //Record start parameters
 		    start = std::chrono::steady_clock::now();  
 		    video_frames = 0; 
 
         });
 
         on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
-	       	// std::cout << "Frame " << video_frames << std::endl; 
-
+        	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
-
+	        
+	        //Compute timestamp in microseconds
 	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
 	        
+	        //Set window active
 	        window.setActive(true);
+
+	        //Check input
 	        handleInput(window, frame_time_since_start);
 
+	        //Check if new frame is ready to be drawn
 	        if(video_frames * frame_duration < frame_time_since_start && !paused){
 	            video_frames++;
 	        } else {
 	            return;
 	        }
 
-
-	        //Clear color buffer  
+	        //Clear color buffer and enable textures
 	        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	        
 	        glEnable(GL_TEXTURE_2D);
 
-	        IplImage* image = cvQueryFrame(video);
-	        if(image == NULL){
-	            std::cout << "no images left in video file" << std::endl;
-	            powerplant.shutdown();
-	            return;
-	        }
-	      
-	        GLenum format;
-	        switch(image->nChannels) {
-	            case 1:
-	                format = GL_LUMINANCE;
-	                break;
-	            case 2:
-	                format = GL_LUMINANCE_ALPHA;
-	                break;
-	            case 3:
-	                format = GL_BGR;
-	                break;
-	            default:
-	                break;
-	        }
+	        //Load next image frame
+	        running = drawCamera(video, PSEYE_FOV_BLUE_DOT) && running;
 
-	        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
-	                0, format, GL_UNSIGNED_BYTE, image->imageData);
-
-	        glMatrixMode(GL_PROJECTION);
-	        glLoadIdentity();
-	        glMatrixMode(GL_MODELVIEW);
-	        glLoadIdentity();
-
-	        /* Draw the camera image, filling the screen */
-	        glColor3f(1., 1., 1.);
-	        glBegin(GL_QUADS);
-	        glTexCoord2f(0., 1.);
-	        glVertex2f(-1., -1.);
-	        glTexCoord2f(1., 1.);
-	        glVertex2f(1., -1.);
-	        glTexCoord2f(1., 0.);
-	        glVertex2f(1., 1.);
-	        glTexCoord2f(0., 0.);
-	        glVertex2f(-1., 1.);
-	        glEnd();
-	        
-	        //setup overgraphics
-	        glClear(GL_DEPTH_BUFFER_BIT);
-
-	        glMatrixMode(GL_PROJECTION);
-	        glm::mat4 proj =
-
-	            // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
-	            // image->width, image->height, 0.01f, 10.0f);
-
-	        glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
-	                                            float(image->width) / float(image->height),  //aspect ratio
-	                                            0.01f,         //near plane distance (min z)
-	                                            10.0f           //Far plane distance (max z)
-	                                            );
-	        glLoadMatrixf(glm::value_ptr(proj));
-
+	        //Match the streams
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, psMoveLatency);
 
+	        
+	        //Draw psmove
 	        autocal::MocapStream::Frame psmoveFrame = sensorPlant.getStream("psmove").getFrame(current_timestamp + psMoveLatency);
-	        // autocal::MocapStream::Frame psmoveFrame = psmoveStream.getFrame(current_timestamp + psMoveLatency);
 	        Transform3D psmovePose;
 	        for(auto& pair : psmoveFrame.rigidBodies){
+	            //Get Rigid Body data
 	            auto& rigidBodyID = pair.first;
 	            auto& rigidBody = pair.second;
+	            //4x4 matrix pose
 	            psmovePose = rigidBody.pose;
-	            // std::cout << "psmove pose = \n" << psmovePose << std::endl;
+	            //Load pose into opengl as view matrix
 	            glMatrixMode(GL_MODELVIEW);
 	            glLoadMatrixd(psmovePose.memptr());  
-	            
+		        
+		        //Draw the coordinate system
 	            drawBasis(0.1);
 	        } 
 
+	        //If we have mocap, draw that too with matches
 	        if(sensorPlant.streamNotEmpty("mocap")){
 		        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
-		        // autocal::MocapStream::Frame optitrackFrame = sensorPlant.getStream("mocap").getFrame(current_timestamp);
 		        for(auto& pair : optitrackFrame.rigidBodies){
+		            //Get Rigid Body data
 		            auto& rigidBodyID = pair.first;
 		            auto& rigidBody = pair.second;
+		            //4x4 matrix pose
 		            Transform3D pose = rigidBody.pose;
-		            // std::cout << "mocap RB" << rigidBodyID << " pose = \n" << pose << std::endl;
-		            // Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
-		            // pose = pose.i();
+		            //Load pose into opengl as view matrix
 		            glMatrixMode(GL_MODELVIEW);
 		            glLoadMatrixd(pose.memptr());  
+		            
+		            //Draw a sphere if it matches
 		            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
 		                glEnable(GL_LIGHTING);
 		                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
 		                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 		                glutSolidSphere(0.05, 10, 10);
-		                // std::cout << "matches RB" << rigidBodyID << std::endl; 
 		            }
+		            //Draw the coordinate system
 		            drawBasis(0.1);
 		        } 
 			}
-
 
 	        window.display();
 
@@ -341,11 +294,15 @@ namespace psmove {
         });
 
 		on<Shutdown>().then([this]{
+			//Display draw framerate of the video
 			auto now = std::chrono::steady_clock::now();    
 		    double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);     
-		    // std::cout << "average draw framerate = " << double(frames) / finish_time << " Hz " << std::endl; 
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
+		    
+		    //Summarise results of matching
 		    sensorPlant.next();
+		    
+		    //Release the video
 		    cvReleaseCapture(&video);  
 		});
     }

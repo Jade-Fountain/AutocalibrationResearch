@@ -8,6 +8,13 @@
   #include <GL/glut.h>
 #endif 
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/ext.hpp"
+#include "opencv2/opencv.hpp"
+
 static void checkGLError(){
 
     GLenum error;
@@ -195,5 +202,69 @@ static void drawCrossHair(){
  
 
     glEnd();
+}
+
+bool drawCamera(CvCapture* video, float verticalFOV){
+    IplImage* image = cvQueryFrame(video);
+    if(image == NULL){
+        std::cout << "no images left in video file" << std::endl;
+        return false;
+    }
+  
+    GLenum format;
+    switch(image->nChannels) {
+        case 1:
+            format = GL_LUMINANCE;
+            break;
+        case 2:
+            format = GL_LUMINANCE_ALPHA;
+            break;
+        case 3:
+            format = GL_BGR;
+            break;
+        default:
+            break;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
+            0, format, GL_UNSIGNED_BYTE, image->imageData);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    /* Draw the camera image, filling the screen */
+    glColor3f(1., 1., 1.);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0., 1.);
+    glVertex2f(-1., -1.);
+    glTexCoord2f(1., 1.);
+    glVertex2f(1., -1.);
+    glTexCoord2f(1., 0.);
+    glVertex2f(1., 1.);
+    glTexCoord2f(0., 0.);
+    glVertex2f(-1., 1.);
+    glEnd();
+    
+    //setup to draw on top of image
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glm::mat4 proj =
+
+        // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
+        // image->width, image->height, 0.01f, 10.0f);
+
+        glm::perspective(   float(verticalFOV * 3.14159 / 180.0),            //VERTICAL FOV
+                            float(image->width) / float(image->height),  //aspect ratio
+                            0.01f,         //near plane distance (min z)
+                            10.0f           //Far plane distance (max z)
+                            );
+    glLoadMatrixf(glm::value_ptr(proj));
+
+    checkGLError();
+
+    return true;
 }
 
