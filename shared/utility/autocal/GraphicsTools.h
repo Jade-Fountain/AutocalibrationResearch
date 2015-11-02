@@ -15,6 +15,10 @@
 #include "glm/ext.hpp"
 #include "opencv2/opencv.hpp"
 
+#include "utility/math/matrix/Transform3D.h"
+#include "utility/autocal/SensorPlant.h"
+
+
 static void checkGLError(){
 
     GLenum error;
@@ -266,5 +270,31 @@ bool drawCamera(CvCapture* video, float verticalFOV){
     checkGLError();
 
     return true;
+}
+
+void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceFrame, autocal::TimeStamp t, const std::vector<std::pair<int,int>>& matches = std::vector<std::pair<int,int>>()){
+    autocal::MocapRecording& recording = sensorPlant.mocapRecording;
+    for(auto& stream : recording.streams){
+        std::string name = stream.first;
+        autocal::MocapStream::Frame frame = sensorPlant.getGroundTruth(name, referenceFrame, t);
+        for(auto& pair : frame.rigidBodies){
+            //Get Rigid Body data
+            auto& rigidBodyID = pair.first;
+            auto& rigidBody = pair.second;
+            //4x4 matrix pose
+            Transform3D pose = rigidBody.pose;
+            //Load pose into opengl as view matrix
+            glMatrixMode(GL_MODELVIEW);
+            glLoadMatrixd(pose.memptr());  
+            //Draw a sphere if it matches
+            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
+                glEnable(GL_LIGHTING);
+                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
+                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+                glutSolidSphere(0.05, 10, 10);
+            }
+            drawBasis(0.1);
+        }
+    }
 }
 

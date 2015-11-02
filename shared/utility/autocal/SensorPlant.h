@@ -38,7 +38,7 @@ namespace autocal {
 
 		MocapRecording mocapRecording;
 
-		MocapStream& getStream(std::string name){
+		const MocapStream& getStream(std::string name){
 			return mocapRecording.getStream(name);
 		}
 

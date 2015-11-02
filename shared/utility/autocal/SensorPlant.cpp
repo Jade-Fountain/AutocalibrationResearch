@@ -141,7 +141,14 @@ namespace autocal {
 
 	
 	autocal::MocapStream::Frame SensorPlant::getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now){
+		//If we are transforming to the same reference basis, just return the current frame unaltered
+		if(stream.compare(desiredBasis) == 0){
+			return mocapRecording.getStream(stream).getFrame(now);
+		}
+		//Init result otherwise
 		autocal::MocapStream::Frame truth;
+		//make the key to retrieve the ground truth transform
+		//TODO: check alternate key ordering too (as its just a matrix inverse to swap order)
 		auto key = std::make_pair(stream, desiredBasis);
 		if(groundTruthTransforms.count(key) != 0 && mocapRecording.streamPresent(stream)){
 			//Get the transform between coordinate systems
@@ -155,7 +162,7 @@ namespace autocal {
 				truth.rigidBodies[rb.first].pose = streamToDesiredBasis * rb.second.pose;
 			}
 		} else {
-			std::cout << "WARNING: ATTEMPTING TO ACCESSING GROUND TRUTH WHEN NONE EXISTS!!!" << std::endl;
+			std::cout << "WARNING: ATTEMPTING TO ACCESS GROUND TRUTH WHEN NONE EXISTS!!!" << std::endl;
 		}
 
 		return truth;

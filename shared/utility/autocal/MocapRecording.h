@@ -16,10 +16,8 @@ This code is part of mocap-kinect experiments*/
 namespace autocal {
 
 	class MocapRecording {
-
-		std::map<std::string, MocapStream> streams;
-	
 	public:
+		std::map<std::string, MocapStream> streams;
 	
 		MocapStream& getStream(std::string stream_name){
 			return streams[stream_name];

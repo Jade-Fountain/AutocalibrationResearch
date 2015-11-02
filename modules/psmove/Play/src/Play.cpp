@@ -87,7 +87,7 @@ namespace psmove {
             // log("loading config: ", config["test"].as<std::string>());
 			video_filename = config["video_filename"].as<std::string>();
 
-		    use_simulation = config["use_simulation"].as<std::string>();
+		    use_simulation = config["use_simulation"].as<bool>();
 
         });
 
@@ -244,46 +244,47 @@ namespace psmove {
 
 	        
 	        //Draw psmove
-	        autocal::MocapStream::Frame psmoveFrame = sensorPlant.getStream("psmove").getFrame(current_timestamp + psMoveLatency);
-	        Transform3D psmovePose;
-	        for(auto& pair : psmoveFrame.rigidBodies){
-	            //Get Rigid Body data
-	            auto& rigidBodyID = pair.first;
-	            auto& rigidBody = pair.second;
-	            //4x4 matrix pose
-	            psmovePose = rigidBody.pose;
-	            //Load pose into opengl as view matrix
-	            glMatrixMode(GL_MODELVIEW);
-	            glLoadMatrixd(psmovePose.memptr());  
+	        drawSensorStreams(sensorPlant, "psmove", current_timestamp, matches);
+	  //       autocal::MocapStream::Frame psmoveFrame = sensorPlant.getStream("psmove").getFrame(current_timestamp + psMoveLatency);
+	  //       Transform3D psmovePose;
+	  //       for(auto& pair : psmoveFrame.rigidBodies){
+	  //           //Get Rigid Body data
+	  //           auto& rigidBodyID = pair.first;
+	  //           auto& rigidBody = pair.second;
+	  //           //4x4 matrix pose
+	  //           psmovePose = rigidBody.pose;
+	  //           //Load pose into opengl as view matrix
+	  //           glMatrixMode(GL_MODELVIEW);
+	  //           glLoadMatrixd(psmovePose.memptr());  
 		        
-		        //Draw the coordinate system
-	            drawBasis(0.1);
-	        } 
+		 //        //Draw the coordinate system
+	  //           drawBasis(0.1);
+	  //       } 
 
-	        //If we have mocap, draw that too with matches
-	        if(sensorPlant.streamNotEmpty("mocap")){
-		        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
-		        for(auto& pair : optitrackFrame.rigidBodies){
-		            //Get Rigid Body data
-		            auto& rigidBodyID = pair.first;
-		            auto& rigidBody = pair.second;
-		            //4x4 matrix pose
-		            Transform3D pose = rigidBody.pose;
-		            //Load pose into opengl as view matrix
-		            glMatrixMode(GL_MODELVIEW);
-		            glLoadMatrixd(pose.memptr());  
+	  //       //If we have mocap, draw that too with matches
+	  //       if(sensorPlant.streamNotEmpty("mocap")){
+		 //        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
+		 //        for(auto& pair : optitrackFrame.rigidBodies){
+		 //            //Get Rigid Body data
+		 //            auto& rigidBodyID = pair.first;
+		 //            auto& rigidBody = pair.second;
+		 //            //4x4 matrix pose
+		 //            Transform3D pose = rigidBody.pose;
+		 //            //Load pose into opengl as view matrix
+		 //            glMatrixMode(GL_MODELVIEW);
+		 //            glLoadMatrixd(pose.memptr());  
 		            
-		            //Draw a sphere if it matches
-		            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
-		                glEnable(GL_LIGHTING);
-		                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
-		                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
-		                glutSolidSphere(0.05, 10, 10);
-		            }
-		            //Draw the coordinate system
-		            drawBasis(0.1);
-		        } 
-			}
+		 //            //Draw a sphere if it matches
+		 //            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
+		 //                glEnable(GL_LIGHTING);
+		 //                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
+		 //                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+		 //                glutSolidSphere(0.05, 10, 10);
+		 //            }
+		 //            //Draw the coordinate system
+		 //            drawBasis(0.1);
+		 //        } 
+			// }
 
 	        window.display();
 
