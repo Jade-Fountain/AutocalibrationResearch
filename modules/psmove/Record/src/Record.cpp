@@ -120,10 +120,12 @@ namespace psmove {
         });
 
 		on<Shutdown>().then([this]{
+			// cvSetCaptureProperty(CvCapture* capture, int property_id, double value)
 			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 		    double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);     
 		    // std::cout << "average draw framerate = " << double(frames) / finish_time << " Hz " << std::endl; 
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
+		    cvReleaseVideoWriter(&writer);
 		});
 
     }
