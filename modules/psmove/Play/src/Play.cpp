@@ -1,20 +1,20 @@
 /*
- * This file is part of NUbots Codebase.
+ * This file is part of Autocalibration Codebase.
  *
- * The NUbots Codebase is free software: you can redistribute it and/or modify
+ * The Autocalibration Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The NUbots Codebase is distributed in the hope that it will be useful,
+ * The Autocalibration Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright 2015 NUbots <nubots@nubots.net>
+ * Copyright 2015 Autocalibration <nubots@nubots.net>
  */
 
 #include "Play.h"
@@ -107,26 +107,20 @@ namespace psmove {
 		        std::cout << "Video load failed... Exiting" << std::endl;
 		        return -1;
 		    } else {
-		        // fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
-		        fps = 21; 
+		        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
+		        // fps = 21; 
 		        width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
 		        height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
 		        std::cout << "Video load successful... FPS = " << fps << std::endl;
 		    }
 		    frame_duration = 1.0 / float(fps);
 		  
-		    //GLEW
-		  	bool success = setUpGLEW();
-		  	if(!success){
-		  		powerplant.shutdown();
-		  	}
-
-		    //Set a background color  
-		    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);  
-		    glEnable(GL_LIGHT0);
-		    glEnable(GL_DEPTH_TEST);
-		    glClear(GL_COLOR_BUFFER_BIT);
-
+   		    bool success = setUpOpenGL();
+	  	    if(!success){
+	  	    	std::cout << "OpenGL Setup Failed! Shutting down" << std::endl; 
+			    powerplant.shutdown();
+			}
+			
 		    //Some GL options to configure for drawing
 		    glEnable(GL_TEXTURE_2D);
 		    GLuint texture;

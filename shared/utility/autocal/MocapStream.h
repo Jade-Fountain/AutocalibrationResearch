@@ -132,13 +132,13 @@ namespace autocal {
 
 		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> slippage;
 
-		bool correctForNUbotsCoordinateSystem;
+		bool correctForAutocalibrationCoordinateSystem;
 
 	public:
 		//Constructors
-		MocapStream() : stream_name(""), slippage(), correctForNUbotsCoordinateSystem(false){}
+		MocapStream() : stream_name(""), slippage(), correctForAutocalibrationCoordinateSystem(false){}
 
-		MocapStream(std::string name, bool correction) : stream_name(name), correctForNUbotsCoordinateSystem(correction){}
+		MocapStream(std::string name, bool correction) : stream_name(name), correctForAutocalibrationCoordinateSystem(correction){}
 
 		//Accessors and small utilities
 		void markStart(TimeStamp t){

@@ -13,7 +13,7 @@ sys.path.append('tools/build')
 if __name__ == '__main__':
 
     # Root parser information
-    command = argparse.ArgumentParser(description='This script is an optional helper script for performing common tasks related to building and running the NUbots code and related projects.')
+    command = argparse.ArgumentParser(description='This script is an optional helper script for performing common tasks related to building and running the Autocalibration code and related projects.')
     subcommands = command.add_subparsers(dest='command')
 
     # Get all of the packages that are in the build tools

@@ -70,6 +70,19 @@ static bool setUpGLEW()
 
     return true;
 }
+
+static bool setUpOpenGL(){
+    bool success = setUpGLEW();
+    if(!success) return success;
+    
+    //Set a background color  
+    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);  
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    return success;
+}
  
 static void drawBasis(float scale){
     GLUquadricObj *quadratic;

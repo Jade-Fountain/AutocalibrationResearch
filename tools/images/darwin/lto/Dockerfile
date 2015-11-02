@@ -194,9 +194,9 @@ RUN apt-get -y install icecc \
 ENV PATH /usr/lib/icecc/bin:$PATH
 
 # You need to mount your local code directory to the container
-# Eg: docker run -t -i -v /local/path/:/nubots/NUbots /bin/bash
-VOLUME /nubots/NUbots
-WORKDIR /nubots/NUbots/build
+# Eg: docker run -t -i -v /local/path/:/nubots/Autocalibration /bin/bash
+VOLUME /nubots/Autocalibration
+WORKDIR /nubots/Autocalibration/build
 
 # Expose our NUbugger ports to allow running in the container
 EXPOSE 12000 12001

@@ -1,20 +1,20 @@
 /*
- * This file is part of NUbots Codebase.
+ * This file is part of Autocalibration Codebase.
  *
- * The NUbots Codebase is free software: you can redistribute it and/or modify
+ * The Autocalibration Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The NUbots Codebase is distributed in the hope that it will be useful,
+ * The Autocalibration Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright 2015 NUbots <nubots@nubots.net>
+ * Copyright 2015 Autocalibration <nubots@nubots.net>
  */
 
 #ifndef MODULES_PSMOVE_RECORD_H
@@ -41,15 +41,27 @@ namespace modules {
 namespace psmove {
 
     class Record : public NUClear::Reactor {
+		//Psmove object for getting psmove pose and video
 		Tracker psmoveTracker;
+		
+		//Window object to draw to
 		sf::Window window;
+		
+		//Video output properties
+		float fps;
+		float frame_duration;
 		int width;
 		int height;
-		int video_frames;
+
+		//State variables
+		int video_frames = 0;
 		bool running = true;
     	std::chrono::time_point<std::chrono::system_clock> start_time;
+
+    	//C api for opencv video writing
 		CvVideoWriter *writer;
 		
+		//handle keyboard
 		void handleInput(const sf::Window& w, double time_since_start);
 
     public:
