@@ -16,7 +16,6 @@ bool MocapRecorder::saveFrame(const std::vector<Transform3D>& poses){
         rigidBodies.col(i++) = arma::vec({double(id),x,y,z, r.row(0)[0],r.row(0)[1],r.row(0)[2],
             										r.row(1)[0],r.row(1)[1],r.row(1)[2],
             										r.row(2)[0],r.row(2)[1],r.row(2)[2]});
-
     }
     auto now = std::chrono::system_clock::now();
     std::stringstream filename;
