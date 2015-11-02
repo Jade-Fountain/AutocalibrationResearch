@@ -36,6 +36,7 @@
 #endif 
 
 #include "opencv2/opencv.hpp"
+#include "SFML/Window.hpp"
 
 namespace modules {
 namespace psmove {
@@ -50,14 +51,17 @@ namespace psmove {
 
 		float frame_duration;
 
-		GLFWwindow* window;
+		sf::Window window;
+		// GLFWwindow* window;
 
 		autocal::SensorPlant sensorPlant;
 
 		//TODO: make better callback system
-		int psMoveLatency;
-		bool paused;
+		int psMoveLatency = -1400;
+		bool paused = false;
+		bool running = true;
  		void handleInput(GLFWwindow* window, double time_since_start); 
+		void handleInput(const sf::Window& w, double time_since_start);
 		
 
     public:

@@ -12,18 +12,11 @@
 //Define an error callback  
 static void error_callback(int error, const char* description)  
 {  
-    fputs(description, stderr);  
+    std::cout << "GLFW error code " << error << " : " << description << std::endl;  
     getchar();  
 }  
 
 
-static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-{
-}
-
-static void handle_input(GLFWwindow* window, double time_since_start){
-
-}
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)  
 {  
     if (key == GLFW_KEY_ESCAPE) {
@@ -82,7 +75,7 @@ static void checkGLError(){
 static GLFWwindow* setUpGLWindow(int w, int h)  
 {  
     //Set the error callback  
-    glfwSetErrorCallback(error_callback);  
+    // glfwSetErrorCallback(error_callback);  
   
     //Initialize GLFW  
     if (!glfwInit())  
@@ -111,7 +104,7 @@ static GLFWwindow* setUpGLWindow(int w, int h)
     //This function makes the context of the specified window current on the calling thread.   
     glfwMakeContextCurrent(window);  
 
-    glfwSetKeyCallback(window, key_callback); 
+    // glfwSetKeyCallback(window, key_callback); 
 
   
     //Initialize GLEW  
@@ -130,6 +123,7 @@ static GLFWwindow* setUpGLWindow(int w, int h)
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
+    glfwPollEvents();
 
     return window;
 }

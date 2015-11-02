@@ -40,6 +40,7 @@
 #include "glm/ext.hpp"
 
 
+
 #include "utility/autocal/PSMoveUtils.h"
 #include "utility/autocal/GraphicsTools.h"
 
@@ -52,6 +53,28 @@ namespace psmove {
     using messages::support::Configuration;
 
     //Define the key input callback  
+	void Play::handleInput(const sf::Window& w, double time_since_start){
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+		    std::cout << "Exiting .." << std::endl;
+		    running = false;
+		}
+		// sf::Event event;
+  //       while (window.pollEvent(event))
+  //       {
+  //           if (event.type == sf::Event::Closed)
+  //           {
+  //               // end the program
+  //               running = false;
+  //           }
+  //           else if (event.type == sf::Event::Resized)
+  //           {
+  //               // adjust the viewport when the window is resized
+  //               glViewport(0, 0, event.size.width, event.size.height);
+  //           }
+  //       }
+	}
+
 	void Play::handleInput(GLFWwindow* window, double time_since_start){
 
         if(glfwGetKey(window,GLFW_KEY_COMMA)){
@@ -94,7 +117,7 @@ namespace psmove {
     }
 
     Play::Play(std::unique_ptr<NUClear::Environment> environment)
-    : Reactor(std::move(environment)) {
+    : Reactor(std::move(environment)),window(sf::VideoMode(640*2, 480*2), "OpenGL") {
 
         on<Configuration>("Play.yaml").then([this] (const Configuration& config) {
         	psMoveLatency = config["psmove_start_latency"].as<long long int>();
@@ -124,7 +147,9 @@ namespace psmove {
 		    
 
 		    //Declare a window object  
-		    window = setUpGLWindow(width, height);
+		    // window = setUpGLWindow(width, height);
+
+		    
 		  
 		    //Some GL options to configure for drawing
 		    glEnable(GL_TEXTURE_2D);
@@ -206,34 +231,30 @@ namespace psmove {
 
 		    std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
-	        std::cout << __LINE__ << std::endl;
 		    bool useTruthForMatching = false;
-	        std::cout << __LINE__ << std::endl;
 		    sensorPlant.setGroundTruthTransform("mocap","psmove", psmoveToMocap.i(), useTruthForMatching);
 
-	        std::cout << __LINE__ << std::endl;
 		    //Main Loop
 		    start = std::chrono::steady_clock::now();  
-	        std::cout << __LINE__ << std::endl;
 		    video_frames = 0; 
+
         });
 
         on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
-	        // frames++;
-	        std::cout << __LINE__ << std::endl;
+	       	std::cout << "Frame " << video_frames << std::endl; 
+
+	       	// frames++;
+
 	        auto now = std::chrono::steady_clock::now();    
-	        std::cout << __LINE__ << std::endl;
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
 
+    		// glfwMakeContextCurrent(window);  
 	        //Get and organize events, like keyboard and mouse input, window resizing, etc...  
-	        glfwPollEvents(); 
-	        std::cout << __LINE__ << std::endl;
+			// glfwPollEvents();
 
-	        handleInput(window, frame_time_since_start);
-	        std::cout << __LINE__ << std::endl;
+	        // handleInput(window, frame_time_since_start);
 
 	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
-	        std::cout << __LINE__ << std::endl;
 	        
 	        if(video_frames * frame_duration < frame_time_since_start && !paused){
 	            video_frames++;
@@ -241,12 +262,13 @@ namespace psmove {
 	            return;
 	        }
 
+	        window.setActive(true);
+	        handleInput(window, frame_time_since_start);
+
 	        //Clear color buffer  
-	        std::cout << __LINE__ << std::endl;
 	        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	        
 	        glEnable(GL_TEXTURE_2D);
-	        std::cout << __LINE__ << std::endl;
 
 	        IplImage* image = cvQueryFrame(video);
 	        if(image == NULL){
@@ -255,7 +277,6 @@ namespace psmove {
 	            return;
 	        }
 	      
-	        std::cout << __LINE__ << std::endl;
 	        GLenum format;
 	        switch(image->nChannels) {
 	            case 1:
@@ -270,7 +291,6 @@ namespace psmove {
 	            default:
 	                break;
 	        }
-	        std::cout << __LINE__ << std::endl;
 
 	        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
 	                0, format, GL_UNSIGNED_BYTE, image->imageData);
@@ -280,7 +300,6 @@ namespace psmove {
 	        glMatrixMode(GL_MODELVIEW);
 	        glLoadIdentity();
 
-	        std::cout << __LINE__ << std::endl;
 	        /* Draw the camera image, filling the screen */
 	        glColor3f(1., 1., 1.);
 	        glBegin(GL_QUADS);
@@ -294,7 +313,6 @@ namespace psmove {
 	        glVertex2f(-1., 1.);
 	        glEnd();
 	        
-	        std::cout << __LINE__ << std::endl;
 	        //setup overgraphics
 	        glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -304,14 +322,13 @@ namespace psmove {
 	            // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
 	            // image->width, image->height, 0.01f, 10.0f);
 
-	         glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
+	        glm::perspective(  float(PSEYE_FOV_BLUE_DOT * 3.14159 / 180.0),            //VERTICAL FOV
 	                                            float(image->width) / float(image->height),  //aspect ratio
 	                                            0.01f,         //near plane distance (min z)
 	                                            10.0f           //Far plane distance (max z)
 	                                            );
 	        glLoadMatrixf(glm::value_ptr(proj));
 
-	        std::cout << __LINE__ << std::endl;
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, psMoveLatency);
 
 	        autocal::MocapStream::Frame psmoveFrame = sensorPlant.getStream("psmove").getFrame(current_timestamp + psMoveLatency);
@@ -328,7 +345,6 @@ namespace psmove {
 	            drawBasis(0.1);
 	        } 
 
-	        std::cout << __LINE__ << std::endl;
 	        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
 	        // autocal::MocapStream::Frame optitrackFrame = sensorPlant.getStream("mocap").getFrame(current_timestamp);
 	        for(auto& pair : optitrackFrame.rigidBodies){
@@ -351,15 +367,12 @@ namespace psmove {
 	        } 
 
 
-	        std::cout << __LINE__ << std::endl;
-	        //Swap buffers  
-	        glfwSwapBuffers(window);  
 
-	        std::cout << __LINE__ << std::endl;
-	        if(glfwWindowShouldClose(window)) {
-	            powerplant.shutdown();
-	        }
-	        std::cout << __LINE__ << std::endl;
+	        window.display();
+
+		    if(!running){
+		    	powerplant.shutdown();
+		    }
 
         });
 
@@ -370,7 +383,7 @@ namespace psmove {
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
 		    sensorPlant.next();
 		    cvReleaseCapture(&video);  
-		    destroyGLWindow(window);
+		    // destroyGLWindow(window);
 		});
     }
 }

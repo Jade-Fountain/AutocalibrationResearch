@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
     start = """
 
     NUClear::PowerPlant::Configuration config;
-    config.threadCount = 4;
+    config.threadCount = 1;
 
     NUClear::PowerPlant plant(config, argc, const_cast<const char**>(argv));
 """
