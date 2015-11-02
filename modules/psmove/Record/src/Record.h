@@ -31,7 +31,10 @@
   #include <GL/glut.h>
 #endif 
 #include <nuclear>
+#include <chrono>
 #include "utility/autocal/PSMoveUtils.h"
+
+#include "SFML/Window.hpp"
 
 
 namespace modules {
@@ -39,14 +42,15 @@ namespace psmove {
 
     class Record : public NUClear::Reactor {
 		Tracker psmoveTracker;
-		GLFWwindow* window;
+		sf::Window window;
 		int width;
 		int height;
 		int video_frames;
-    	NUClear::clock::time_point start_time;
+		bool running = true;
+    	std::chrono::time_point<std::chrono::system_clock> start_time;
 		CvVideoWriter *writer;
 		
-		void handleInput(GLFWwindow* window, double time_since_start);
+		void handleInput(const sf::Window& w, double time_since_start);
 
     public:
         /// @brief Called by the powerplant to build and setup the Record reactor.

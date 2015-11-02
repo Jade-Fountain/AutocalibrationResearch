@@ -39,8 +39,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/ext.hpp"
 
-
-
 #include "utility/autocal/PSMoveUtils.h"
 #include "utility/autocal/GraphicsTools.h"
 
@@ -109,8 +107,8 @@ namespace psmove {
 		        std::cout << "Video load failed... Exiting" << std::endl;
 		        return -1;
 		    } else {
-		        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
-		        // fps = 30; 
+		        // fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
+		        fps = 21; 
 		        width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
 		        height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
 		        std::cout << "Video load successful... FPS = " << fps << std::endl;
@@ -316,27 +314,28 @@ namespace psmove {
 	            drawBasis(0.1);
 	        } 
 
-	        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
-	        // autocal::MocapStream::Frame optitrackFrame = sensorPlant.getStream("mocap").getFrame(current_timestamp);
-	        for(auto& pair : optitrackFrame.rigidBodies){
-	            auto& rigidBodyID = pair.first;
-	            auto& rigidBody = pair.second;
-	            Transform3D pose = rigidBody.pose;
-	            // std::cout << "mocap RB" << rigidBodyID << " pose = \n" << pose << std::endl;
-	            // Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
-	            // pose = pose.i();
-	            glMatrixMode(GL_MODELVIEW);
-	            glLoadMatrixd(pose.memptr());  
-	            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
-	                glEnable(GL_LIGHTING);
-	                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
-	                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
-	                glutSolidSphere(0.05, 10, 10);
-	                // std::cout << "matches RB" << rigidBodyID << std::endl; 
-	            }
-	            drawBasis(0.1);
-	        } 
-
+	        if(sensorPlant.streamNotEmpty("mocap")){
+		        autocal::MocapStream::Frame optitrackFrame = sensorPlant.getGroundTruth("mocap", "psmove", current_timestamp);
+		        // autocal::MocapStream::Frame optitrackFrame = sensorPlant.getStream("mocap").getFrame(current_timestamp);
+		        for(auto& pair : optitrackFrame.rigidBodies){
+		            auto& rigidBodyID = pair.first;
+		            auto& rigidBody = pair.second;
+		            Transform3D pose = rigidBody.pose;
+		            // std::cout << "mocap RB" << rigidBodyID << " pose = \n" << pose << std::endl;
+		            // Transform3D pose = psmoveToMocap.i() * rigidBody.pose;
+		            // pose = pose.i();
+		            glMatrixMode(GL_MODELVIEW);
+		            glLoadMatrixd(pose.memptr());  
+		            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
+		                glEnable(GL_LIGHTING);
+		                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
+		                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+		                glutSolidSphere(0.05, 10, 10);
+		                // std::cout << "matches RB" << rigidBodyID << std::endl; 
+		            }
+		            drawBasis(0.1);
+		        } 
+			}
 
 
 	        window.display();

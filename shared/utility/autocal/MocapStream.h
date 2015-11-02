@@ -146,6 +146,8 @@ namespace autocal {
 		}
 
 		int size() const {return stream.size();}
+
+		bool isEmpty() const {return stream.empty();}
 		
 		std::string name() const {return stream_name;}
 

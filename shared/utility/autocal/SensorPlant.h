@@ -46,6 +46,10 @@ namespace autocal {
 			mocapRecording.getStream(s.name()) = s;
 		}
 
+		bool streamNotEmpty(std::string name){
+			return !getStream(name).isEmpty();
+		}
+
 		bool isRunning(){return !simulate || simParams.size()!=0;}
 				
 		std::vector<std::pair<int,int>> getCorrelations(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
