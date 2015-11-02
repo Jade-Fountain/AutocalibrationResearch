@@ -59,6 +59,17 @@ namespace psmove {
 		    std::cout << "Exiting .." << std::endl;
 		    running = false;
 		}
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Comma)){
+            psMoveLatency = psMoveLatency - 1000;
+            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Period)){
+            psMoveLatency = psMoveLatency + 1000;
+            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::P)){
+        	paused = !paused;
+        }
 		// sf::Event event;
   //       while (window.pollEvent(event))
   //       {
@@ -75,47 +86,6 @@ namespace psmove {
   //       }
 	}
 
-	void Play::handleInput(GLFWwindow* window, double time_since_start){
-
-        if(glfwGetKey(window,GLFW_KEY_COMMA)){
-            psMoveLatency = psMoveLatency - 1000;
-            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
-        }
-        if(glfwGetKey(window,GLFW_KEY_PERIOD)){
-            psMoveLatency = psMoveLatency + 1000;
-            std::cout << "psMoveLatency = " << psMoveLatency << std::endl;
-        }
-        if(glfwGetKey(window,GLFW_KEY_ESCAPE)){
-            glfwSetWindowShouldClose(window, GL_TRUE);
-        }
-        if(glfwGetKey(window,GLFW_KEY_P)){
-        	paused = !paused;
-        }
-
-        //TODO: better camera
-        // if(glfwGetKey(window,GLFW_KEY_S)){
-        //     cam.moveLocal(glm::vec3(0,0,velocity));
-        // }
-        // if(glfwGetKey(window,GLFW_KEY_D)){
-        //     cam.moveLocal(glm::vec3(velocity,0.0,0));
-        // }
-        // if(glfwGetKey(window,GLFW_KEY_E)){
-        //     cam.moveLocal(glm::vec3(0.0,velocity,0));
-        // }
-        // if(glfwGetKey(window,GLFW_KEY_Q)){
-        //     cam.moveLocal(glm::vec3(0.0,-velocity,0));
-        // }
-
-
-        // double xpos, ypos;
-        // double rotation_vel_x = 0.01;
-        // double rotation_vel_y = 0.01;
-        // glfwGetCursorPos(window, &xpos, &ypos);
-        // float yaw = rotation_vel_x * xpos;
-        // float pitch = rotation_vel_y * ypos;
-        // cam.updateRotation(-yaw,-pitch);
-    }
-
     Play::Play(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)),window(sf::VideoMode(640*2, 480*2), "OpenGL") {
 
@@ -128,6 +98,8 @@ namespace psmove {
         });
 
         on<Startup>().then([this]{
+
+	        window.setActive(true);
 
 		    std::cout << "Loading video file " << video_filename << std::endl;
 
@@ -144,13 +116,19 @@ namespace psmove {
 		        std::cout << "Video load successful... FPS = " << fps << std::endl;
 		    }
 		    frame_duration = 1.0 / float(fps);
-		    
-
-		    //Declare a window object  
-		    // window = setUpGLWindow(width, height);
-
-		    
 		  
+		    //GLEW
+		  	bool success = setUpGLEW();
+		  	if(!success){
+		  		powerplant.shutdown();
+		  	}
+
+		    //Set a background color  
+		    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);  
+		    glEnable(GL_LIGHT0);
+		    glEnable(GL_DEPTH_TEST);
+		    glClear(GL_COLOR_BUFFER_BIT);
+
 		    //Some GL options to configure for drawing
 		    glEnable(GL_TEXTURE_2D);
 		    GLuint texture;
@@ -241,20 +219,15 @@ namespace psmove {
         });
 
         on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
-	       	std::cout << "Frame " << video_frames << std::endl; 
-
-	       	// frames++;
+	       	// std::cout << "Frame " << video_frames << std::endl; 
 
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
 
-    		// glfwMakeContextCurrent(window);  
-	        //Get and organize events, like keyboard and mouse input, window resizing, etc...  
-			// glfwPollEvents();
-
-	        // handleInput(window, frame_time_since_start);
-
 	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
+	        
+	        window.setActive(true);
+	        handleInput(window, frame_time_since_start);
 	        
 	        if(video_frames * frame_duration < frame_time_since_start && !paused){
 	            video_frames++;
@@ -262,8 +235,6 @@ namespace psmove {
 	            return;
 	        }
 
-	        window.setActive(true);
-	        handleInput(window, frame_time_since_start);
 
 	        //Clear color buffer  
 	        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -383,7 +354,6 @@ namespace psmove {
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
 		    sensorPlant.next();
 		    cvReleaseCapture(&video);  
-		    // destroyGLWindow(window);
 		});
     }
 }

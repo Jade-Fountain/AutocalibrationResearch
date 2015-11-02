@@ -60,7 +60,6 @@ namespace psmove {
 		int psMoveLatency = -1400;
 		bool paused = false;
 		bool running = true;
- 		void handleInput(GLFWwindow* window, double time_since_start); 
 		void handleInput(const sf::Window& w, double time_since_start);
 		
 
