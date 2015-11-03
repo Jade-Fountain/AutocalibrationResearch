@@ -40,6 +40,11 @@ namespace autocal {
 			RigidBody r;
 			
 			arma::vec3 pos = data.rows(1,3);
+			Rotation3D rot;
+			int start = 4;
+			for(int i = 0; i < 3; i++){
+				rot.row(i) = data.rows(start + 3 * i, start + 3 * i + 2).t();
+			}
 			//Change back to mocap coords from nubots coords (sigh...)
 			if(correctForAutocalibrationCoordinateSystem){
 				r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
@@ -47,11 +52,6 @@ namespace autocal {
 				r.pose.translation() = pos;
 			}
 			
-			Rotation3D rot;
-			int start = 4;
-			for(int i = 0; i < 3; i++){
-				rot.row(i) = data.rows(start + 3 * i, start + 3 * i + 2).t();
-			}
 			if(correctForAutocalibrationCoordinateSystem){
 				UnitQuaternion q(rot);
 				//Change back to mocap coords from nubots coords (sigh...)
@@ -197,22 +197,41 @@ namespace autocal {
 		return success;
 	}
 
-	bool MocapStream::setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const Transform3D& pose){
+	bool MocapStream::setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis){
 		//Check that the frame doesn't already exist
 		TimeStamp t = getTimeStamp(frame_time);
-		if(stream.count(t) == 0){
-			stream[t] = Frame();
-		}
-		stream[t].rigidBodies[id] = RigidBody({pose});
+		setRigidBodyInFrame(t,id,pose, correctCoordinateSystem, reflectZAxis);
 	}
 
-	bool MocapStream::setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const Transform3D& pose){
+	bool MocapStream::setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis){
 		//Check that the frame doesn't already exist
 		TimeStamp t = frame_time;
 		if(stream.count(t) == 0){
 			stream[t] = Frame();
 		}
 		stream[t].rigidBodies[id] = RigidBody({pose});
+		RigidBody& r = stream[t].rigidBodies[id];
+		
+		arma::vec3 pos = r.pose.translation();
+		Rotation3D rot = r.pose.rotation();
+		//Change back to mocap coords from nubots coords (sigh...)
+		if(correctCoordinateSystem){
+			UnitQuaternion q(rot);
+			//Change back to mocap coords from nubots coords (sigh...)
+			UnitQuaternion q_(arma::vec4{
+				 q.kX(),
+				-q.kZ(),
+				 q.kW(),
+				-q.kY(),
+				});
+			//Turn back into rotation
+			r.pose.rotation() = Rotation3D(q_);
+			r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
+		}
+
+		if(reflectZAxis){
+			r.pose.z() = -r.pose.z();
+		}
 	}
 
 	std::map<MocapStream::RigidBodyID, arma::vec> MocapStream::getInvariates(TimeStamp now){

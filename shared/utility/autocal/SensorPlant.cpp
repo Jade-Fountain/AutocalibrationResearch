@@ -76,8 +76,6 @@ namespace autocal {
 			totalGuesses[cor.first] ++;
 		}
 		
-
-
 		return correlations;
 
 	}

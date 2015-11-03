@@ -171,9 +171,9 @@ namespace autocal {
 		//Heavy functions
 		bool loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ = false, const std::set<int>& allowedIDs = std::set<int>());
 
-		bool setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose);
+		bool setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
 		
-		bool setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose);
+		bool setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
 
 		std::map<MocapStream::RigidBodyID, arma::vec> getInvariates(TimeStamp now);
 		

@@ -33,7 +33,7 @@
 
 #include "utility/autocal/GraphicsTools.h"
 #include "messages/support/Configuration.h"
-#include "messages/input/proto/MotionCapture.pb.h"
+#include "messages/input/MotionCapture.h"
 #include "utility/math/geometry/UnitQuaternion.h"
 #include "utility/math/matrix/Rotation3D.h"
 #include "utility/math/matrix/Transform3D.h"
@@ -43,7 +43,7 @@ namespace psmove {
 
     using messages::support::Configuration;
     using utility::math::geometry::UnitQuaternion;
-	using messages::input::proto::MotionCapture;
+	using messages::input::MotionCapture;
     using utility::math::matrix::Rotation3D;
     using utility::math::matrix::Transform3D;
 
@@ -88,16 +88,16 @@ namespace psmove {
 		    checkGLError();
 	        
 	        start_time = std::chrono::system_clock::now();    
-  			start_timestamp = std::chrono::duration_cast<std::chrono::microseconds>(start).count()
+  			start_timestamp = std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
         });
 
 		   //Main Loop  
-        on<Every<60,Per<std::chrono::seconds>>, With<MotionCapture>,Single>().then([this]
-        	(const MotionCapture& mocap){
+        on<Every<60,Per<std::chrono::seconds>>, Optional<With<MotionCapture>>,Single>().then([this]
+        	(const std::shared_ptr<const MotionCapture>& mocap){
 	        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
 
-	        autocal::TimeStamp current_timestamp = start_timestamp + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
+	        autocal::TimeStamp current_timestamp = start_timestamp + std::chrono::duration_cast<std::chrono::microseconds>(now-start_time).count();
     		
     		if(video_frames * frame_duration < frame_time_since_start){
 	            video_frames++;
@@ -106,22 +106,26 @@ namespace psmove {
 	        }
 
 	        //Add measurement for mocap
-	        for(auto& rigidBody : mocap.rigidBodies){
-	        	int id = rigidBody.id;
-	        	Transform3D pose;
-	        	pose.translation() = rigidBody.position();
-                UnitQuaternion q(arma::vec4{rigidBody.rotation().t(),
-                							rigidBody.rotation().x(),
-                                            rigidBody.rotation().y(),
-                                            rigidBody.rotation().z()
-                                            });
-				pose.rotation() = Rotation3D(q);
-				//Reflect coordinate system
-				pose.z() = -pose.z();
-				sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose);
+	        if(mocap){
+		        for(auto& rigidBody : mocap->rigidBodies){
+		        	int id = rigidBody.id;
+		        	Transform3D pose;
+		        	pose.translation() = arma::vec3({double(rigidBody.position[0]),
+													 double(rigidBody.position[1]),
+													 double(rigidBody.position[2])});
+	                UnitQuaternion q(arma::vec4{rigidBody.rotation[3],
+	                							rigidBody.rotation[0],
+	                                            rigidBody.rotation[1],
+	                                            rigidBody.rotation[2]
+	                                            });
+					pose.rotation() = Rotation3D(q);
+					//Reflect coordinate system
+					// pose.z() = -pose.z();
+					sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose, true, false);
+		        }	
 	        }
 
-	        //Add measurement for psmove
+	        //TODO: Add measurement for psmove
 	        psmoveTracker.update();
 
 	        window.setActive(true);
@@ -131,8 +135,8 @@ namespace psmove {
 	        
 	        psmoveTracker.render();
 
-	        //Draw red crosshair for aiming camera
-	        drawCrossHair();
+	        //TODO: perform matching
+	        drawSensorStreams(sensorPlant, "mocap", current_timestamp);
 
 	        //Get interaction
 	        handleInput(window, frame_time_since_start);
