@@ -283,7 +283,7 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
             auto& rigidBody = pair.second;
             //4x4 matrix pose
             Transform3D pose = rigidBody.pose;
-            std::cout << "pose " << rigidBodyID << " = \n" << pose << std::endl;
+            // std::cout << "pose " << rigidBodyID << " = \n" << pose << std::endl;
             //Load pose into opengl as view matrix
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  

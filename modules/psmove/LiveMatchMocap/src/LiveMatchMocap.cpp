@@ -58,7 +58,7 @@ namespace psmove {
 
     LiveMatchMocap::LiveMatchMocap(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)), 
-    window(sf::VideoMode(640*2, 480*2), "OpenGL", sf::Style::Default, sf::ContextSettings(32)),
+    window(sf::VideoMode(640*4, 480*4), "OpenGL", sf::Style::Default, sf::ContextSettings(32)),
     sensorPlant(false) //Do not simulate
      {
 
@@ -113,15 +113,22 @@ namespace psmove {
 		        	pose.translation() = arma::vec3({double(rigidBody.position[0]),
 													 double(rigidBody.position[1]),
 													 double(rigidBody.position[2])});
-	                UnitQuaternion q(arma::vec4{rigidBody.rotation[3],
-	                							rigidBody.rotation[0],
-	                                            rigidBody.rotation[1],
-	                                            rigidBody.rotation[2]
-	                                            });
+	                UnitQuaternion q(rigidBody.rotation[3], // real part
+	                				 arma::vec3({
+	                				 	double(rigidBody.rotation[0]),//imaginary part
+										double(rigidBody.rotation[1]),
+										double(rigidBody.rotation[2])
+											 	})
+	                				 );
 					pose.rotation() = Rotation3D(q);
-					//Reflect coordinate system
-					// pose.z() = -pose.z();
-					sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose, true, false);
+		        	if(id != 1){ 
+						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose, false, false);
+		        	} else {
+						std::cout << "pose: " << id << " = \n" << pose << std::endl; 
+						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
+						pose.x() = -pose.x();
+		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i(), false);
+		        	}
 		        }	
 	        }
 
@@ -135,8 +142,22 @@ namespace psmove {
 	        
 	        psmoveTracker.render();
 
+	        glMatrixMode(GL_PROJECTION);
+	        //49.3 is the measured vFOV of the pseye camera on blue setting
+		    glm::mat4 proj =
+
+		        // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
+		        // image->width, image->height, 0.01f, 10.0f);
+
+		        glm::perspective(   float(49.3 * 3.14159 / 180.0),            //VERTICAL FOV
+		                            float(width) / float(height),  //aspect ratio
+		                            0.01f,         //near plane distance (min z)
+		                            10.0f           //Far plane distance (max z)
+		                            );
+		    glLoadMatrixf(glm::value_ptr(proj));
+
 	        //TODO: perform matching
-	        drawSensorStreams(sensorPlant, "mocap", current_timestamp);
+	        drawSensorStreams(sensorPlant, "psmove", current_timestamp);
 
 	        //Get interaction
 	        handleInput(window, frame_time_since_start);
