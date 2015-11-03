@@ -86,6 +86,7 @@ namespace autocal {
 					}						
 				}
 			}
+			// if(eliminatedHypotheses.size() == )
 		}
 
 		bool Correlator::sufficientData(){

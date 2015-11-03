@@ -29,6 +29,7 @@
 #include "psmoveapi/psmove_fusion.h"
 
 #include "MocapRecorder.h"
+#include "SensorPlant.h"
 
 #include "utility/math/matrix/Transform3D.h"
 
@@ -64,11 +65,14 @@ class Tracker {
         void render();
         void saveFrame(CvVideoWriter *writer);
         void savePoses();
+        void addMeasurementsToStream(autocal::SensorPlant& plant, autocal::TimeStamp t);
+
 
     private:
         PSMove **m_moves;
         int *m_items;
         int m_count;
+        float unit_factor = 0.1; //PSMOVE API units are decimeters
 
         std::vector<Point3D> m_trace;
         float m_rotation;

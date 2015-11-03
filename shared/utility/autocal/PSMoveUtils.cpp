@@ -227,6 +227,19 @@ void Tracker::saveFrame(CvVideoWriter *writer){
         std::cout << "Frame failed to save" << std::endl;
     }
 }
+void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, autocal::TimeStamp t){
+    for (int i=0; i<m_count; i++) {
+        GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
+        Transform3D pose;
+        // units = decimeters
+        pose << m[0] << m[4] << m[8] << unit_factor * m[12] << arma::endr
+             << m[1] << m[5] << m[9] << unit_factor * m[13] << arma::endr
+             << m[2] << m[6] << m[10] << unit_factor * m[14] << arma::endr
+             << m[3] << m[7] << m[11] << m[15] << arma::endr;
+
+        plant.mocapRecording.addMeasurement("psmove", t, i, pose);
+    }
+}
 
 void Tracker::savePoses(){
     std::vector<Transform3D> poses;
@@ -234,7 +247,6 @@ void Tracker::savePoses(){
         GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
         Transform3D pose;
         // units = decimeters
-        float unit_factor = 0.1;
         pose << m[0] << m[4] << m[8] << unit_factor * m[12] << arma::endr
              << m[1] << m[5] << m[9] << unit_factor * m[13] << arma::endr
              << m[2] << m[6] << m[10] << unit_factor * m[14] << arma::endr

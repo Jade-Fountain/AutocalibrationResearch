@@ -122,18 +122,20 @@ namespace psmove {
 	                				 );
 					pose.rotation() = Rotation3D(q);
 		        	if(id != 1){ 
-						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose, false, false);
+						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose);
 		        	} else {
-						std::cout << "pose: " << id << " = \n" << pose << std::endl; 
+						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
 						pose.x() = -pose.x();
-		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i(), false);
+		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i());
 		        	}
 		        }	
 	        }
 
-	        //TODO: Add measurement for psmove
+
+	        //Update and add measurement for psmove
 	        psmoveTracker.update();
+			psmoveTracker.addMeasurementsToStream(sensorPlant, current_timestamp);
 
 	        window.setActive(true);
 
@@ -157,7 +159,9 @@ namespace psmove {
 		    glLoadMatrixf(glm::value_ptr(proj));
 
 	        //TODO: perform matching
-	        drawSensorStreams(sensorPlant, "psmove", current_timestamp);
+	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, 0);
+
+	        drawSensorStreams(sensorPlant, "psmove", current_timestamp, matches);
 
 	        //Get interaction
 	        handleInput(window, frame_time_since_start);
