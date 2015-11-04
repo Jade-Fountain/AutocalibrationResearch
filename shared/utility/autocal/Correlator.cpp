@@ -13,7 +13,7 @@ namespace autocal {
 		Correlator::Correlator():firstRotationReadings(){
 			number_of_samples = 10;
 			difference_threshold = 1;
-			elimination_score_threshold = 0.1;
+			elimination_score_threshold = 0.01;
 		}
 
 
@@ -106,7 +106,7 @@ namespace autocal {
 		}
 
 		void Correlator::compute(){
-			// std::cout << "\nComputing matches..." << std::endl;
+			std::cout << "\nComputing matches..." << std::endl;
 			std::map<MocapStream::RigidBodyID,float> totalScores;
 			for(auto& hypothesis : recordedStates){
 				//Extract data from its confusing encrypted data structure
@@ -125,9 +125,10 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				// float score = getSylvesterScore(states1, states2, key);
+				float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				float score = getRotationScore(states1, states2, key);
+				// float score = getRotationScore(states1, states2, key);
+
 
 				//Init score to 1 if not recorded or set at zero
 				if(scores.count(key) == 0 || scores[key] == 0){
@@ -138,7 +139,11 @@ namespace autocal {
 				//CONFIG HERE: score accumulation turned on by uncommenting this line:
 				scores[key] = score;// * scores[key];
 
-				// std::cout << "score[" << id1 << "," << id2 << "] = " << scores[key] << " " << states1.size() << " samples "<< std::endl;
+				std::cout << "score[" << id1 << "," << id2 << "] = " << scores[key] << " " << states1.size() << " samples "<< std::endl;
+				// for(int i = 0; i < states1.size(); i++){
+				// 	std::cout << "states1[" << i << "] \n" << states1[i] << std::endl;
+				// 	std::cout << "states2[" << i << "] \n" << states2[i] << std::endl;
+				// }
 
 				totalScores[id1] += scores[key];
 			}
@@ -180,9 +185,12 @@ namespace autocal {
 			for(int i = 0; i < states1.size(); i++){
 				const Transform3D& A = states1[i];
 				const Transform3D& B = states2[i];
-				totalError += Transform3D::norm((A * X).i() * (Y * B));
+				Transform3D errorMat = (A * X).i() * (Y * B);
+				float error = Transform3D::norm(errorMat);
+				totalError += error;
+				std::cout << "Error = " << error << " for transform\n" << errorMat << std::endl;
 			}
-			// std::cout <<  "error = " << totalError << std::endl;
+			std::cout <<  "error = " << totalError << std::endl;
 			return likelihood(totalError / float(number_of_samples));
 		}
 
@@ -202,7 +210,7 @@ namespace autocal {
 			float angle1 = Rotation3D::norm(R1);
 			float angle2 = Rotation3D::norm(R2);
 
-			std::cout << "angle for rb" << key.first <<" = " << angle1 << " angle for psmove "<< key.second << " = " << angle2 << std::endl;
+			// std::cout << "angle for rb" << key.first <<" = " << angle1 << " angle for psmove "<< key.second << " = " << angle2 << std::endl;
 			float error = std::fabs(angle2 - angle1);
 			//BELOW LINE DOESNT MAKE A LARGE DIFFERENCE.
 			error = std::fmin(error, 2 * M_PI - error);

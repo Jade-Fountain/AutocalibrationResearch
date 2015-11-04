@@ -56,7 +56,8 @@ namespace psmove {
 		int height;
 
 		autocal::SensorPlant sensorPlant;
-
+		bool use_simulation = false;
+		
 		//State variables
 		int video_frames = 0;
 		bool running = true;

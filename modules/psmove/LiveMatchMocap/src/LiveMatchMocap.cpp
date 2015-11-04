@@ -58,8 +58,7 @@ namespace psmove {
 
     LiveMatchMocap::LiveMatchMocap(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)), 
-    window(sf::VideoMode(640*4, 480*4), "OpenGL", sf::Style::Default, sf::ContextSettings(32)),
-    sensorPlant(false) //Do not simulate
+    window(sf::VideoMode(640*4, 480*4), "OpenGL", sf::Style::Default, sf::ContextSettings(32))
      {
 
         on<Configuration>("LiveMatchMocap.yaml").then([this] (const Configuration& config) {
@@ -68,9 +67,26 @@ namespace psmove {
 		    height = config["height"].as<int>();
 	    	fps = config["fps"].as<float>();
 	    	frame_duration = 1.0 / fps;
+	    	use_simulation = config["use_simulation"].as<bool>();
         });
 
         on<Startup>().then([this]{
+        	//Initialise sensor plant
+		    sensorPlant = autocal::SensorPlant(use_simulation);
+		    //Optional simulation parameters
+		    if(use_simulation){
+		        //Exp 4 -...
+		        autocal::MocapStream::SimulationParameters a1; 
+		        autocal::MocapStream::SimulationParameters a2;
+		        autocal::MocapStream::SimulationParameters d1; 
+		        autocal::MocapStream::SimulationParameters d2; 
+		        a2.noise.angle_stddev = 1;
+		        d1.noise.disp_stddev = 2;
+		        d2.noise.disp_stddev = 10;
+		        int aN = 10;
+		        int dN = 10;
+		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
+		    }
 
 	        window.setActive(true);
 
@@ -122,7 +138,7 @@ namespace psmove {
 	                				 );
 					pose.rotation() = Rotation3D(q);
 		        	if(id != 1){ 
-						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose);
+						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false,true);
 		        	} else {
 						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
@@ -137,7 +153,7 @@ namespace psmove {
 
 	        //Update and add measurement for psmove
 	        psmoveTracker.update();
-			psmoveTracker.addMeasurementsToStream(sensorPlant, current_timestamp);
+			if(!use_simulation) psmoveTracker.addMeasurementsToStream(sensorPlant, current_timestamp);
 
 	        window.setActive(true);
 

@@ -37,7 +37,7 @@ namespace autocal {
 		
 		//if we simulate the data, derive it from the second stream
 		if(simulate){
-			currentState1 = stream2.getCompleteSimulatedStates(now + latencyOfStream1, {18,12}, simParams.front());
+			currentState1 = stream2.getCompleteSimulatedStates(now + latencyOfStream1, {2}, simParams.front());
 		} else {
 			MocapStream& stream1 = mocapRecording.getStream(stream_name_1);
 			if(stream1.size() == 0) return empty_result;
