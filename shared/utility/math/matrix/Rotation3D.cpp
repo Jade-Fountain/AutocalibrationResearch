@@ -150,9 +150,12 @@ namespace matrix {
 
     float Rotation3D::norm(Rotation3D T){
         UnitQuaternion q = UnitQuaternion(T);
+        //Get angle between -2Pi and 2pi
         float angle = q.getAngle();
-        //TODO: how to weight these two?
-        return std::fabs(angle);
+        //Just want magnitude
+        float theta = std::fabs(angle);
+        //But rotating more that Pi in one direction is equivalent to a rotation in the other direction
+        return std::fmin(2 * M_PI - theta, theta);
     }
 
 

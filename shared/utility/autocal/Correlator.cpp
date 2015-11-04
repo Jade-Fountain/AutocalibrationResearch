@@ -11,8 +11,8 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 100;
-			difference_threshold = 0.01;
+			number_of_samples = 10;
+			difference_threshold = 1;
 			elimination_score_threshold = 0.1;
 		}
 
@@ -43,14 +43,16 @@ namespace autocal {
 				// std::cout << "diff2 = " << diff2 << std::endl; 
 				// std::cout << "T2 = " << T2 << std::endl; 
 
+				//If we have no recorded states yet, or the new states differ significantly from the previous, add the new states
 				if( noRecordedStates ||
 					diff1 > difference_threshold || 
 					diff2 > difference_threshold)
 				{
-					//Check if bad sample:	
+					//Check if bad sample (for the particular solver we are using):	
 					UnitQuaternion q1(Rotation3D(T1.rotation()));
 					UnitQuaternion q2(Rotation3D(T2.rotation()));
 					if(q1.kW() == 0 || q2.kW() == 0) return;
+
 
 					if(recordedStates[key].first.size() >= number_of_samples){
 						recordedStates[key].first.erase(recordedStates[key].first.begin());
@@ -78,7 +80,7 @@ namespace autocal {
 				
 				if(totalScores[id1] != 0){
 					//Normalise
-					score = score / totalScores[id1];
+					score = score;// / totalScores[id1];
 					//Eliminate
 					if(score < elimination_score_threshold && eliminatedHypotheses.count(pairID) == 0){
 						eliminatedHypotheses.insert(pairID);
@@ -96,14 +98,15 @@ namespace autocal {
 			if(computableStreams.size() == 0) return false;
 			for(auto& hypothesis : recordedStates){
 				const auto& key = hypothesis.first;
-				std::cout << "computableStreams.count(key) = " << computableStreams.count(key) << std::endl;
+				// std::cout << "computableStreams.count(key) = " << computableStreams.count(key) << std::endl;
+				if(eliminatedHypotheses.count(key) != 0) continue;
 				if(computableStreams.count(key) == 0) return false;
 			}
 			return true;
 		}
 
 		void Correlator::compute(){
-			std::cout << "\nComputing matches..." << std::endl;
+			// std::cout << "\nComputing matches..." << std::endl;
 			std::map<MocapStream::RigidBodyID,float> totalScores;
 			for(auto& hypothesis : recordedStates){
 				//Extract data from its confusing encrypted data structure
@@ -122,9 +125,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				float score = getSylvesterScore(states1, states2, key);
+				// float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				// float score = getRotationScore(states1, states2, key);
+				float score = getRotationScore(states1, states2, key);
 
 				//Init score to 1 if not recorded or set at zero
 				if(scores.count(key) == 0 || scores[key] == 0){
@@ -199,7 +202,7 @@ namespace autocal {
 			float angle1 = Rotation3D::norm(R1);
 			float angle2 = Rotation3D::norm(R2);
 
-
+			std::cout << "angle for rb" << key.first <<" = " << angle1 << " angle for psmove "<< key.second << " = " << angle2 << std::endl;
 			float error = std::fabs(angle2 - angle1);
 			//BELOW LINE DOESNT MAKE A LARGE DIFFERENCE.
 			error = std::fmin(error, 2 * M_PI - error);
