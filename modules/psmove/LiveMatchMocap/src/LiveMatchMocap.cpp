@@ -130,6 +130,8 @@ namespace psmove {
 		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i());
 		        	}
 		        }	
+	        } else {
+	        	std::cout << "NO MOCAP RECEIVED" << std::endl;
 	        }
 
 

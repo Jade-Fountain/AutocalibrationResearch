@@ -26,7 +26,7 @@ namespace autocal {
 
 			if(recordedStates.count(key) == 0){
 				//Initialise if key missing. (true => calculate cov)
-				recordedStates[key] = std::pair<std::vector<utility::math::matrix::Transform3D>, std::vector<utility::math::matrix::Transform3D>>();
+				recordedStates[key] = StreamPair();
 			} else {
 				//Add current stats to the vector
 				bool noRecordedStates = recordedStates[key].first.empty() || recordedStates[key].second.empty();
@@ -86,27 +86,32 @@ namespace autocal {
 					}						
 				}
 			}
-			// if(eliminatedHypotheses.size() == )
+			//If all eliminated			
+			if(eliminatedHypotheses.size() == scores.size()){
+				reset();
+			}
 		}
 
 		bool Correlator::sufficientData(){
 			if(computableStreams.size() == 0) return false;
 			for(auto& hypothesis : recordedStates){
 				const auto& key = hypothesis.first;
+				std::cout << "computableStreams.count(key) = " << computableStreams.count(key) << std::endl;
 				if(computableStreams.count(key) == 0) return false;
 			}
 			return true;
 		}
 
 		void Correlator::compute(){
+			std::cout << "\nComputing matches..." << std::endl;
 			std::map<MocapStream::RigidBodyID,float> totalScores;
 			for(auto& hypothesis : recordedStates){
 				//Extract data from its confusing encrypted data structure
 				const auto& key = hypothesis.first;
 				const auto& id1 = key.first;
 				const auto& id2 = key.second;
-				const std::vector<Transform3D>& states1 = hypothesis.second.first;
-				const std::vector<Transform3D>& states2 = hypothesis.second.second;
+				const Correlator::Stream& states1 = hypothesis.second.first;
+				const Correlator::Stream& states2 = hypothesis.second.second;
 				
 				//Check whether or not we need to check this hypothesis anymore
 				if(eliminatedHypotheses.count(key) != 0) continue;
@@ -154,8 +159,8 @@ namespace autocal {
 			computableStreams.clear();
 		}
 
-		float Correlator::getSylvesterScore(std::vector<Transform3D> states1, std::vector<Transform3D> states2, 
-											std::pair<MocapStream::RigidBodyID,MocapStream::RigidBodyID> key){
+		float Correlator::getSylvesterScore(const Correlator::Stream& states1, const Correlator::Stream& states2, 
+											Correlator::Hypothesis key){
 			//Fit data
 			bool success = true;
 			auto result = CalibrationTools::solveHomogeneousDualSylvester(states1,states2,success);
@@ -178,8 +183,8 @@ namespace autocal {
 			return likelihood(totalError / float(number_of_samples));
 		}
 
-		float Correlator::getRotationScore(std::vector<Transform3D> states1, std::vector<Transform3D> states2,
-										   std::pair<MocapStream::RigidBodyID,MocapStream::RigidBodyID> key){
+		float Correlator::getRotationScore(const Correlator::Stream& states1, const Correlator::Stream& states2,
+										   Correlator::Hypothesis key){
 			
 			if(firstRotationReadings.count(key) == 0){
 				std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> val = {states1.front().rotation(), states2.front().rotation()};

@@ -32,29 +32,28 @@ namespace autocal {
 		float elimination_score_threshold; 
 		//STATE
 
+		using Hypothesis = std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID>;
+		using Stream = std::vector<utility::math::matrix::Transform3D>;
+		using StreamPair = std::pair<Stream, Stream>;
+
 		//States for matchStreams
-		std::map<std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID>, 
-				 	std::pair<std::vector<utility::math::matrix::Transform3D>, std::vector<utility::math::matrix::Transform3D>>>
-				 	 recordedStates;
+		std::map<Hypothesis, StreamPair> recordedStates;
 		//Stores scores for the matchings
-		std::map<std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID>, float> scores;
+		std::map<Hypothesis, float> scores;
 		//Stores the matches which have been deduced incorrect
-		std::set<std::pair<MocapStream::RigidBodyID, 
-						   MocapStream::RigidBodyID>> eliminatedHypotheses;
+		std::set<Hypothesis> eliminatedHypotheses;
 		
-		std::set<std::pair<MocapStream::RigidBodyID, 
-							   MocapStream::RigidBodyID>> computableStreams;
+		std::set<Hypothesis> computableStreams;
 
 		//For rotation scoring:
-		std::map<std::pair<MocapStream::RigidBodyID,         MocapStream::RigidBodyID>,
-				 std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> >
+		std::map<Hypothesis, std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> >
 				 firstRotationReadings;
 		
-		float getSylvesterScore(std::vector<utility::math::matrix::Transform3D> states1, std::vector<utility::math::matrix::Transform3D> states2, 
-								std::pair<MocapStream::RigidBodyID,MocapStream::RigidBodyID> key);
+		float getSylvesterScore(const Stream& states1, const Stream& states2, 
+								Hypothesis key);
 
-		float getRotationScore(std::vector<utility::math::matrix::Transform3D> states1, std::vector<utility::math::matrix::Transform3D> states2, 
-								std::pair<MocapStream::RigidBodyID,MocapStream::RigidBodyID> key);
+		float getRotationScore(const Stream& states1, const Stream& states2, 
+								Hypothesis key);
 		
 		void resetRecordedStates();
 		
