@@ -30,7 +30,7 @@ Tracker::Tracker()
     // }
 
 
-    psmove_tracker_set_mirror(m_tracker, PSMove_True);
+    psmove_tracker_set_mirror(m_tracker, PSMove_False);
     psmove_tracker_set_exposure(m_tracker, Exposure_HIGH);
 
     m_moves = (PSMove**)calloc(m_count, sizeof(PSMove*));

@@ -106,6 +106,9 @@ namespace geometry {
     arma::vec3 UnitQuaternion::getAxis() const {
     	double angle = getAngle();
     	double sinThetaOnTwo = std::sin(angle / 2.0);
+        if(sinThetaOnTwo == 0){
+            return arma::zeros(3);
+        }
     	return imaginary() / sinThetaOnTwo;
     }
 

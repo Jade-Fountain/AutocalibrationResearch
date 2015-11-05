@@ -83,6 +83,10 @@ namespace matrix {
         return *this * createRotationZ(radians);
     }
 
+    Transform3D Transform3D::scale(const arma::vec3& v) const{
+        return *this * createScale(v);
+    }
+
     Transform3D Transform3D::rotateLocal(const Rotation3D& rotation, const Transform3D& local) const {
         return Transform3D(Transform3D(rotation) * worldToLocal(local)).localToWorld(local);
     }
@@ -200,6 +204,12 @@ namespace matrix {
     Transform3D Transform3D::createRotationZ(double radians) {
         Transform3D transform;
         transform.submat(0,0,2,2) = Rotation3D::createRotationZ(radians);
+        return transform;
+    }
+
+    Transform3D Transform3D::createScale(const arma::vec3& v){
+        Transform3D transform;
+        transform.rotation() = arma::diagmat(v);
         return transform;
     }
 

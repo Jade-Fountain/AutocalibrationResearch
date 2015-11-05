@@ -145,6 +145,8 @@ namespace matrix {
              */
             Transform3D rotateZ(double radians) const;
 
+            Transform3D scale(const arma::vec3& v) const;
+
             Transform3D rotateLocal(const Rotation3D& rotation, const Transform3D& local) const;
             Transform3D rotateXLocal(double radians, const Transform3D& local) const;
             Transform3D rotateYLocal(double radians, const Transform3D& local) const;
@@ -247,6 +249,8 @@ namespace matrix {
              * @return The rotation transform
              */
             static Transform3D createRotationZ(double radians);
+            
+            static Transform3D createScale(const arma::vec3& v);
             
             /**
              * @brief Interpolates between two transforms

@@ -80,11 +80,8 @@ namespace psmove {
 		        autocal::MocapStream::SimulationParameters a2;
 		        autocal::MocapStream::SimulationParameters d1; 
 		        autocal::MocapStream::SimulationParameters d2; 
-		        a2.noise.angle_stddev = 1;
-		        d1.noise.disp_stddev = 2;
-		        d2.noise.disp_stddev = 10;
-		        int aN = 10;
-		        int dN = 10;
+		        int aN = 1;
+		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 		    }
 
@@ -137,12 +134,13 @@ namespace psmove {
 											 	})
 	                				 );
 					pose.rotation() = Rotation3D(q);
+		        	// pose = Transform3D::createScale(arma::vec3({-1,1,1})) * pose;
 		        	if(id != 1){ 
-						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false,true);
+						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false,false);
 		        	} else {
 						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
-						pose.x() = -pose.x();
+						// pose.x() = -pose.x();
 		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i());
 		        	}
 		        }	

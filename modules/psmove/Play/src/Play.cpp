@@ -151,16 +151,16 @@ namespace psmove {
 		        autocal::MocapStream::SimulationParameters a2;
 		        autocal::MocapStream::SimulationParameters d1; 
 		        autocal::MocapStream::SimulationParameters d2; 
-		        a2.noise.angle_stddev = 1;
-		        d1.noise.disp_stddev = 2;
-		        d2.noise.disp_stddev = 10;
-		        int aN = 10;
-		        int dN = 10;
+		        // a2.noise.angle_stddev = 1;
+		        // d1.noise.disp_stddev = 2;
+		        // d2.noise.disp_stddev = 10;
+		        int aN = 1;
+		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 		    }
 
 		    //Push back the loaded streams
-		    sensorPlant.addStream(psmoveStream);
+		    if(!use_simulation) sensorPlant.addStream(psmoveStream);
 		    sensorPlant.addStream(optitrackStream);
 
 		    //Ground Truth computation

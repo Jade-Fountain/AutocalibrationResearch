@@ -37,7 +37,12 @@ namespace autocal {
 		
 		//if we simulate the data, derive it from the second stream
 		if(simulate){
-			currentState1 = stream2.getCompleteSimulatedStates(now + latencyOfStream1, {2}, simParams.front());
+			currentState1 = stream2.getCompleteSimulatedStates(now , {2}, simParams.front());
+			for(auto& m : currentState1){
+				mocapRecording.addMeasurement(stream_name_1, now, m.first, m.second);
+				// std::cout  << "adding measurement to " << stream_name_1 << "[" << m.first << "\n" << m.second << std::endl;
+					// std::cout  << "based on" << stream_name_2 << "[" << 2 << "\n" << stream2.getFrame(now).rigidBodies[2].pose << std::endl;
+			}
 		} else {
 			MocapStream& stream1 = mocapRecording.getStream(stream_name_1);
 			if(stream1.size() == 0) return empty_result;
@@ -72,7 +77,7 @@ namespace autocal {
 		for (auto& cor : correlations){
 			if(correctGuesses.count(cor.first) == 0) correctGuesses[cor.first] = 0;
 			if(totalGuesses.count(cor.first) == 0) totalGuesses[cor.first] = 0;
-			correctGuesses[cor.first] += int(cor.first == 0 && cor.second == 2);
+			correctGuesses[cor.first] += int(cor.first == 1 && cor.second == 2);
 			totalGuesses[cor.first] ++;
 		}
 		

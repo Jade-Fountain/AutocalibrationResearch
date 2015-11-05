@@ -349,15 +349,17 @@ namespace autocal {
 				std::pair<int,int> key = {i,int(rbID)};
 
 				if(simWorldTransform.count(key) == 0){
-					// simWorldTransform[key] = Transform3D::getRandom(1,0.1);
-					simWorldTransform[key] = Transform3D({ 0.1040,  -0.0023,  -0.9946,  -0.3540,
-													      -0.1147,   0.9933,  -0.0143,  -0.9437,
-													       0.9879,   0.1156,   0.1030,   1.2106,
-													            0,        0,        0,   1.0000}).t();//transpose because column major reading
+					simWorldTransform[key] = Transform3D::getRandomU(1,0.1);
+					// simWorldTransform[key] = arma::eye(4,4);
+					//  Transform3D({ 0.1040,  -0.0023,  -0.9946,  -0.3540,
+					// 								      -0.1147,   0.9933,  -0.0143,  -0.9437,
+					// 								       0.9879,   0.1156,   0.1030,   1.2106,
+					// 								            0,        0,        0,   1.0000}).t();//transpose because column major reading
 					std::cout << "simWorldTransform = \n" << simWorldTransform[key] << std::endl;
 				}
 				if(simLocalTransform.count(key) == 0){
 					simLocalTransform[key] = Transform3D::getRandomU(1,0.1);
+					// simLocalTransform[key] = simLocalTransform[key].rotateX(M_PI_2);
 					std::cout << "simLocalTransform = \n" << simLocalTransform[key] << std::endl;
 				}
 				//Noise:
@@ -381,12 +383,13 @@ namespace autocal {
 
 				slippage[rbID] = Transform3D(Rotation3D::createRotationZ(angle),arma::vec3({x,0,0}));
 				// std::cout << "slippage[" << rbID << "] = " << Transform3D::norm(slippage[rbID]) << std::endl;
-				// std::cout << "noise[" << rbID << "] = " << Transform3D::norm(noise) << std::endl;
+				// std::cout << "localNoise[" << rbID << "] = " << Transform3D::norm(localNoise) << std::endl;
+				// std::cout << "globalNoise[" << rbID << "] = " << Transform3D::norm(globalNoise) << std::endl;
 				// std::cout << "slippage/noise[" << rbID << "] = " << Transform3D::norm(slippage[rbID])/Transform3D::norm(noise) << std::endl;
 
 				Transform3D transform = simWorldTransform[key] * latestFrame.rigidBodies[rbID].pose * globalNoise * simLocalTransform[key] * slippage[rbID] * localNoise;
 				// std::cout << "transform = " << transform.translation().t() << std::endl;
-
+				transform.translation() = arma::vec{0,0,-1};
 				states[i++] = transform;
 			}
 		}
