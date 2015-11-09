@@ -83,7 +83,7 @@ namespace support {
 				}
 
 				bool success = true;
-				std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveHomogeneousDualSylvester(samplesA , samplesB, success);
+				std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveZhuang1994(samplesA , samplesB, success);
 
 				auto measuredX = result.first;
 				auto measuredY = result.second;

@@ -33,6 +33,21 @@ namespace autocal{
 		return omega;
 	}
 
+	/*
+	 * Returns matrix of vectorised matrix v
+	*/
+	arma::mat CalibrationTools::unvectorize(arma::mat v, int n_rows){
+		int n_cols = 0;
+		if(v.size() % n_rows != 0){
+			std::cout << "CalibrationTools::unvectorize - vector size is not divisible by number of rows: v.size() = " <<  v.size() << ", n_rows = " << n_rows << std::endl;
+		} else {
+			n_cols = v.size() / n_rows;
+		}
+		arma::mat M = v;
+		M.reshape(n_rows,n_cols);
+		return M;
+	}
+
 	//
 	// void CalibrationTools::checkOrthonormal(M){
 
@@ -79,10 +94,10 @@ namespace autocal{
 		pages={549-554}
 		}	
 		*/
-	std::pair<Transform3D, Transform3D> CalibrationTools::solveHomogeneousDualSylvester(const std::vector<Transform3D>& samplesA,const std::vector<Transform3D>& samplesB, bool& success){
+	std::pair<Transform3D, Transform3D> CalibrationTools::solveZhuang1994(const std::vector<Transform3D>& samplesA,const std::vector<Transform3D>& samplesB, bool& success){
 		if(samplesA.size() < 3 || samplesB.size() < 3){
-			std::cout << "CalibrationTools::solveHomogeneousDualSylvester - NEED MORE THAN 2 SAMPLES" << std::endl;
-			throw std::domain_error("CalibrationTools::solveHomogeneousDualSylvester - NEED MORE THAN 2 SAMPLES");
+			std::cout << "CalibrationTools::solveZhuang1994 - NEED MORE THAN 2 SAMPLES" << std::endl;
+			throw std::domain_error("CalibrationTools::solveZhuang1994 - NEED MORE THAN 2 SAMPLES");
 		}
 		Transform3D X,Y;
 
@@ -212,4 +227,58 @@ namespace autocal{
 
 		return std::pair<Transform3D, Transform3D>(X,Y);
 	}
+
+
+	// @article{shah_solving_2013,
+	// 	title = {Solving the {Robot}-{World}/{Hand}-{Eye} {Calibration} {Problem} {Using} the {Kronecker} {Product}},
+	// 	volume = {5},
+	// 	issn = {1942-4302},
+	// 	url = {http://dx.doi.org/10.1115/1.4024473},
+	// 	doi = {10.1115/1.4024473},
+	// 	abstract = {This paper constructs a separable closed-form solution to the robot-world/hand-eye calibration problem AX = YB. Qualifications and properties that determine the uniqueness of X and Y as well as error metrics that measure the accuracy of a given X and Y are given. The formulation of the solution involves the Kronecker product and the singular value decomposition. The method is compared with existing solutions on simulated data and real data. It is shown that the Kronecker method that is presented in this paper is a reliable and accurate method for solving the robot-world/hand-eye calibration problem.},
+	// 	number = {3},
+	// 	urldate = {2015-10-12},
+	// 	journal = {Journal of Mechanisms and Robotics},
+	// 	author = {Shah, Mili},
+	// 	month = jun,
+	// 	year = {2013},
+	// 	pages = {031007--031007},
+	// 	file = {Full Text PDF:/Users/jake/Library/Application Support/Zotero/Profiles/3jsx8rgb.default/zotero/storage/ZBI8MGZA/Shah - 2013 - Solving the Robot-WorldHand-Eye Calibration Probl.pdf:application/pdf}
+	// }
+
+	// solves AX=YB for X,Y and A in sampleA, B in sampleB
+	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveKronecker_Shah2013(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
+		
+		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
+
+		//Create kronecker matrix K
+		arma::mat K(9,9);
+		for(int i = 0; i < samplesA.size(); i++){
+			const Transform3D& A = samplesA[i];
+			const Transform3D& B = samplesB[i];
+
+			K += arma::kron(B.rotation(),A.rotation());
+
+		}
+
+		//Take singular value decomposition of K
+		arma::mat u,v;
+		arma::vec s;
+		arma::svd(u,s,v,K);
+
+		arma::mat V_x = unvectorize(v,3);
+		arma::mat V_y = unvectorize(u,3);
+
+		//TODO: finish
+
+		return result;
+
+	}
+
+
+
+
+
+
+
 }
