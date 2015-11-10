@@ -37,7 +37,7 @@ namespace autocal {
 		
 		//if we simulate the data, derive it from the second stream
 		if(simulate){
-			currentState1 = stream2.getCompleteSimulatedStates(now , {2}, simParams.front());
+			currentState1 = stream2.getCompleteSimulatedStates(now, simulatedCorrelations, simParams.front());
 			for(auto& m : currentState1){
 				mocapRecording.addMeasurement(stream_name_1, now, m.first, m.second);
 				// std::cout  << "adding measurement to " << stream_name_1 << "[" << m.first << "\n" << m.second << std::endl;
@@ -77,7 +77,9 @@ namespace autocal {
 		for (auto& cor : correlations){
 			if(correctGuesses.count(cor.first) == 0) correctGuesses[cor.first] = 0;
 			if(totalGuesses.count(cor.first) == 0) totalGuesses[cor.first] = 0;
-			correctGuesses[cor.first] += int(cor.first == 1 && cor.second == 2);
+			if(simulatedCorrelations.count(cor.first) > 0){
+				correctGuesses[cor.first] += int(simulatedCorrelations[cor.first] == cor.second);
+			}
 			totalGuesses[cor.first] ++;
 		}
 		
@@ -190,6 +192,10 @@ namespace autocal {
 		correctGuesses.clear();
 		totalGuesses.clear();
 		computeTimes.reset();
+	}
+
+	void SensorPlant::setAnswers(std::map<int,int> answers){
+		simulatedCorrelations = answers;
 	}
 
 	void SensorPlant::setSimParameters(

@@ -335,7 +335,7 @@ namespace autocal {
 	}
 
 
-	std::map<MocapStream::RigidBodyID, Transform3D> MocapStream::getCompleteSimulatedStates(TimeStamp now, std::vector<RigidBodyID> ids, const SimulationParameters& sim){
+	std::map<MocapStream::RigidBodyID, Transform3D> MocapStream::getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim){
 		std::map<MocapStream::RigidBodyID, Transform3D> states;
 
 		int lag_milliseconds = sim.latency_ms;
@@ -345,9 +345,9 @@ namespace autocal {
 			
 			Frame latestFrame = getFrame(now);
 			RigidBodyID i = 1;
-			for (auto& rbID : ids){
-				std::pair<int,int> key = {i,int(rbID)};
-
+			for (auto& key : ids){
+				int rbID = key.second;
+				
 				if(simWorldTransform.count(key) == 0){
 					simWorldTransform[key] = Transform3D::getRandomU(1,0.1);
 					// simWorldTransform[key] = arma::eye(4,4);

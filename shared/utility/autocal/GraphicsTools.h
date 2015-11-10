@@ -272,11 +272,12 @@ bool drawCamera(CvCapture* video, float verticalFOV){
     return true;
 }
 
-void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceFrame, autocal::TimeStamp t, const std::vector<std::pair<int,int>>& matches = std::vector<std::pair<int,int>>()){
+void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceFrame, std::string matchStreamRange, autocal::TimeStamp t, const std::vector<std::pair<int,int>>& matches = std::vector<std::pair<int,int>>()){
     autocal::MocapRecording& recording = sensorPlant.mocapRecording;
     for(auto& stream : recording.streams){
         std::string name = stream.first;
         autocal::MocapStream::Frame frame = sensorPlant.getGroundTruth(name, referenceFrame, t);
+        bool drawMatches = (name == matchStreamRange);
         for(auto& pair : frame.rigidBodies){
             //Get Rigid Body data
             auto& rigidBodyID = pair.first;
@@ -288,7 +289,12 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixd(pose.memptr());  
             //Draw a sphere if it matches
-            if(matches.size() > 0 && matches[0].second == rigidBodyID) {
+            //TODO:recode this garbage!
+            bool drawMatch = false;
+            for(auto& m : matches){
+                drawMatch = drawMatch || (m.second == rigidBodyID);
+            }
+            if(drawMatches && drawMatch) {
                 glEnable(GL_LIGHTING);
                 GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);

@@ -83,6 +83,11 @@ namespace psmove {
 		        int aN = 1;
 		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
+				
+				//set the simulated connections between rigid bodies
+		        std::map<int,int> answers;
+		        answers[1] = 1;
+		        sensorPlant.setAnswers(answers);
 		    }
 
 	        window.setActive(true);
@@ -177,7 +182,7 @@ namespace psmove {
 	        //TODO: perform matching
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, 0);
 
-	        drawSensorStreams(sensorPlant, "psmove", current_timestamp, matches);
+	        drawSensorStreams(sensorPlant, "psmove", "mocap", current_timestamp, matches);
 
 	        //Get interaction
 	        handleInput(window, frame_time_since_start);

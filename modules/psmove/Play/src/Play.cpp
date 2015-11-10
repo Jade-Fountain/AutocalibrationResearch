@@ -157,6 +157,11 @@ namespace psmove {
 		        int aN = 1;
 		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
+		        //set the simulated connections between rigid bodies
+		        std::map<int,int> answers;
+		        answers[1] = 2;
+		        answers[2] = 1;
+		        sensorPlant.setAnswers(answers);
 		    }
 
 		    //Push back the loaded streams
@@ -244,7 +249,11 @@ namespace psmove {
 
 	        
 	        //Draw psmove
-	        drawSensorStreams(sensorPlant, "psmove", current_timestamp, matches);
+	        drawSensorStreams(sensorPlant,
+	        				  "psmove", //reference frame
+	        				  "mocap", //matching range (ie stream to match to, usually the same as reference frame, but not this time)
+	        				  current_timestamp,
+	        				  matches);
 
 	        window.display();
 

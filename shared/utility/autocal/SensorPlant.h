@@ -29,6 +29,7 @@ namespace autocal {
 		arma::running_stat<double> computeTimes;
 		std::map<int, int> correctGuesses; 
 		std::map<int, int> totalGuesses; 
+		std::map<int,int> simulatedCorrelations;
 
 
 	public:
@@ -61,6 +62,8 @@ namespace autocal {
 		std::map<MocapStream::RigidBodyID,float> multiply(std::map<MocapStream::RigidBodyID,float> m1, std::map<MocapStream::RigidBodyID,float> m2);
 
 		void setGroundTruthTransform(std::string streamA, std::string streamB, utility::math::matrix::Transform3D mapAtoB, bool useTruth = false);
+		
+		void setAnswers(std::map<int,int> answers);
 		
 		void setSimParameters(
 			MocapStream::SimulationParameters a1, MocapStream::SimulationParameters a2, int aN,
