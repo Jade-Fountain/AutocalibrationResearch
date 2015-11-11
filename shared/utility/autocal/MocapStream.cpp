@@ -344,9 +344,9 @@ namespace autocal {
 		if(stream.size() != 0){
 			
 			Frame latestFrame = getFrame(now);
-			RigidBodyID i = 1;
 			for (auto& key : ids){
-				int rbID = key.second;
+				int artificialID = key.first;
+				int derivedID = key.second;
 				
 				if(simWorldTransform.count(key) == 0){
 					simWorldTransform[key] = Transform3D::getRandomU(1,0.1);
@@ -369,28 +369,28 @@ namespace autocal {
 				// Transform3D globalNoise = Transform3D::getRandomN(0.310524198 ,0.052928682);
 				// Transform3D noise = Transform3D();
 				
-		 	 	if(slippage.count(rbID) == 0){
-		 	 		slippage[rbID] = Transform3D();
-		 	 	}
-		 	 	float df = sim.slip.disp.f;
-		 	 	float displacement = sim.slip.disp.A;
+		 	//  	if(slippage.count(derivedID) == 0){
+		 	//  		slippage[derivedID] = Transform3D();
+		 	//  	}
+		 	//  	float df = sim.slip.disp.f;
+		 	//  	float displacement = sim.slip.disp.A;
 
-		 	 	float af = sim.slip.angle.f;
-		 	 	float angleAmp = sim.slip.angle.A;
+		 	//  	float af = sim.slip.angle.f;
+		 	//  	float angleAmp = sim.slip.angle.A;
 
-		 	 	float x = displacement * std::sin(2 * M_PI * now * 1e-6 * df);
-		 	 	float angle = angleAmp * std::sin(2 * M_PI * now * 1e-6 * af);
+		 	//  	float x = displacement * std::sin(2 * M_PI * now * 1e-6 * df);
+		 	//  	float angle = angleAmp * std::sin(2 * M_PI * now * 1e-6 * af);
 
-				slippage[rbID] = Transform3D(Rotation3D::createRotationZ(angle),arma::vec3({x,0,0}));
-				// std::cout << "slippage[" << rbID << "] = " << Transform3D::norm(slippage[rbID]) << std::endl;
-				// std::cout << "localNoise[" << rbID << "] = " << Transform3D::norm(localNoise) << std::endl;
-				// std::cout << "globalNoise[" << rbID << "] = " << Transform3D::norm(globalNoise) << std::endl;
-				// std::cout << "slippage/noise[" << rbID << "] = " << Transform3D::norm(slippage[rbID])/Transform3D::norm(noise) << std::endl;
+				// slippage[derivedID] = Transform3D(Rotation3D::createRotationZ(angle),arma::vec3({x,0,0}));
+				// std::cout << "slippage[" << derivedID << "] = " << Transform3D::norm(slippage[derivedID]) << std::endl;
+				// std::cout << "localNoise[" << derivedID << "] = " << Transform3D::norm(localNoise) << std::endl;
+				// std::cout << "globalNoise[" << derivedID << "] = " << Transform3D::norm(globalNoise) << std::endl;
+				// std::cout << "slippage/noise[" << derivedID << "] = " << Transform3D::norm(slippage[derivedID])/Transform3D::norm(noise) << std::endl;
 
-				Transform3D transform = simWorldTransform[key] * latestFrame.rigidBodies[rbID].pose * globalNoise * simLocalTransform[key] * slippage[rbID] * localNoise;
+				Transform3D transform = simWorldTransform[key] * latestFrame.rigidBodies[derivedID].pose * globalNoise * simLocalTransform[key] * localNoise;
 				// std::cout << "transform = " << transform.translation().t() << std::endl;
-				transform.translation() = arma::vec{0,0,-1};
-				states[i++] = transform;
+				// transform.translation() = arma::vec{0,0,-1};
+				states[artificialID] = transform;
 			}
 		}
 

@@ -37,6 +37,10 @@ namespace autocal {
 		
 		//if we simulate the data, derive it from the second stream
 		if(simulate){
+			if(simParams.size() == 0){
+				std::cout << "NO SIM PARAMETERS LEFT. CRASHING" << std::endl;
+				throw std::range_error("NO SIM PARAMETERS LEFT. CRASHING");
+			}
 			currentState1 = stream2.getCompleteSimulatedStates(now, simulatedCorrelations, simParams.front());
 			for(auto& m : currentState1){
 				mocapRecording.addMeasurement(stream_name_1, now, m.first, m.second);
@@ -143,7 +147,6 @@ namespace autocal {
 
 
 	}
-
 	
 	autocal::MocapStream::Frame SensorPlant::getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now){
 		//If we are transforming to the same reference basis, just return the current frame unaltered
@@ -173,7 +176,7 @@ namespace autocal {
 		return truth;
 	}
 
-	void SensorPlant::next(){
+	bool SensorPlant::next(){
 		for(auto& c : correlators){
 			c.second.reset();
 		}
@@ -183,7 +186,7 @@ namespace autocal {
 			std::cerr << "Finished simulating: " << s.latency_ms << " " << s.noise.angle_stddev << " " << s.noise.disp_stddev << " " 
 					  << s.slip.disp.f << " " << s.slip.disp.A << " "
 					  << s.slip.angle.f << " " << s.slip.angle.A << " ";
-		}
+		} 
 		std::cerr << " Fraction correct: " << std::endl; 
 		for(auto guess : correctGuesses){
 			std::cerr << "id: " << guess.first << " = " <<  float(guess.second) / float(totalGuesses[guess.first]) << std::endl;
@@ -192,6 +195,7 @@ namespace autocal {
 		correctGuesses.clear();
 		totalGuesses.clear();
 		computeTimes.reset();
+		return simParams.size() != 0;
 	}
 
 	void SensorPlant::setAnswers(std::map<int,int> answers){

@@ -49,7 +49,7 @@ namespace support {
     : Reactor(std::move(environment)) {
 
         on<Configuration>("TestCalibrationTools.yaml").then([this] (const Configuration& config) {
-			float errorThreshold = config["angle_stddev"].as<float>() + config["disp_stddev"].as<float>();
+			float errorThreshold = std::fmax(0.001,config["angle_stddev"].as<float>() + config["disp_stddev"].as<float>());
         	std::cout << "errorThreshold = " << errorThreshold << std::endl;
         	int fails = 0;
 			for(int j = 0; j < config["number_of_trials"].as<int>(); j++){	
@@ -110,8 +110,8 @@ namespace support {
 					std::cout << "measuredY = \n" << measuredY << std::endl;
 
 
-					std::cout << "Transform3D::normmeasuredX .i() *  X) = " << errorX << std::endl;
-					std::cout << "Transform3D::normmeasuredY .i() *  Y) = " << errorY << std::endl;
+					std::cout << "Transform3D::norm(measuredX .i() *  X) = " << errorX << std::endl;
+					std::cout << "Transform3D::norm(measuredY .i() *  Y) = " << errorY << std::endl;
 					std::cout <<  "total error = " << totalError << std::endl;
 				}
 			}

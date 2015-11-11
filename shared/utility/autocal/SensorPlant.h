@@ -69,7 +69,7 @@ namespace autocal {
 			MocapStream::SimulationParameters a1, MocapStream::SimulationParameters a2, int aN,
 			MocapStream::SimulationParameters d1, MocapStream::SimulationParameters d2, int dN);
 
-		void next();
+		bool next();
 
 		void convertToGroundTruth(std::string streamA, std::string streamB);
 

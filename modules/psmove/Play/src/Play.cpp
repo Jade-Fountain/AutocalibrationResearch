@@ -151,16 +151,21 @@ namespace psmove {
 		        autocal::MocapStream::SimulationParameters a2;
 		        autocal::MocapStream::SimulationParameters d1; 
 		        autocal::MocapStream::SimulationParameters d2; 
+		        a1.noise.angle_stddev = 0;
 		        // a2.noise.angle_stddev = 1;
-		        // d1.noise.disp_stddev = 2;
+		        d1.noise.disp_stddev = 0;
 		        // d2.noise.disp_stddev = 10;
 		        int aN = 1;
 		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 		        //set the simulated connections between rigid bodies
 		        std::map<int,int> answers;
-		        answers[1] = 2;
-		        answers[2] = 1;
+		        answers[1] = 1;
+		        // answers[2] = 2;
+		        sensorPlant.setAnswers(answers);
+		    } else {
+		        std::map<int,int> answers;
+		        answers[0] = 2;
 		        sensorPlant.setAnswers(answers);
 		    }
 
@@ -258,7 +263,15 @@ namespace psmove {
 	        window.display();
 
 		    if(!running){
+			    //Load next sim params, or end if there are none
+		    	bool next = sensorPlant.next();
+		    	
+		    	if(next) {
+		    		// reset();
+		    	} else {
+		    	}
 		    	powerplant.shutdown();
+
 		    }
 
         });
@@ -268,9 +281,6 @@ namespace psmove {
 			auto now = std::chrono::steady_clock::now();    
 		    double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);     
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
-		    
-		    //Summarise results of matching
-		    sensorPlant.next();
 		    
 		    //Release the video
 		    cvReleaseCapture(&video);  

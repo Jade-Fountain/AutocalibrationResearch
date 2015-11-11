@@ -11,7 +11,7 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 10;
+			number_of_samples = 20;
 			difference_threshold = 1;
 			elimination_score_threshold = 0.1;
 		}
@@ -125,9 +125,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				// float score = getSylvesterScore(states1, states2, key);
+				float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				float score = getRotationScore(states1, states2, key);
+				// float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -190,10 +190,10 @@ namespace autocal {
 				totalError += error;
 				UnitQuaternion rotA(Rotation3D(A.rotation()));
 				UnitQuaternion rotB(Rotation3D(B.rotation()));
-				std::cout << "Error = " << error 
-						  << " A = " << rotA.getAngle() << "rads about axis " << rotA.getAxis().t()
-						  << " B = " << rotB.getAngle() << "rads about axis " << rotB.getAxis().t()
-						  << std::endl;
+				// std::cout << "Error = " << error 
+				// 		  << " A = " << rotA.getAngle() << "rads about axis " << rotA.getAxis().t()
+				// 		  << " B = " << rotB.getAngle() << "rads about axis " << rotB.getAxis().t()
+				// 		  << std::endl;
 			}
 			std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
 			return likelihood(totalError / float(number_of_samples));
