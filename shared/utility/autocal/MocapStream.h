@@ -49,43 +49,47 @@ namespace autocal {
 
 	private:
 
-		std::map<TimeStamp, Frame> stream;
+		std::shared_ptr<std::map<TimeStamp, Frame>> stream;
 
 		std::string stream_name;
 
+		TimeStamp streamStart;
+
+		bool correctForAutocalibrationCoordinateSystem;
+		
 		TimeStamp getTimeStamp(const std::chrono::system_clock::time_point& t){
 			return std::chrono::duration_cast<std::chrono::microseconds>(t.time_since_epoch()).count();
 		}
 
 		Frame createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs);
 
-		TimeStamp streamStart;
-
-		bool correctForAutocalibrationCoordinateSystem;
-
 	public:
 		//Constructors
-		MocapStream() : stream_name(""), correctForAutocalibrationCoordinateSystem(false){}
+		MocapStream() : stream_name(""), correctForAutocalibrationCoordinateSystem(false){
+			stream = std::make_shared<std::map<TimeStamp, Frame>>();
+		}
 
-		MocapStream(std::string name, bool correction) : stream_name(name), correctForAutocalibrationCoordinateSystem(correction){}
+		MocapStream(std::string name, bool correction) : stream_name(name), correctForAutocalibrationCoordinateSystem(correction){
+			stream = std::make_shared<std::map<TimeStamp, Frame>>();
+		}
 
 		//Accessors and small utilities
 		void markStart(TimeStamp t){
 			streamStart = t;
 		}
 
-		int size() const {return stream.size();}
+		int size() const {return stream->size();}
 
-		bool isEmpty() const {return stream.empty();}
+		bool isEmpty() const {return stream->empty();}
 		
 		std::string name() const {return stream_name;}
 
 		std::string toString();
 
-		std::map<TimeStamp, Frame>& frameList(){return stream;}
+		void transform(utility::math::matrix::Transform3D T);
 		
-		std::map<TimeStamp,Frame>::iterator begin(){return stream.begin();}
-		std::map<TimeStamp,Frame>::iterator end(){return stream.end();}
+		std::map<TimeStamp,Frame>::iterator begin(){return stream->begin();}
+		std::map<TimeStamp,Frame>::iterator end(){return stream->end();}
 		
 		//Frame retrieval
 		Frame getFrame(const std::chrono::system_clock::time_point& t);

@@ -42,9 +42,9 @@ namespace autocal {
 
 
 	public:
-		SensorPlant(bool sim = false): simulate(sim){}
+		SensorPlant(bool sim = false): simulate(sim){ }
 
-		bool isSimulated(){return simulate;}
+		bool isSimulated(){ return simulate;}
 
 		MocapRecording mocapRecording;
 
@@ -61,11 +61,7 @@ namespace autocal {
 		}
 
 		bool isRunning(){return !simulate || simParams.size()!=0;}
-				
-		std::vector<Hypothesis> getCorrelations(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
-		
-		std::vector<Hypothesis> getCorrelationsOfInvariants(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
-		
+								
 		std::vector<Hypothesis> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1 = 0);
 
 		std::map<MocapStream::RigidBodyID,float> multiply(std::map<MocapStream::RigidBodyID,float> m1, std::map<MocapStream::RigidBodyID,float> m2);
@@ -84,7 +80,6 @@ namespace autocal {
 
 		autocal::MocapStream::Frame getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now);
 
-		//TODO:implement
 		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim, MocapStream& stream);
 
 

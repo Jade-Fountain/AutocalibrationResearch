@@ -134,17 +134,11 @@ namespace autocal {
 			//Get the transform between coordinate systems
 			Transform3D streamToDesiredBasis = groundTruthTransforms[key];
 
-			for(auto& frame : mocapRecording.getStream(streamA).frameList()){
-				//Loop through and record transformed rigid body poses
-				for (auto& rb : frame.second.rigidBodies){
-					Transform3D T = streamToDesiredBasis * rb.second.pose;
-					rb.second.pose = T;
-				}
-			}
+			mocapRecording.getStream(streamA).transform(streamToDesiredBasis);
+			
 		} else {
 			std::cout << "WARNING: ATTEMPTING TO ACCESSING GROUND TRUTH WHEN NONE EXISTS!!!" << std::endl;
 		}
-
 
 	}
 	
