@@ -20,10 +20,13 @@ The sensor plant is responsible for fusing multiple measurements*/
 namespace autocal {
 	
 	class SensorPlant{
-				
-		std::map<std::pair<std::string,std::string>, utility::math::matrix::Transform3D> groundTruthTransforms;
 
-		std::map<std::pair<std::string,std::string> ,Correlator> correlators;
+		using Hypothesis = std::pair<int,int>;
+		using NamePair = std::pair<std::string,std::string>;
+				
+		std::map<NamePair, utility::math::matrix::Transform3D> groundTruthTransforms;
+
+		std::map<NamePair ,Correlator> correlators;
 
 		//State variables
 		bool simulate;
@@ -31,11 +34,11 @@ namespace autocal {
 		arma::running_stat<double> computeTimes;
 		std::map<int, int> correctGuesses; 
 		std::map<int, int> totalGuesses; 
-		std::map<int,int> simulatedCorrelations;
+		std::map<int, int> simulatedCorrelations;
 
 		//Simulation parameters
-		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simWorldTransform;
-		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simLocalTransform;
+		std::map<Hypothesis, utility::math::matrix::Transform3D> simWorldTransform;
+		std::map<Hypothesis, utility::math::matrix::Transform3D> simLocalTransform;
 
 
 	public:
@@ -59,11 +62,11 @@ namespace autocal {
 
 		bool isRunning(){return !simulate || simParams.size()!=0;}
 				
-		std::vector<std::pair<int,int>> getCorrelations(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
+		std::vector<Hypothesis> getCorrelations(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
 		
-		std::vector<std::pair<int,int>> getCorrelationsOfInvariants(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
+		std::vector<Hypothesis> getCorrelationsOfInvariants(std::string stream_name_1, std::string stream_name_2, TimeStamp now);
 		
-		std::vector<std::pair<int,int>> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1 = 0);
+		std::vector<Hypothesis> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1 = 0);
 
 		std::map<MocapStream::RigidBodyID,float> multiply(std::map<MocapStream::RigidBodyID,float> m1, std::map<MocapStream::RigidBodyID,float> m2);
 
