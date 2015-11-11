@@ -47,75 +47,6 @@ namespace autocal {
 
 		};
 
-		struct SimulationParameters{
-			
-			struct SinFunc{
-				float f = 0;//frequency
-				float A = 0;//amplitude
-			};
-
-			struct Noise{
-				float angle_stddev = 0;
-				float disp_stddev = 0;
-			};
-
-			struct {
-				SinFunc disp;
-				SinFunc angle;
-			} slip;
-			float latency_ms = 0;
-			Noise noise;
-
-			SimulationParameters operator+(const SimulationParameters& s){
-				SimulationParameters s_;
-				
-				s_.latency_ms = s.latency_ms + this->latency_ms;
-				
-				s_.noise.angle_stddev = s.noise.angle_stddev + this->noise.angle_stddev;
-				s_.noise.disp_stddev = s.noise.disp_stddev + this->noise.disp_stddev;
-
-				s_.slip.disp.f = s.slip.disp.f + this->slip.disp.f;
-				s_.slip.disp.A = s.slip.disp.A + this->slip.disp.A;
-				s_.slip.angle.f = s.slip.angle.f + this->slip.angle.f;
-				s_.slip.angle.A = s.slip.angle.A + this->slip.angle.A;
-
-				return s_;
-			}
-			SimulationParameters operator-(const SimulationParameters& s){
-				SimulationParameters s_;
-				
-				s_.latency_ms = this->latency_ms - s.latency_ms ;
-				
-				s_.noise.angle_stddev = this->noise.angle_stddev - s.noise.angle_stddev ;
-				s_.noise.disp_stddev = this->noise.disp_stddev - s.noise.disp_stddev ;
-
-				s_.slip.disp.f = this->slip.disp.f - s.slip.disp.f ;
-				s_.slip.disp.A = this->slip.disp.A - s.slip.disp.A ;
-				s_.slip.angle.f = this->slip.angle.f - s.slip.angle.f ;
-				s_.slip.angle.A = this->slip.angle.A - s.slip.angle.A ;
-
-				return s_;
-			}
-			SimulationParameters operator*(const float& f){
-				SimulationParameters s_;
-				
-				s_.latency_ms = this->latency_ms * f;
-				
-				s_.noise.angle_stddev = this->noise.angle_stddev * f;
-				s_.noise.disp_stddev = this->noise.disp_stddev * f;
-
-				s_.slip.disp.f = this->slip.disp.f * f;
-				s_.slip.disp.A = this->slip.disp.A * f;
-				s_.slip.angle.f = this->slip.angle.f * f;
-				s_.slip.angle.A = this->slip.angle.A * f;
-
-				return s_;
-			}
-
-		};
-
-		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simWorldTransform;
-		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simLocalTransform;
 	private:
 
 		std::map<TimeStamp, Frame> stream;
@@ -130,13 +61,11 @@ namespace autocal {
 
 		TimeStamp streamStart;
 
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> slippage;
-
 		bool correctForAutocalibrationCoordinateSystem;
 
 	public:
 		//Constructors
-		MocapStream() : stream_name(""), slippage(), correctForAutocalibrationCoordinateSystem(false){}
+		MocapStream() : stream_name(""), correctForAutocalibrationCoordinateSystem(false){}
 
 		MocapStream(std::string name, bool correction) : stream_name(name), correctForAutocalibrationCoordinateSystem(correction){}
 
@@ -164,27 +93,20 @@ namespace autocal {
 		Frame getFrame(const TimeStamp& t);
 		TimeStamp getFrameTime(const TimeStamp& t);
 
+		//Iterator accessor
 		std::map<TimeStamp,Frame>::iterator getUpperBoundIter(const TimeStamp& t);
 		std::map<TimeStamp,Frame>::iterator getLowerBoundIter(const TimeStamp& t);
 		
-
-		//Heavy functions
+		//Load data from files
 		bool loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ = false, const std::set<int>& allowedIDs = std::set<int>());
 
+		//set data using different time indicators
 		bool setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
-		
 		bool setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
-
-		std::map<MocapStream::RigidBodyID, arma::vec> getInvariates(TimeStamp now);
 		
-		std::map<MocapStream::RigidBodyID, arma::vec> getStates(TimeStamp now);
-		
+		//Get the latest poses of the recorded data
 		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteStates(TimeStamp now);
-
-		std::map<MocapStream::RigidBodyID, arma::vec> getSimulatedStates(TimeStamp now, std::vector<RigidBodyID> ids);
 		
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim);
-
 	};
 
 }

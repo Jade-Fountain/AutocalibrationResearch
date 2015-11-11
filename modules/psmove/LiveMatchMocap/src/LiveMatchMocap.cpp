@@ -76,10 +76,10 @@ namespace psmove {
 		    //Optional simulation parameters
 		    if(use_simulation){
 		        //Exp 4 -...
-		        autocal::MocapStream::SimulationParameters a1; 
-		        autocal::MocapStream::SimulationParameters a2;
-		        autocal::MocapStream::SimulationParameters d1; 
-		        autocal::MocapStream::SimulationParameters d2; 
+		        autocal::SimulationParameters a1; 
+		        autocal::SimulationParameters a2;
+		        autocal::SimulationParameters d1; 
+		        autocal::SimulationParameters d2; 
 		        int aN = 1;
 		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);

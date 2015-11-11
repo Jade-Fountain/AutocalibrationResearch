@@ -12,6 +12,7 @@ The sensor plant is responsible for fusing multiple measurements*/
 #include "MocapRecording.h"
 #include "CalibrationTools.h"
 #include "Correlator.h"
+#include "Simulation.h"
 
 #ifndef AUTOCAL_SENSOR_PLANT
 #define AUTOCAL_SENSOR_PLANT
@@ -24,12 +25,17 @@ namespace autocal {
 
 		std::map<std::pair<std::string,std::string> ,Correlator> correlators;
 
+		//State variables
 		bool simulate;
-		std::queue<MocapStream::SimulationParameters> simParams;
+		std::queue<SimulationParameters> simParams;
 		arma::running_stat<double> computeTimes;
 		std::map<int, int> correctGuesses; 
 		std::map<int, int> totalGuesses; 
 		std::map<int,int> simulatedCorrelations;
+
+		//Simulation parameters
+		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simWorldTransform;
+		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simLocalTransform;
 
 
 	public:
@@ -66,14 +72,18 @@ namespace autocal {
 		void setAnswers(std::map<int,int> answers);
 		
 		void setSimParameters(
-			MocapStream::SimulationParameters a1, MocapStream::SimulationParameters a2, int aN,
-			MocapStream::SimulationParameters d1, MocapStream::SimulationParameters d2, int dN);
+			SimulationParameters a1, SimulationParameters a2, int aN,
+			SimulationParameters d1, SimulationParameters d2, int dN);
 
 		bool next();
 
 		void convertToGroundTruth(std::string streamA, std::string streamB);
 
 		autocal::MocapStream::Frame getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now);
+
+		//TODO:implement
+		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim, MocapStream& stream);
+
 
 	};
 
