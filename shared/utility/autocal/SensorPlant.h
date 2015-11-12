@@ -29,22 +29,16 @@ namespace autocal {
 		std::map<NamePair ,Correlator> correlators;
 
 		//State variables
-		bool simulate;
 		std::queue<SimulationParameters> simParams;
 		arma::running_stat<double> computeTimes;
 		std::map<int, int> correctGuesses; 
 		std::map<int, int> totalGuesses; 
-		std::map<int, int> simulatedCorrelations;
+		std::map<NamePair,std::map<int, int>> correctMatchings;
 
-		//Simulation parameters
-		std::map<Hypothesis, utility::math::matrix::Transform3D> simWorldTransform;
-		std::map<Hypothesis, utility::math::matrix::Transform3D> simLocalTransform;
 
 
 	public:
-		SensorPlant(bool sim = false): simulate(sim){ }
-
-		bool isSimulated(){ return simulate;}
+		SensorPlant(){}
 
 		MocapRecording mocapRecording;
 
@@ -52,15 +46,11 @@ namespace autocal {
 			return mocapRecording.getStream(name);
 		}
 
-		void addStream(const MocapStream& s){
-			mocapRecording.getStream(s.name()) = s;
-		}
+		void addStream(const MocapStream& s);
 
 		bool streamNotEmpty(std::string name){
 			return !getStream(name).isEmpty();
 		}
-
-		bool isRunning(){return !simulate || simParams.size()!=0;}
 								
 		std::vector<Hypothesis> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1 = 0);
 
@@ -68,7 +58,7 @@ namespace autocal {
 
 		void setGroundTruthTransform(std::string streamA, std::string streamB, utility::math::matrix::Transform3D mapAtoB, bool useTruth = false);
 		
-		void setAnswers(std::map<int,int> answers);
+		void setAnswers(std::string s1, std::string s2, std::map<int,int> answers);
 		
 		void setSimParameters(
 			SimulationParameters a1, SimulationParameters a2, int aN,
@@ -80,7 +70,7 @@ namespace autocal {
 
 		autocal::MocapStream::Frame getGroundTruth(std::string stream, std::string desiredBasis, TimeStamp now);
 
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim, MocapStream& stream);
+		void setCurrentSimParameters(const SimulationParameters& sim);
 
 
 	};

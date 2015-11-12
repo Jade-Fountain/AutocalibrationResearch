@@ -6,6 +6,7 @@ This code is part of mocap-kinect experiments*/
 #include <dirent.h>
 #include <map>
 #include <set>
+#include "Simulation.h"
 #include "utility/math/matrix/Transform3D.h"
 #include "utility/math/matrix/Rotation3D.h"
 #include "utility/math/geometry/UnitQuaternion.h"
@@ -48,8 +49,17 @@ namespace autocal {
 		};
 
 	private:
+		//Simulation parameters
+		bool simulated = false;
+		std::map<int,int> simulationIDs;
+		SimulationParameters simulationParameters;
+		using Hypothesis = std::pair<int,int>;
 
-		std::shared_ptr<std::map<TimeStamp, Frame>> stream;
+		std::map<Hypothesis, utility::math::matrix::Transform3D> simWorldTransform;
+		std::map<Hypothesis, utility::math::matrix::Transform3D> simLocalTransform;
+
+		//Standard parameters
+		std::shared_ptr<std::map<TimeStamp, Frame>> parentStream;
 
 		std::string stream_name;
 
@@ -63,6 +73,7 @@ namespace autocal {
 
 		Frame createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs);
 
+		std::shared_ptr<std::map<TimeStamp, Frame>> stream;
 	public:
 		//Constructors
 		MocapStream() : stream_name(""), correctForAutocalibrationCoordinateSystem(false){
@@ -95,6 +106,7 @@ namespace autocal {
 		Frame getFrame(const std::chrono::system_clock::time_point& t);
 		Frame getInterpolatedFrame(const TimeStamp& t);
 		Frame getFrame(const TimeStamp& t);
+		Frame getParentFrame(const TimeStamp& t);
 		TimeStamp getFrameTime(const TimeStamp& t);
 
 		//Iterator accessor
@@ -109,7 +121,15 @@ namespace autocal {
 		bool setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
 		
 		//Get the latest poses of the recorded data
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteStates(TimeStamp now);
+		std::map<RigidBodyID, utility::math::matrix::Transform3D> getCompleteStates(TimeStamp now);
+
+		//Simulation stuff
+		void setupSimulation(const MocapStream& parentStream_, std::map<int,int> simulationIDs_);
+
+		void setSimulationParameters(const SimulationParameters& sim);
+
+		Frame getSimulatedFrame(TimeStamp now);
+
 		
 	};
 

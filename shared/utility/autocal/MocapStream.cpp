@@ -95,6 +95,8 @@ namespace autocal {
 	
 	MocapStream::Frame MocapStream::getInterpolatedFrame(const TimeStamp& t){
 		//Get last frame at current time point
+		if(simulated) return getSimulatedFrame(t);
+
 		if(stream->count(t) != 0){
 			return (*stream)[t];
 		} else {
@@ -116,6 +118,18 @@ namespace autocal {
 		} else {
 			auto ub = stream->lower_bound(t);
 			if(ub == stream->begin()) return ub->second;
+			ub--;
+			return ub->second;
+		}
+	}
+
+	MocapStream::Frame MocapStream::getParentFrame(const TimeStamp& t){
+		//Get last frame at current time point
+		if(parentStream->count(t) != 0){
+			return (*parentStream)[t];
+		} else {
+			auto ub = parentStream->lower_bound(t);
+			if(ub == parentStream->begin()) return ub->second;
 			ub--;
 			return ub->second;
 		}
@@ -261,6 +275,66 @@ namespace autocal {
 				rb.second.pose = newPose;
 			}
 		}
+	}
+
+	void MocapStream::setupSimulation(const MocapStream& parentStream_, std::map<int,int> simulationIDs_){
+		simulated = true;
+		simulationIDs = simulationIDs_;
+		parentStream = parentStream_.stream;
+	}
+
+	void MocapStream::setSimulationParameters(const SimulationParameters& sim){
+		simulationParameters = sim;
+	}
+
+	MocapStream::Frame MocapStream::getSimulatedFrame(TimeStamp now){
+		MocapStream::Frame frame;
+
+		int lag_milliseconds = simulationParameters.latency_ms;
+		now -= lag_milliseconds * 1000;
+		
+		if(parentStream->size() != 0){
+			
+			MocapStream::Frame latestFrame = getParentFrame(now);
+			for (auto& key : simulationIDs){
+				int artificialID = key.first;
+				int derivedID = key.second;
+				
+				if(simWorldTransform.count(key) == 0){
+					simWorldTransform[key] = Transform3D::getRandomU(1,0.1);
+					// simWorldTransform[key] = arma::eye(4,4);
+					//  Transform3D({ 0.1040,  -0.0023,  -0.9946,  -0.3540,
+					// 								      -0.1147,   0.9933,  -0.0143,  -0.9437,
+					// 								       0.9879,   0.1156,   0.1030,   1.2106,
+					// 								            0,        0,        0,   1.0000}).t();//transpose because column major reading
+					std::cout << "simWorldTransform = \n" << simWorldTransform[key] << std::endl;
+				}
+				if(simLocalTransform.count(key) == 0){
+					simLocalTransform[key] = Transform3D::getRandomU(1,0.1);
+					// simLocalTransform[key] = simLocalTransform[key].rotateX(M_PI_2);
+					std::cout << "simLocalTransform = \n" << simLocalTransform[key] << std::endl;
+				}
+
+				//Noise:
+				Transform3D localNoise = Transform3D::getRandomN(simulationParameters.noise.angle_stddev ,simulationParameters.noise.disp_stddev);
+				// std::cout << "noise = " << arma::vec4(localNoise * arma::vec4({0,0,0,1})).t() << std::endl;
+				Transform3D globalNoise = Transform3D::getRandomN(simulationParameters.noise.angle_stddev ,simulationParameters.noise.disp_stddev);
+				// Transform3D globalNoise = Transform3D::getRandomN(0.310524198 ,0.052928682);
+				
+				Transform3D transform = simWorldTransform[key] * latestFrame.rigidBodies[derivedID].pose * globalNoise * simLocalTransform[key] * localNoise;
+				
+				//Debugging
+				// std::cout << "transform = " << transform.translation().t() << std::endl;
+				transform.translation() = arma::vec{0,0,-1};
+				
+				frame.rigidBodies[artificialID] = RigidBody();
+				frame.rigidBodies[artificialID].pose = transform;
+			}
+		}
+
+		(*stream)[now] = frame;
+
+		return frame;
 	}
 
 

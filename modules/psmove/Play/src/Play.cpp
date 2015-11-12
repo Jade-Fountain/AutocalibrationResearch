@@ -133,7 +133,6 @@ namespace psmove {
 
 		    //PSmove pose stream
 		    autocal::MocapStream psmoveStream("psmove", false);
-		    psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
 
 		    //Mocap pose stream
 		    autocal::MocapStream optitrackStream("mocap", true);
@@ -143,7 +142,7 @@ namespace psmove {
 		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ, mocapAllowedIDs);
 
 		    //Initialise sensor plant
-		    sensorPlant = SensorPlant(use_simulation);
+		    sensorPlant = SensorPlant();
 		    //Optional simulation parameters
 		    if(use_simulation){
 		        //Exp 4 -...
@@ -162,15 +161,19 @@ namespace psmove {
 		        std::map<int,int> answers;
 		        answers[1] = 1;
 		        // answers[2] = 2;
-		        sensorPlant.setAnswers(answers);
+		        sensorPlant.setAnswers("psmove","mocap",answers);
+		        psmoveStream.setupSimulation(optitrackStream, answers);
+
 		    } else {
+		    	psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
 		        std::map<int,int> answers;
 		        answers[0] = 2;
-		        sensorPlant.setAnswers(answers);
+		        sensorPlant.setAnswers("psmove","mocap",answers);
 		    }
 
 		    //Push back the loaded streams
-		    if(!use_simulation) sensorPlant.addStream(psmoveStream);
+		    //Ensure simulation is setup for sensor plant prior to adding
+		    sensorPlant.addStream(psmoveStream);
 		    sensorPlant.addStream(optitrackStream);
 
 		    //Ground Truth computation
