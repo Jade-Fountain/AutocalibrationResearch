@@ -29,7 +29,7 @@ namespace autocal {
 		auto& correlator = correlators[hypothesisKey];
 
 		//Check we have data to compare
-		if(stream2.size() == 0){
+		if(stream2.size() == 0 || stream1.size() == 0 ){
 			return empty_result;
 		}
 
@@ -53,8 +53,6 @@ namespace autocal {
 		if(correlator.sufficientData()){
 			correlator.compute();
 		}
-
-		// std::cout << "FRAME END"  << std::endl;
 
 		std::vector<SensorPlant::Hypothesis> correlations = correlator.getBestCorrelations();
 

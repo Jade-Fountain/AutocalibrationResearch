@@ -113,6 +113,8 @@ namespace autocal {
 	
 	MocapStream::Frame MocapStream::getFrame(const TimeStamp& t){
 		//Get last frame at current time point
+		if(simulated) return getSimulatedFrame(t);
+
 		if(stream->count(t) != 0){
 			return (*stream)[t];
 		} else {
