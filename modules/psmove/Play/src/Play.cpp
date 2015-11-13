@@ -137,9 +137,8 @@ namespace psmove {
 		    //Mocap pose stream
 		    autocal::MocapStream optitrackStream("mocap", true);
 		    //coordinate system is LH while psmove is RH
-		    bool optitrackReflectZ = false;
 		    std::set<int> mocapAllowedIDs = {1,2};
-		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ, mocapAllowedIDs);
+		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), mocapAllowedIDs);
 
 		    //Initialise sensor plant
 		    sensorPlant = SensorPlant();

@@ -30,7 +30,7 @@ namespace autocal {
 	}
 
 
-	MocapStream::Frame MocapStream::createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs){
+	MocapStream::Frame MocapStream::createFrame(arma::mat m, const std::set<int>& allowedIDs){
 		Frame f;
 		// std::cout << "Loading " << m.n_cols << " rigid bodies" << std::endl;
 		// std::cout << m << std::endl;
@@ -65,10 +65,6 @@ namespace autocal {
 				r.pose.rotation() = Rotation3D(q_);
 			}else{
 				r.pose.rotation() = rot;
-			}
-
-			if(reflectZ){
-				r.pose.z() = -r.pose.z();
 			}
 
 			// std::cout << "data: " <<  data << std::endl;
@@ -155,7 +151,7 @@ namespace autocal {
 		return stream->lower_bound(t);
 	}
 	
-	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ, const std::set<int>& allowedIDs){
+	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, const std::set<int>& allowedIDs){
 		std::cout << "Loading data ..." << std::endl;
 
 		TimeStamp min = start_time;
@@ -190,7 +186,7 @@ namespace autocal {
 				if(success){ 
 					//Do not store frame if it has no info
 					if(frame.n_cols!=0){
-						(*stream)[timestamp] = createFrame(frame, reflectZ, allowedIDs);
+						(*stream)[timestamp] = createFrame(frame, allowedIDs);
 					}
 				} else {
 					continue;
