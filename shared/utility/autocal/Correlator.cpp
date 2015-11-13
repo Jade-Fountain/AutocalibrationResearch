@@ -11,9 +11,9 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 20;
+			number_of_samples = 10;
 			difference_threshold = 1;
-			elimination_score_threshold = 0.1;
+			elimination_score_threshold = 0.01;
 		}
 
 
@@ -80,11 +80,11 @@ namespace autocal {
 				
 				if(totalScores[id1] != 0){
 					//Normalise
-					score = score;// / totalScores[id1];
+					score = score / totalScores[id1];
 					//Eliminate
 					if(score < elimination_score_threshold && eliminatedHypotheses.count(pairID) == 0){
-						eliminatedHypotheses.insert(pairID);
-						std::cout << "Eliminated: [" << pairID.first << "," << pairID.second << "]" << std::endl;
+						// eliminatedHypotheses.insert(pairID);
+						// std::cout << "Eliminated: [" << pairID.first << "," << pairID.second << "]" << std::endl;
 					}						
 				}
 			}
@@ -194,6 +194,10 @@ namespace autocal {
 				// 		  << " A = " << rotA.getAngle() << "rads about axis " << rotA.getAxis().t()
 				// 		  << " B = " << rotB.getAngle() << "rads about axis " << rotB.getAxis().t()
 				// 		  << std::endl;
+				// std::cout << "det(A.rotation()) = " << arma::det(A.rotation()) << std::endl;
+				// std::cout << "det(B.rotation()) = " << arma::det(B.rotation()) << std::endl;
+				// std::cout << "det(X.rotation()) = " << arma::det(X.rotation()) << std::endl;
+				// std::cout << "det(Y.rotation()) = " << arma::det(Y.rotation()) << std::endl;
 			}
 			std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
 			return likelihood(totalError / float(number_of_samples));

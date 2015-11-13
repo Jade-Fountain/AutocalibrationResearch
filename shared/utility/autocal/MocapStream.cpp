@@ -327,7 +327,7 @@ namespace autocal {
 				
 				//Debugging
 				// std::cout << "transform = " << transform.translation().t() << std::endl;
-				transform.translation() = arma::vec{0,0,-1};
+				// transform.translation() = arma::vec{0,0,-1};
 				
 				frame.rigidBodies[artificialID] = RigidBody();
 				frame.rigidBodies[artificialID].pose = transform;

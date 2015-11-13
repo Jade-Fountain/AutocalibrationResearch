@@ -137,7 +137,7 @@ namespace psmove {
 		    //Mocap pose stream
 		    autocal::MocapStream optitrackStream("mocap", true);
 		    //coordinate system is LH while psmove is RH
-		    bool optitrackReflectZ = true;
+		    bool optitrackReflectZ = false;
 		    std::set<int> mocapAllowedIDs = {1,2};
 		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ, mocapAllowedIDs);
 
@@ -159,7 +159,7 @@ namespace psmove {
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 		        //set the simulated connections between rigid bodies
 		        std::map<int,int> answers;
-		        answers[1] = 2;
+		        answers[1] = 1;
 		        // answers[2] = 2;
 		        sensorPlant.setAnswers("psmove","mocap",answers);
 		        psmoveStream.setupSimulation(optitrackStream, answers);
