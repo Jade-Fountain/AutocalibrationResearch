@@ -14,8 +14,7 @@ namespace autocal {
 									 const TimeStamp& timeStamp, 
 									 const MocapStream::RigidBodyID& rigidBodyId, 
 									 const Transform3D& pose,
-									 bool correctCoordinateSystem, 
-									 bool reflectZAxis)
+									 bool correctCoordinateSystem)
 	{	
 		//Create a new stream if one with this name doesnt exist
 		if(streams.count(name) == 0){
@@ -23,7 +22,7 @@ namespace autocal {
 			streams[name] = MocapStream(name, false);
 		}
 		//Set the data
-		streams[name].setRigidBodyInFrame(timeStamp, rigidBodyId, pose, correctCoordinateSystem, reflectZAxis);
+		streams[name].setRigidBodyInFrame(timeStamp, rigidBodyId, pose, correctCoordinateSystem);
 	}
 
 	void MocapRecording::markStartOfStreams(TimeStamp now){

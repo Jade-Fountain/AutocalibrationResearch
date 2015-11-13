@@ -49,9 +49,20 @@ namespace autocal {
 					diff2 > difference_threshold)
 				{
 					//Check if bad sample (for the particular solver we are using):	
-					UnitQuaternion q1(Rotation3D(T1.rotation()));
-					UnitQuaternion q2(Rotation3D(T2.rotation()));
+					Rotation3D R1 = T1.rotation();
+					UnitQuaternion q1(R1);
+					Rotation3D R2 = T2.rotation();
+					UnitQuaternion q2(R2);
 					if(q1.kW() == 0 || q2.kW() == 0) return;
+
+					//Check det
+					if(std::fabs(arma::det(R1) - 1) > 0.1){
+						std::cout << __FILE__ << " : Det R1 = " << arma::det(R1) << std::endl;
+					}
+					if(std::fabs(arma::det(R2) - 1) > 0.1){
+						std::cout << __FILE__ << " : Det R2 = " << arma::det(R2) << std::endl;
+
+					}
 
 
 					if(recordedStates[key].first.size() >= number_of_samples){

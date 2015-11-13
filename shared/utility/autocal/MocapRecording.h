@@ -27,7 +27,7 @@ namespace autocal {
 			return streams.count(stream_name) != 0;
 		}
 
-		void addMeasurement(const std::string& name, const TimeStamp& timeStamp, const MocapStream::RigidBodyID& rigidBodyId, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem = false, bool reflectZAxis = false);
+		void addMeasurement(const std::string& name, const TimeStamp& timeStamp, const MocapStream::RigidBodyID& rigidBodyId, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem = false);
 		
 		void markStartOfStreams(TimeStamp now);
 

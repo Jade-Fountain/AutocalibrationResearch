@@ -141,7 +141,7 @@ namespace psmove {
 					pose.rotation() = Rotation3D(q);
 		        	// pose = Transform3D::createScale(arma::vec3({-1,1,1})) * pose;
 		        	if(id != 1){ 
-						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false,false);
+						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false);
 		        	} else {
 						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 

@@ -141,12 +141,16 @@ Tracker::render()
     /* Draw the camera image, filling the screen */
     glColor3f(1., 1., 1.);
     glBegin(GL_QUADS);
+    //BL
     glTexCoord2f(0., 1.);
     glVertex2f(-1., -1.);
+    //BR
     glTexCoord2f(1., 1.);
     glVertex2f(1., -1.);
+    //TR
     glTexCoord2f(1., 0.);
     glVertex2f(1., 1.);
+    //TL
     glTexCoord2f(0., 0.);
     glVertex2f(-1., 1.);
     glEnd();

@@ -132,10 +132,10 @@ namespace psmove {
 		    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		    //PSmove pose stream
-		    autocal::MocapStream psmoveStream("psmove", false);
+		    autocal::MocapStream psmoveStream("psmove", true);
 
 		    //Mocap pose stream
-		    autocal::MocapStream optitrackStream("mocap", true);
+		    autocal::MocapStream optitrackStream("mocap", false, true);
 		    //coordinate system is LH while psmove is RH
 		    std::set<int> mocapAllowedIDs = {1,2};
 		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), mocapAllowedIDs);
@@ -191,7 +191,7 @@ namespace psmove {
 		    
 		    arma::vec3 psuedoX =  arma::normalise(left - right);
 		    psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
-		    psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+		    psmoveToMocap.x() = -arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
 
 			//--------------------------------------------------------------------
 			    // Ground truth exp 1

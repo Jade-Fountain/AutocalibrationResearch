@@ -67,6 +67,10 @@ namespace autocal {
 				r.pose.rotation() = rot;
 			}
 
+			if(LHInput){
+				transformLHtoRH(r.pose);
+			}
+
 			// std::cout << "data: " <<  data << std::endl;
 			// std::cout << "id:" << int(data[0]) << std::endl;
 			// std::cout << "position:" << r.pose.translation() << std::endl;
@@ -210,13 +214,13 @@ namespace autocal {
 		return success;
 	}
 
-	bool MocapStream::setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis){
+	bool MocapStream::setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem){
 		//Check that the frame doesn't already exist
 		TimeStamp t = getTimeStamp(frame_time);
-		setRigidBodyInFrame(t,id,pose, correctCoordinateSystem, reflectZAxis);
+		setRigidBodyInFrame(t,id,pose, correctCoordinateSystem);
 	}
 
-	bool MocapStream::setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis){
+	bool MocapStream::setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem){
 		//Check that the frame doesn't already exist
 		TimeStamp t = frame_time;
 		if(stream->count(t) == 0){
@@ -242,9 +246,10 @@ namespace autocal {
 			r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
 		}
 
-		if(reflectZAxis){
-			r.pose.z() = -r.pose.z();
+		if(LHInput){
+			transformLHtoRH(r.pose);
 		}
+
 	}
 
 	std::map<MocapStream::RigidBodyID, Transform3D> MocapStream::getCompleteStates(TimeStamp now){
@@ -335,6 +340,13 @@ namespace autocal {
 		return frame;
 	}
 
+
+	void MocapStream::transformLHtoRH(Transform3D& T){
+		if(LHInput){
+			Transform3D L = Transform3D::createScale(arma::vec3({-1,1,1}));
+			T = L * T * L;//last L is actually L.i() = L;
+		}
+	}
 
 
 
