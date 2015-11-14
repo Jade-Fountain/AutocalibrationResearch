@@ -22,11 +22,18 @@
 #include <format.h>
 
 #include "messages/support/Configuration.h"
+#include "utility/math/geometry/UnitQuaternion.h"
+#include "utility/math/matrix/Rotation3D.h"
 
 namespace modules {
 namespace input {
 
+    using messages::input::RigidBodyFrame;
     using messages::support::Configuration;
+
+    using utility::math::matrix::Transform3D;
+    using utility::math::matrix::Rotation3D;
+    using utility::math::geometry::UnitQuaternion;
 
     NatNet::NatNet(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)) {
@@ -82,6 +89,29 @@ namespace input {
                     }
                 });
             }
+        });
+
+        on<Trigger<MotionCapture>>().then([this](const MotionCapture& mocap){
+            auto rigidBodies = std::make_unique<RigidBodyFrame>();
+            for(auto& rigidBody : mocap.rigidBodies){
+                    int id = rigidBody.id;
+                    Transform3D pose;
+                    pose.translation() = arma::vec3({double(rigidBody.position[0]),
+                                                     double(rigidBody.position[1]),
+                                                     double(rigidBody.position[2])});
+                    UnitQuaternion q(rigidBody.rotation[3], // real part
+                                     arma::vec3({
+                                        double(rigidBody.rotation[0]),//imaginary part
+                                        double(rigidBody.rotation[1]),
+                                        double(rigidBody.rotation[2])
+                                                })
+                                     );
+                    pose.rotation() = Rotation3D(q);
+                    
+                    rigidBodies->poses[id] = pose;
+
+                }   
+            emit(std::move(rigidBodies));
         });
     }
 

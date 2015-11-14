@@ -65,7 +65,7 @@ class Tracker {
         void render();
         void saveFrame(CvVideoWriter *writer);
         void savePoses();
-        void addMeasurementsToStream(autocal::SensorPlant& plant, autocal::TimeStamp t);
+        void addMeasurementsToStream(autocal::SensorPlant& plant, std::string stream_name, autocal::TimeStamp t);
 
 
     private:

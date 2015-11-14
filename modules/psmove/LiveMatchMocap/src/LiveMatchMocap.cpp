@@ -42,8 +42,10 @@ namespace modules {
 namespace psmove {
 
     using messages::support::Configuration;
-    using utility::math::geometry::UnitQuaternion;
+    using messages::input::RigidBodyFrame;
 	using messages::input::MotionCapture;
+    
+    using utility::math::geometry::UnitQuaternion;
     using utility::math::matrix::Rotation3D;
     using utility::math::matrix::Transform3D;
 
@@ -71,9 +73,10 @@ namespace psmove {
         });
 
         on<Startup>().then([this]{
-        	//Initialise sensor plant
-		    sensorPlant = autocal::SensorPlant(use_simulation);
 		    //Optional simulation parameters
+		    autocal::MocapStream psmoveStream("psmove", false);
+		    autocal::MocapStream optitrackStream("mocap", false, false);
+
 		    if(use_simulation){
 		        //Exp 4 -...
 		        autocal::SimulationParameters a1; 
@@ -87,8 +90,13 @@ namespace psmove {
 				//set the simulated connections between rigid bodies
 		        std::map<int,int> answers;
 		        answers[1] = 1;
-		        sensorPlant.setAnswers(answers);
+		        sensorPlant.setAnswers("psmove","mocap",answers);
+		        psmoveStream.setupSimulation(optitrackStream, answers);
+
 		    }
+
+		    sensorPlant.addStream(psmoveStream);
+		    sensorPlant.addStream(optitrackStream);
 
 	        window.setActive(true);
 
@@ -110,8 +118,8 @@ namespace psmove {
         });
 
 		   //Main Loop  
-        on<Every<60,Per<std::chrono::seconds>>, Optional<With<MotionCapture>>,Single>().then([this]
-        	(const std::shared_ptr<const MotionCapture>& mocap){
+        on<Every<60,Per<std::chrono::seconds>>, Optional<With<RigidBodyFrame>>,Single>().then([this]
+        	(const std::shared_ptr<const RigidBodyFrame>& mocap){
 	        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
 
@@ -125,21 +133,9 @@ namespace psmove {
 
 	        //Add measurement for mocap
 	        if(mocap){
-		        for(auto& rigidBody : mocap->rigidBodies){
-		        	int id = rigidBody.id;
-		        	Transform3D pose;
-		        	pose.translation() = arma::vec3({double(rigidBody.position[0]),
-													 double(rigidBody.position[1]),
-													 double(rigidBody.position[2])});
-	                UnitQuaternion q(rigidBody.rotation[3], // real part
-	                				 arma::vec3({
-	                				 	double(rigidBody.rotation[0]),//imaginary part
-										double(rigidBody.rotation[1]),
-										double(rigidBody.rotation[2])
-											 	})
-	                				 );
-					pose.rotation() = Rotation3D(q);
-		        	// pose = Transform3D::createScale(arma::vec3({-1,1,1})) * pose;
+		        for(auto& rigidBody : mocap->poses){
+		        	int id = rigidBody.first;
+		        	const Transform3D& pose = rigidBody.second;
 		        	if(id != 1){ 
 						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false);
 		        	} else {
@@ -156,7 +152,7 @@ namespace psmove {
 
 	        //Update and add measurement for psmove
 	        psmoveTracker.update();
-			if(!use_simulation) psmoveTracker.addMeasurementsToStream(sensorPlant, current_timestamp);
+			if(!use_simulation) psmoveTracker.addMeasurementsToStream(sensorPlant, "psmove", current_timestamp);
 
 	        window.setActive(true);
 

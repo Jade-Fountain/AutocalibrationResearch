@@ -231,7 +231,7 @@ void Tracker::saveFrame(CvVideoWriter *writer){
         std::cout << "Frame failed to save" << std::endl;
     }
 }
-void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, autocal::TimeStamp t){
+void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, std::string stream_name, autocal::TimeStamp t){
     for (int i=0; i<m_count; i++) {
         GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
         Transform3D pose;
@@ -241,7 +241,7 @@ void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, autocal::Time
              << m[2] << m[6] << m[10] << unit_factor * m[14] << arma::endr
              << m[3] << m[7] << m[11] << m[15] << arma::endr;
 
-        plant.mocapRecording.addMeasurement("psmove", t, i, pose);
+        plant.mocapRecording.addMeasurement(stream_name, t, i, pose);
     }
 }
 
