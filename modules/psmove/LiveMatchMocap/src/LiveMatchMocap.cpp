@@ -57,19 +57,19 @@ namespace psmove {
 		    running = false;
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)){
-			pitchComp += 0.01 * M_PI / 180;
+			pitchComp += 0.1;
 			std::cout << "Pitch comp = " << pitchComp << std::endl;
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)){
-			pitchComp -= 0.01 * M_PI / 180;
+			pitchComp -= 0.1;
 			std::cout << "Pitch comp = " << pitchComp << std::endl;
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-			yawComp += 0.01 * M_PI / 180;
+			yawComp += 0.1;
 			std::cout << "Yaw comp = " << yawComp << std::endl;
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-			yawComp -= 0.01 * M_PI / 180;
+			yawComp -= 0.1;
 			std::cout << "Yaw comp = " << yawComp << std::endl;
 		}
 	}
@@ -89,6 +89,18 @@ namespace psmove {
         });
 
         on<Startup>().then([this]{
+        	//49.3 is the measured vFOV of the pseye camera on blue setting
+		    proj =
+
+		        // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
+		        // image->width, image->height, 0.01f, 10.0f);
+
+		        glm::perspective(   float(49.3 * 3.14159 / 180.0),            //VERTICAL FOV
+		                            float(width) / float(height),  //aspect ratio
+		                            0.1f,         //near plane distance (min z)
+		                            1000.0f           //Far plane distance (max z)
+		                            );
+
 		    //Optional simulation parameters
 		    autocal::MocapStream psmoveStream("psmove", false);
 		    autocal::MocapStream optitrackStream("mocap", false, false);
@@ -124,8 +136,9 @@ namespace psmove {
 			    powerplant.shutdown();
 			}
 			//Psmove
+		    psmoveTracker.setProjection(proj);
 		    psmoveTracker.init();
-		    
+
 		    //Check errors
 		    checkGLError();
 	        
@@ -158,8 +171,8 @@ namespace psmove {
 						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
 						// pose.x() = -pose.x();
-						Transform3D pitchRot = Transform3D::createRotationX(pitchComp);
-						Transform3D yawRot = Transform3D::createRotationY(yawComp);
+						Transform3D pitchRot = Transform3D::createRotationX(pitchComp * M_PI / 180);
+						Transform3D yawRot = Transform3D::createRotationY(yawComp * M_PI / 180);
 		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pitchRot * yawRot * pose.i());
 		        	}
 		        }	
@@ -180,17 +193,7 @@ namespace psmove {
 	        psmoveTracker.render();
 
 	        glMatrixMode(GL_PROJECTION);
-	        //49.3 is the measured vFOV of the pseye camera on blue setting
-		    glm::mat4 proj =
-
-		        // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
-		        // image->width, image->height, 0.01f, 10.0f);
-
-		        glm::perspective(   float(49.3 * 3.14159 / 180.0),            //VERTICAL FOV
-		                            float(width) / float(height),  //aspect ratio
-		                            0.01f,         //near plane distance (min z)
-		                            10.0f           //Far plane distance (max z)
-		                            );
+	        
 		    glLoadMatrixf(glm::value_ptr(proj));
 
 	        //TODO: perform matching

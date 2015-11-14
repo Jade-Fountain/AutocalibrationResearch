@@ -1,6 +1,7 @@
 
 #include "PSMoveUtils.h"
 
+
 Tracker::Tracker()
     : m_moves(NULL),
       m_count(psmove_count_connected()),
@@ -44,6 +45,7 @@ Tracker::Tracker()
         
         while (psmove_tracker_enable(m_tracker, m_moves[i]) != Tracker_CALIBRATED);
     }
+
 }
 
 Tracker::~Tracker()
@@ -56,6 +58,18 @@ Tracker::~Tracker()
     free(m_items);
     free(m_moves);
 }
+
+void Tracker::setProjection(glm::mat4 proj){
+    float* proj_ptr = psmove_fusion_get_projection_matrix(m_fusion);
+    for(int i = 0 ; i < 16; i++){
+        std::cout << proj_ptr[i] << std::endl;
+    }
+    memcpy(proj_ptr, glm::value_ptr(proj), sizeof(float)*16);
+    for(int i = 0 ; i < 16; i++){
+        std::cout << proj_ptr[i] << std::endl;
+    }
+}
+
 
 void
 Tracker::update()
@@ -236,9 +250,10 @@ void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, std::string s
         GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
         Transform3D pose;
         // units = decimeters
-        pose << m[0] << m[4] << m[8] << unit_factor * m[12] << arma::endr
-             << m[1] << m[5] << m[9] << unit_factor * m[13] << arma::endr
-             << m[2] << m[6] << m[10] << unit_factor * m[14] << arma::endr
+        //HACK O.5 FOR HALF DISTANCE
+        pose << m[0] << m[4] << m[8] << unit_factor * m[12] * 0.5 << arma::endr
+             << m[1] << m[5] << m[9] << unit_factor * m[13] * 0.5 << arma::endr
+             << m[2] << m[6] << m[10] << unit_factor * m[14] * 0.5 << arma::endr
              << m[3] << m[7] << m[11] << m[15] << arma::endr;
 
         plant.mocapRecording.addMeasurement(stream_name, t, i, pose);

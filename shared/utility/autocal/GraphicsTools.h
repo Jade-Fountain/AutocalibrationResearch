@@ -98,7 +98,7 @@ static bool setUpOpenGL(){
 static void drawBasis(float scale){
     GLUquadricObj *quadratic;
     quadratic = gluNewQuadric();
-    float coneRadius = 0.3 * scale;
+    float coneRadius = 0.2 * scale;
     float coneHeight = 0.6 * scale;
     int numberOfConeSegments = 10;
     
@@ -277,6 +277,7 @@ bool drawCamera(CvCapture* video, float verticalFOV){
 }
 
 void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceFrame, std::string matchStreamRange, autocal::TimeStamp t, const std::vector<std::pair<int,int>>& matches = std::vector<std::pair<int,int>>()){
+    float basisScale = 0.05;
     autocal::MocapRecording& recording = sensorPlant.mocapRecording;
     for(auto& stream : recording.streams){
         std::string name = stream.first;
@@ -302,9 +303,9 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
                 glEnable(GL_LIGHTING);
                 GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
-                glutSolidSphere(0.05, 10, 10);
+                glutSolidSphere(0.2 * basisScale, 10, 10);
             }
-            drawBasis(0.1);
+            drawBasis(basisScale);
         }
     }
 }

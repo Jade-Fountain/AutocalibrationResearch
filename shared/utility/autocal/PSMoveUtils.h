@@ -28,6 +28,13 @@
 #include "psmoveapi/psmove_tracker.h"
 #include "psmoveapi/psmove_fusion.h"
 
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/ext.hpp"
+
 #include "MocapRecorder.h"
 #include "SensorPlant.h"
 
@@ -62,6 +69,7 @@ class Tracker {
         void update();
 
         void init();
+        void setProjection(glm::mat4 proj);
         void render();
         void saveFrame(CvVideoWriter *writer);
         void savePoses();

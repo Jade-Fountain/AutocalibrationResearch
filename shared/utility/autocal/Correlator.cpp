@@ -210,7 +210,7 @@ namespace autocal {
 				// std::cout << "det(X.rotation()) = " << arma::det(X.rotation()) << std::endl;
 				// std::cout << "det(Y.rotation()) = " << arma::det(Y.rotation()) << std::endl;
 			}
-			std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
+			// std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
 			return likelihood(totalError / float(number_of_samples));
 		}
 
