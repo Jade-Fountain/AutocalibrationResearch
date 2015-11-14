@@ -56,6 +56,22 @@ namespace psmove {
 		    std::cout << "Exiting .." << std::endl;
 		    running = false;
 		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)){
+			pitchComp += 0.01 * M_PI / 180;
+			std::cout << "Pitch comp = " << pitchComp << std::endl;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)){
+			pitchComp -= 0.01 * M_PI / 180;
+			std::cout << "Pitch comp = " << pitchComp << std::endl;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+			yawComp += 0.01 * M_PI / 180;
+			std::cout << "Yaw comp = " << yawComp << std::endl;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
+			yawComp -= 0.01 * M_PI / 180;
+			std::cout << "Yaw comp = " << yawComp << std::endl;
+		}
 	}
 
     LiveMatchMocap::LiveMatchMocap(std::unique_ptr<NUClear::Environment> environment)
@@ -142,7 +158,9 @@ namespace psmove {
 						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
 						// pose.x() = -pose.x();
-		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i());
+						Transform3D pitchRot = Transform3D::createRotationX(pitchComp);
+						Transform3D yawRot = Transform3D::createRotationY(yawComp);
+		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pitchRot * yawRot * pose.i());
 		        	}
 		        }	
 	        } else {
@@ -179,6 +197,9 @@ namespace psmove {
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, 0);
 
 	        drawSensorStreams(sensorPlant, "psmove", "mocap", current_timestamp, matches);
+
+	        //Draw red crosshair for aiming camera
+	        // drawCrossHair();
 
 	        //Get interaction
 	        handleInput(window, frame_time_since_start);

@@ -55,6 +55,10 @@ namespace psmove {
 		int width;
 		int height;
 
+		//Camera calibration compensation tuning
+		float pitchComp = 0;
+		float yawComp = 0;
+
 		autocal::SensorPlant sensorPlant;
 		bool use_simulation = false;
 		
