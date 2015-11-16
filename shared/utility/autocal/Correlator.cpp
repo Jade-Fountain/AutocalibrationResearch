@@ -11,8 +11,8 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 10;
-			difference_threshold = 1;
+			number_of_samples = 100;
+			difference_threshold = 0.1;
 			elimination_score_threshold = 0.01;
 		}
 
@@ -117,7 +117,7 @@ namespace autocal {
 		}
 
 		void Correlator::compute(){
-			// std::cout << "\nComputing matches..." << std::endl;
+			std::cout << "\nComputing matches..." << std::endl;
 			std::map<MocapStream::RigidBodyID,float> totalScores;
 			for(auto& hypothesis : recordedStates){
 				//Extract data from its confusing encrypted data structure
@@ -150,7 +150,7 @@ namespace autocal {
 				//CONFIG HERE: score accumulation turned on by uncommenting this line:
 				scores[key] = score;// * scores[key];
 
-				// std::cout << "score[" << id1 << "," << id2 << "] = " << scores[key] << " " << states1.size() << " samples "<< std::endl;
+				std::cout << "score[" << id1 << "," << id2 << "] = " << scores[key] << " " << states1.size() << " samples "<< std::endl;
 				// for(int i = 0; i < states1.size(); i++){
 				// 	std::cout << "states1[" << i << "] \n" << states1[i] << std::endl;
 				// 	std::cout << "states2[" << i << "] \n" << states2[i] << std::endl;
@@ -210,7 +210,7 @@ namespace autocal {
 				// std::cout << "det(X.rotation()) = " << arma::det(X.rotation()) << std::endl;
 				// std::cout << "det(Y.rotation()) = " << arma::det(Y.rotation()) << std::endl;
 			}
-			// std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
+			std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
 			return likelihood(totalError / float(number_of_samples));
 		}
 

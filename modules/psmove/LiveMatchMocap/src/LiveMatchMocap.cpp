@@ -110,14 +110,16 @@ namespace psmove {
 		        autocal::SimulationParameters a1; 
 		        autocal::SimulationParameters a2;
 		        autocal::SimulationParameters d1; 
-		        autocal::SimulationParameters d2; 
+		        autocal::SimulationParameters d2;
+		        // a1.noise.angle_stddev = 0.1;
+		        // a1.noise.disp_stddev = 0.1;
 		        int aN = 1;
 		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 				
 				//set the simulated connections between rigid bodies
 		        std::map<int,int> answers;
-		        answers[1] = 1;
+		        answers[1] = 3;
 		        sensorPlant.setAnswers("psmove","mocap",answers);
 		        psmoveStream.setupSimulation(optitrackStream, answers);
 
@@ -212,8 +214,16 @@ namespace psmove {
 
 	        //Shutdown if necessary
 	        if(!running){
-	            powerplant.shutdown();
-	        }
+			    //Load next sim params, or end if there are none
+		    	bool next = sensorPlant.next();
+		    	
+		    	if(next) {
+		    		// reset();
+		    	} else {
+		    	}
+		    	powerplant.shutdown();
+
+		    }
         });
 
 		on<Shutdown>().then([this]{

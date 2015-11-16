@@ -303,7 +303,7 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
                 glEnable(GL_LIGHTING);
                 GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
-                glutSolidSphere(0.2 * basisScale, 10, 10);
+                glutSolidSphere(0.5 * basisScale, 10, 10);
             }
             drawBasis(basisScale);
         }
