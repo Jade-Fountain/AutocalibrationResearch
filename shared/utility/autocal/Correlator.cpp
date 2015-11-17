@@ -3,7 +3,7 @@ author Jake Fountain
 This code is part of mocap-kinect experiments*/
 
 #include "Correlator.h"
-
+#include <limits>
 namespace autocal {
 
 	using utility::math::matrix::Transform3D;
@@ -28,15 +28,7 @@ namespace autocal {
 				//Initialise if key missing. (true => calculate cov)
 				recordedStates[key] = StreamPair();
 			} else {
-				//Add current stats to the vector
-				bool noRecordedStates = recordedStates[key].first.empty() || recordedStates[key].second.empty();
 				
-				Transform3D lastTransform1 = recordedStates[key].first.empty() ? Transform3D() : recordedStates[key].first.back().i();
-				float diff1 = Transform3D::norm(lastTransform1 * T1);
-				
-				Transform3D lastTransform2 = recordedStates[key].second.empty() ? Transform3D() : recordedStates[key].second.back().i();
-				float diff2 = Transform3D::norm(lastTransform2 * T2);
-
 				// std::cout << "number of samples = " << recordedStates[key].first.size() << std::endl;
 				// std::cout << "diff1 = " << diff1 << std::endl; 
 				// if( id1 == 1 && id2 == 18) std::cout << "T2 = " << T2 << std::endl; 
@@ -44,9 +36,8 @@ namespace autocal {
 				// std::cout << "T2 = " << T2 << std::endl; 
 
 				//If we have no recorded states yet, or the new states differ significantly from the previous, add the new states
-				if( noRecordedStates ||
-					diff1 > difference_threshold || 
-					diff2 > difference_threshold)
+				if( stateIsNew(T1, recordedStates[key].first) 
+					|| stateIsNew(T2, recordedStates[key].second) )
 				{
 					//Check if bad sample (for the particular solver we are using):	
 					Rotation3D R1 = T1.rotation();
@@ -64,6 +55,7 @@ namespace autocal {
 
 					}
 
+					std::cout << "Recording Sample..." << std::endl; 
 
 					if(recordedStates[key].first.size() >= number_of_samples){
 						recordedStates[key].first.erase(recordedStates[key].first.begin());
@@ -177,6 +169,31 @@ namespace autocal {
 			recordedStates.clear();
 			computableStreams.clear();
 		}
+
+		bool Correlator::stateIsNew(const utility::math::matrix::Transform3D& T, const Stream& states){
+			if(states.empty()) return true;
+
+			// //OLD METHOD
+			// //Add current stats to the vector			
+			// const Transform3D& lastTransform = states.back().i();
+			// float diff = Transform3D::norm(lastTransform * T);
+			// return diff > difference_threshold;
+
+			//New method
+			float minDiffAngle = std::numeric_limits<float>::max();
+			float minDiffPos = std::numeric_limits<float>::max();
+			for(auto& S : states){
+				float diffAngle = Rotation3D::norm(S.rotation().t() * T.rotation());
+				float diffPos = arma::norm(T.translation() - S.translation());
+				if(diffAngle < minDiffAngle && diffPos < minDiffPos ){
+					minDiffAngle = diffAngle;
+					minDiffPos = diffPos;
+				}
+			}
+			// std::cout << "angle = " << minDiffAngle << " pos = " << minDiffPos << std::endl;
+			return minDiffAngle > difference_threshold && minDiffPos > difference_threshold;
+		}
+
 
 		float Correlator::getSylvesterScore(const Correlator::Stream& states1, const Correlator::Stream& states2, 
 											Correlator::Hypothesis key){
