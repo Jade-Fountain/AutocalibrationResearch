@@ -11,9 +11,9 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 10;
+			number_of_samples = 3;
 			difference_threshold = 1;
-			elimination_score_threshold = 0.01;
+			elimination_score_threshold = 0.1;
 		}
 
 
@@ -136,9 +136,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				float score = getSylvesterScore(states1, states2, key);
+				// float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				// float score = getRotationScore(states1, states2, key);
+				float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero

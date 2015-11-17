@@ -19,7 +19,11 @@ namespace autocal{
 	using utility::math::matrix::Transform3D;
 
 	int CalibrationTools::kroneckerDelta(int i, int j){
-		return (i == j) ? 1 : 0;
+		return (i == j);
+	}
+
+	template <typename T> int sgn(T val) {
+	    return (T(0) < val) - (val < T(0));
 	}
 
 	/*
@@ -252,8 +256,9 @@ namespace autocal{
 		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
 
 		//Create kronecker matrix K
+		int n = samplesA.size();
 		arma::mat K(9,9);
-		for(int i = 0; i < samplesA.size(); i++){
+		for(int i = 0; i < n; i++){
 			const Transform3D& A = samplesA[i];
 			const Transform3D& B = samplesB[i];
 
@@ -262,14 +267,53 @@ namespace autocal{
 		}
 
 		//Take singular value decomposition of K
-		arma::mat u,v;
+		arma::mat U,V;
 		arma::vec s;
-		arma::svd(u,s,v,K);
+		arma::svd(U,s,V,K);
 
-		arma::mat V_x = unvectorize(v,3);
-		arma::mat V_y = unvectorize(u,3);
+		std::cout << "U = \n" << U << std::endl;
+		std::cout << "s = \n" << s << std::endl;
+		std::cout << "V = \n" << V << std::endl;
 
-		//TODO: finish
+		//Get index of singular values closest to n
+		// arma::vec sMinusN = arma::abs(s-double(n));
+		// sMinusN.min(index);
+		
+		//Use largest singular value
+		arma::uword index = 0;
+
+		arma::vec v = V.col(index);
+		arma::vec u = U.col(index);
+		
+		std::cout << "u = \n" << u << std::endl;
+		std::cout << "s(index)  = \n" << s(index) << std::endl;
+		std::cout << "v = \n" << v << std::endl;
+
+		arma::mat V_x = unvectorize(u,3);
+		arma::mat V_y = unvectorize(v,3);
+
+
+		float detV_x = arma::det(V_x);
+		float detV_y = arma::det(V_y);
+
+		std::cout << "det(V_x) = \n" << detV_x << std::endl;
+		std::cout << "det(V_y) = \n" << detV_y << std::endl;
+
+		float alpha_x =  1 / std::cbrt(detV_x);
+		float alpha_y =  1 / std::cbrt(detV_y);
+
+		std::cout << "alpha_x = \n" << alpha_x << std::endl;
+		std::cout << "alpha_y = \n" << alpha_y << std::endl;
+
+		Rotation3D R_x = alpha_x * V_x;
+		Rotation3D R_y = alpha_y * V_y;
+
+		std::cout << "det(R_x) = \n" << arma::det(R_x) << std::endl;
+		std::cout << "det(R_y) = \n" << arma::det(R_y) << std::endl;
+
+
+		result.first.rotation() = R_x;
+		result.second.rotation() = R_y;
 
 		return result;
 

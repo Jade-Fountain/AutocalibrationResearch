@@ -54,8 +54,8 @@ namespace support {
         	int fails = 0;
 			for(int j = 0; j < config["number_of_trials"].as<int>(); j++){	
 				// simWorldTransform[key] = Transform3D::getRandom(1,0.1);
-				Transform3D X = Transform3D::getRandomU(1,1);//transpose because column major reading
-				Transform3D Y = Transform3D::getRandomU(1,0.1);
+				Transform3D X = Transform3D::getRandomU(1,0);//transpose because column major reading
+				Transform3D Y = Transform3D::getRandomU(1,0);
 				
 
 				int N = config["number_of_samples"].as<int>();
@@ -83,7 +83,8 @@ namespace support {
 				}
 
 				bool success = true;
-				std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveZhuang1994(samplesA , samplesB, success);
+
+				std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveKronecker_Shah2013(samplesA , samplesB, success);
 
 				auto measuredX = result.first;
 				auto measuredY = result.second;
