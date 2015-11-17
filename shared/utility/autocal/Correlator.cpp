@@ -11,8 +11,8 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 100;
-			difference_threshold = 0.1;
+			number_of_samples = 10;
+			difference_threshold = 1;
 			elimination_score_threshold = 0.01;
 		}
 
@@ -91,7 +91,7 @@ namespace autocal {
 				
 				if(totalScores[id1] != 0){
 					//Normalise
-					score = score;// / totalScores[id1];
+					// score = score / totalScores[id1];
 					//Eliminate
 					if(score < elimination_score_threshold && eliminatedHypotheses.count(pairID) == 0){
 						eliminatedHypotheses.insert(pairID);
@@ -136,9 +136,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				// float score = getSylvesterScore(states1, states2, key);
+				float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				float score = getRotationScore(states1, states2, key);
+				// float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -201,9 +201,9 @@ namespace autocal {
 				totalError += error;
 				UnitQuaternion rotA(Rotation3D(A.rotation()));
 				UnitQuaternion rotB(Rotation3D(B.rotation()));
-				// std::cout << "Error = " << error 
-				// 		  << " A = " << rotA.getAngle() << "rads about axis " << rotA.getAxis().t()
-				// 		  << " B = " << rotB.getAngle() << "rads about axis " << rotB.getAxis().t()
+				// std::cout << "Error = " << error << std::endl  
+				// 		  << " A = " << rotA.getAngle() << " rads about axis " << rotA.getAxis().t()
+				// 		  << " B = " << rotB.getAngle() << " rads about axis " << rotB.getAxis().t()
 				// 		  << std::endl;
 				// std::cout << "det(A.rotation()) = " << arma::det(A.rotation()) << std::endl;
 				// std::cout << "det(B.rotation()) = " << arma::det(B.rotation()) << std::endl;

@@ -69,6 +69,10 @@ namespace geometry {
                 kZ() = 0.25f * s;
             }
         }
+
+        if(std::fabs(getAngle()) > M_PI){
+            *this = -*this;
+        }
         
         if(!is_finite()){
             std::cout << "Quaternion is not finite!" << std::endl;
