@@ -49,8 +49,10 @@ namespace support {
     			//Rotation measurement
     			//TODO: try axis angle
     			Rotation3D rot = pose.rotation();
+    			UnitQuaternion q(rot);
     			float rotNorm = Rotation3D::norm(rot);
-    			arma::vec rotMeas = {rotNorm};
+    			float quatAngle = q.getAngle();
+    			arma::vec rotMeas = {rotNorm, quatAngle};
 
     			//Position measurement
     			arma::vec3 pos = pose.translation();
@@ -71,9 +73,9 @@ namespace support {
         	for(auto rb : stats){
         		log("===================");
         		log("RB ", rb.first);
-        		log("mean = \n", rb.second.mean());
+        		log("mean = \n", rb.second.mean().t());
         		log("variance = \n", rb.second.cov());
-        		log("stddev = \n", rb.second.stddev());
+        		log("stddev = \n", rb.second.stddev().t());
         		log("===================");
         	}
         });

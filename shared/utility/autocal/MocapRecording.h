@@ -31,6 +31,11 @@ namespace autocal {
 		
 		void markStartOfStreams(TimeStamp now);
 
+		void addStats(const std::string& name, const MocapStream::RigidBodyID& rigidBodyId, const utility::math::matrix::Transform3D& pose);
+
+		using StreamStats = std::map<MocapStream::RigidBodyID, arma::running_stat_vec<arma::vec>>;
+		std::map<std::string, StreamStats> stats;
+		bool performStats;
 
 	};
 

@@ -86,6 +86,8 @@ namespace psmove {
 	    	fps = config["fps"].as<float>();
 	    	frame_duration = 1.0 / fps;
 	    	use_simulation = config["use_simulation"].as<bool>();
+
+	    	sensorPlant.mocapRecording.performStats = config["perform_stats"].as<bool>();
         });
 
         on<Startup>().then([this]{
@@ -224,6 +226,21 @@ namespace psmove {
 		    	powerplant.shutdown();
 
 		    }
+        });
+
+
+        on<Every<10,std::chrono::seconds>>().then([this]{
+	        for(auto& stats : sensorPlant.mocapRecording.stats){	
+	        	log("Stream name: ",stats.first);
+	        	for(auto rb : stats.second){
+	        		log("===================");
+	        		log("RB ", rb.first);
+	        		log("mean = \n", rb.second.mean().t());
+	        		log("variance = \n", rb.second.cov());
+	        		log("stddev = \n", rb.second.stddev().t());
+	        		log("===================");
+	        	}
+	        }
         });
 
 		on<Shutdown>().then([this]{

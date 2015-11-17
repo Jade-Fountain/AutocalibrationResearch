@@ -91,11 +91,11 @@ namespace autocal {
 				
 				if(totalScores[id1] != 0){
 					//Normalise
-					score = score / totalScores[id1];
+					score = score;// / totalScores[id1];
 					//Eliminate
 					if(score < elimination_score_threshold && eliminatedHypotheses.count(pairID) == 0){
-						// eliminatedHypotheses.insert(pairID);
-						// std::cout << "Eliminated: [" << pairID.first << "," << pairID.second << "]" << std::endl;
+						eliminatedHypotheses.insert(pairID);
+						std::cout << "Eliminated: [" << pairID.first << "," << pairID.second << "]" << std::endl;
 					}						
 				}
 			}
@@ -136,9 +136,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				float score = getSylvesterScore(states1, states2, key);
+				// float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				// float score = getRotationScore(states1, states2, key);
+				float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
