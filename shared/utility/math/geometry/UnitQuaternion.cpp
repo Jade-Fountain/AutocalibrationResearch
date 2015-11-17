@@ -134,6 +134,25 @@ namespace geometry {
         *this = arma::normalise(*this);
     }
 
+    arma::mat44 UnitQuaternion::getLeftQuatMultMatrix(){
+        arma::mat44 Q;
+        Q << kW() << -kX() << -kY() << -kZ() << arma::endr
+          << kX() <<  kW() << -kZ() <<  kY() << arma::endr
+          << kY() <<  kZ() <<  kW() << -kX() << arma::endr
+          << kZ() << -kY() <<  kX() <<  kW() << arma::endr;
+        return Q;
+    }
+
+    arma::mat44 UnitQuaternion::getRightQuatMultMatrix(){
+        arma::mat44 W;
+        W << kW() << -kX() << -kY() << -kZ() << arma::endr
+          << kX() <<  kW() <<  kZ() << -kY() << arma::endr
+          << kY() << -kZ() <<  kW() <<  kX() << arma::endr
+          << kZ() <<  kY() << -kX() <<  kW() << arma::endr;
+        return W;
+    }
+
+
     float UnitQuaternion::random(float a, float b){
         float alpha = rand() / float(RAND_MAX);
         return a * alpha + b * (1 - alpha);

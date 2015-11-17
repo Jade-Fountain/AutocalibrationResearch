@@ -73,6 +73,16 @@ namespace geometry {
 
             void normalise();
 
+            /* @return Matrix Q(q) such that given another quaternion q', then
+             * Q(q) * q' = q * q'
+            */
+            arma::mat44 getLeftQuatMultMatrix();
+
+            /* @return Matrix W(q) such that given another quaternion q', then
+             * W(q) * q' = q' * q
+            */
+            arma::mat44 getRightQuatMultMatrix();
+
             static float random(float a, float b);
             static UnitQuaternion getRandomU(float max_angle);
             static UnitQuaternion getRandomN(float stddev);
@@ -100,6 +110,7 @@ namespace geometry {
             inline arma::subview_col<double> imaginary() { return rows(1,3); }
 
             UnitQuaternion slerp(const UnitQuaternion& p, const double& t);
+
 
     };
 
