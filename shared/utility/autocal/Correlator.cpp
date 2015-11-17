@@ -224,8 +224,8 @@ namespace autocal {
 			}
 
 			//Fit data
-			Rotation3D R1 = states1.back().rotation().t() * firstRotationReadings[key].first;
-			Rotation3D R2 = states2.back().rotation().t() * firstRotationReadings[key].second;
+			Rotation3D R1 = states1.back().rotation().t() * states1.front().rotation();
+			Rotation3D R2 = states2.back().rotation().t() * states2.front().rotation();
 
 			float angle1 = Rotation3D::norm(R1);
 			float angle2 = Rotation3D::norm(R2);
