@@ -55,8 +55,8 @@ namespace support {
 	        if(config["calibration_process_id"].as<int>() == 0){
 				for(int j = 0; j < config["number_of_trials"].as<int>(); j++){	
 					// simWorldTransform[key] = Transform3D::getRandom(1,0.1);
-					Transform3D X = Transform3D::getRandomU(M_PI,0);//transpose because column major reading
-					Transform3D Y = Transform3D::getRandomU(M_PI,0);
+					Transform3D X = Transform3D::getRandomU(M_PI,1);//transpose because column major reading
+					Transform3D Y = Transform3D::getRandomU(M_PI,1);
 					
 
 					int N = config["number_of_samples"].as<int>();

@@ -52,6 +52,8 @@ namespace matrix {
              */
             Rotation();
 
+            Rotation(const arma::mat& m);
+
             /**
              * @brief Convert from a quaternions vec4
              */
@@ -126,6 +128,18 @@ namespace matrix {
              * @return Retrieve the euler angles (xyz) from the matrix
              */
             arma::vec3 eulerAngles() const;
+
+            Rotation3D orthogonalise() const;
+
+            inline const arma::vec3 x() const { return submat(0,0,2,0); }
+            inline arma::subview<double> x() { return submat(0,0,2,0); }
+
+            inline const arma::vec3 y() const { return submat(0,1,2,1); }
+            inline arma::subview<double> y() { return submat(0,1,2,1); }
+
+            inline const arma::vec3 z() const { return submat(0,2,2,2); }
+            inline arma::subview<double> z() { return submat(0,2,2,2); }
+
 
             /**
              * @brief Computes 'size' of the transform T

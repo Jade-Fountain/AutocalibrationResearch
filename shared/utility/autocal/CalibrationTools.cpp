@@ -87,6 +87,42 @@ namespace autocal{
 		return success;
 	}
 
+	std::pair<arma::vec3,arma::vec3> CalibrationTools::getTranslationComponent(const std::vector<Transform3D>& samplesA, const std::vector<Transform3D>& samplesB,const Rotation3D& Ry, bool& success){
+		arma::mat combinedF; 
+		arma::vec combinedD; 
+
+		for (int i = 0; i < samplesA.size(); i++){
+			Rotation3D RA = samplesA[i].rotation(); 
+			arma::vec3 pA = samplesA[i].translation(); 
+			arma::vec3 pB = samplesB[i].translation(); 
+
+			arma::mat F = arma::join_rows(RA,-arma::eye(3,3)); 
+
+			arma::vec D = Ry * pB - pA; 
+
+			if (i == 0){	
+				combinedF = F; 
+				combinedD = D; 
+			}else{	
+				combinedF = arma::join_cols(combinedF,F); 
+				combinedD = arma::join_cols(combinedD,D); 
+			}
+		}
+		arma::vec pxpy;
+		bool pxpySuccess = solveWithSVD(combinedF,combinedD,pxpy); 
+
+		if(!pxpySuccess){
+			//If SVD fails, return identity
+			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;
+			success = false;
+			return std::pair<arma::vec3, arma::vec3>();
+		}
+		
+		std::pair<arma::vec3,arma::vec3> txty(pxpy.rows(0,2),pxpy.rows(3,5));
+		return txty;
+	}
+
+
 		/*
 		solves AX=YB for X,Y and A in sampleA, B in sampleB
 
@@ -198,40 +234,13 @@ namespace autocal{
 		Rotation3D Rx(x); 
 		Rotation3D Ry(y); 
 
-		arma::mat combinedF; 
-		arma::vec combinedD; 
-
-		for (int i = 0; i < samplesA.size(); i++){
-			Rotation3D RA = samplesA[i].submat(0,0,2,2); 
-			arma::vec3 pA = samplesA[i].submat(0,3,2,3); 
-			arma::vec3 pB = samplesB[i].submat(0,3,2,3); 
-
-			arma::mat F = arma::join_rows(RA,-arma::eye(3,3)); 
-
-			arma::vec D = Ry * pB - pA; 
-
-			if (i == 0){	
-				combinedF = F; 
-				combinedD = D; 
-			}else{	
-				combinedF = arma::join_cols(combinedF,F); 
-				combinedD = arma::join_cols(combinedD,D); 
-			}
-		}
-		arma::vec pxpy;
-		bool pxpySuccess = solveWithSVD(combinedF,combinedD,pxpy); 
-		if(!pxpySuccess){
-			//If SVD fails, return identity
-			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;
-			success = false;
-			return std::pair<Transform3D, Transform3D>(X,Y);
-		}
-		
 		X.rotation() = Rx; 
 		Y.rotation() = Ry; 
 
-		X.translation() = pxpy.rows(0,2); 
-		Y.translation() = pxpy.rows(3,5); 
+		auto translation = getTranslationComponent(samplesA, samplesB, Ry, success);
+
+		X.translation() = translation.first; 
+		Y.translation() = translation.second; 
 
 		return std::pair<Transform3D, Transform3D>(X,Y);
 	}
@@ -256,8 +265,13 @@ namespace autocal{
 
 	// solves AX=YB for X,Y and A in sampleA, B in sampleB
 	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveKronecker_Shah2013(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
-		
+		if(samplesA.size() < 3 || samplesB.size() < 3){
+			std::cout << "CalibrationTools - NEED MORE THAN 2 SAMPLES" << std::endl;
+			throw std::domain_error("CalibrationTools - NEED MORE THAN 2 SAMPLES");
+		}
 		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
+
+		//Rotation part
 
 		//Create kronecker matrix K
 		int n = samplesA.size();
@@ -308,14 +322,21 @@ namespace autocal{
 		// std::cout << "alpha_x = \n" << alpha_x << std::endl;
 		// std::cout << "alpha_y = \n" << alpha_y << std::endl;
 
-		Rotation3D R_y = alpha_x * V_x;
-		Rotation3D R_x = alpha_y * V_y;
+		Rotation3D R_y(alpha_x * V_x);
+		Rotation3D R_x(alpha_y * V_y);
 
 		// std::cout << "det(R_x) = \n" << arma::det(R_x) << std::endl;
 		// std::cout << "det(R_y) = \n" << arma::det(R_y) << std::endl;
 
+		//Translation part
+
+		auto translation = getTranslationComponent(samplesA, samplesB, R_y, success);
+
 		result.first.rotation() = R_x;
 		result.second.rotation() = R_y;
+
+		result.first.translation() = translation.first;
+		result.second.translation() = translation.second;
 
 		return result;
 
@@ -342,16 +363,16 @@ namespace autocal{
 		}
 
 		arma::mat44 CTC = C.t() * C;
-
-		Rotation3D R_x;
-		Rotation3D R_y;
-
-		std::cout << "det(R_x) = \n" << arma::det(R_x) << std::endl;
-		std::cout << "det(R_y) = \n" << arma::det(R_y) << std::endl;
+		
+		arma::vec eigval;
+		arma::mat eigvec;
+		arma::eig_sym( eigval, eigvec, CTC );
 
 
-		result.first.rotation() = R_x;
-		result.second.rotation() = R_y;
+
+
+		// result.first = R_x;
+		// result.second = R_y;
 
 		return result;
 
