@@ -30,6 +30,8 @@ namespace autocal {
 		float difference_threshold;
 
 		float elimination_score_threshold; 
+
+		float score_inclusion_threshold;
 		//STATE
 
 		using Hypothesis = std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID>;

@@ -14,6 +14,7 @@ namespace autocal {
 			number_of_samples = 10;
 			difference_threshold = 0.1;
 			elimination_score_threshold = 0.1;
+			score_inclusion_threshold = 0.5;
 		}
 
 
@@ -128,9 +129,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				// float score = getSylvesterScore(states1, states2, key);
+				float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				float score = getRotationScore(states1, states2, key);
+				// float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -281,7 +282,9 @@ namespace autocal {
 			}
 			std::vector<std::pair<int,int>> result;
 			for(auto& match : bestMatches){
-				result.push_back(std::make_pair(int(match.first),int(match.second)));
+				if(bestScores[match.first] > score_inclusion_threshold){
+					result.push_back(std::make_pair(int(match.first),int(match.second)));
+				}
 			}
 			return result;
 		}
