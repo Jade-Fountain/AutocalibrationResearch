@@ -261,7 +261,7 @@ namespace autocal{
 
 		//Create kronecker matrix K
 		int n = samplesA.size();
-		arma::mat K(9,9);
+		arma::mat K = arma::zeros(9,9);
 		for(int i = 0; i < n; i++){
 			const Transform3D& A = samplesA[i];
 			const Transform3D& B = samplesB[i];
@@ -275,9 +275,9 @@ namespace autocal{
 		arma::vec s;
 		arma::svd(U,s,V,K);
 
-		std::cout << "U = \n" << U << std::endl;
-		std::cout << "s = \n" << s << std::endl;
-		std::cout << "V = \n" << V << std::endl;
+		// std::cout << "U = \n" << U << std::endl;
+		// std::cout << "s = \n" << s << std::endl;
+		// std::cout << "V = \n" << V << std::endl;
 
 		//Get index of singular values closest to n
 		// arma::vec sMinusN = arma::abs(s-double(n));
@@ -286,31 +286,65 @@ namespace autocal{
 		//Use largest singular value
 		arma::uword index = 0;
 
-		arma::vec v = V.col(index);
 		arma::vec u = U.col(index);
+		arma::vec v = V.col(index);
 		
-		std::cout << "u = \n" << u << std::endl;
-		std::cout << "s(index)  = \n" << s(index) << std::endl;
-		std::cout << "v = \n" << v << std::endl;
+		// std::cout << "u = \n" << u << std::endl;
+		// std::cout << "s(index)  = \n" << s(index) << std::endl;
+		// std::cout << "v = \n" << v << std::endl;
 
 		arma::mat V_x = unvectorize(u,3);
 		arma::mat V_y = unvectorize(v,3);
 
-
 		float detV_x = arma::det(V_x);
 		float detV_y = arma::det(V_y);
 
-		std::cout << "det(V_x) = \n" << detV_x << std::endl;
-		std::cout << "det(V_y) = \n" << detV_y << std::endl;
+		// std::cout << "det(V_x) = \n" << detV_x << std::endl;
+		// std::cout << "det(V_y) = \n" << detV_y << std::endl;
 
 		float alpha_x =  1 / std::cbrt(detV_x);
 		float alpha_y =  1 / std::cbrt(detV_y);
 
-		std::cout << "alpha_x = \n" << alpha_x << std::endl;
-		std::cout << "alpha_y = \n" << alpha_y << std::endl;
+		// std::cout << "alpha_x = \n" << alpha_x << std::endl;
+		// std::cout << "alpha_y = \n" << alpha_y << std::endl;
 
-		Rotation3D R_x = alpha_x * V_x;
-		Rotation3D R_y = alpha_y * V_y;
+		Rotation3D R_y = alpha_x * V_x;
+		Rotation3D R_x = alpha_y * V_y;
+
+		// std::cout << "det(R_x) = \n" << arma::det(R_x) << std::endl;
+		// std::cout << "det(R_y) = \n" << arma::det(R_y) << std::endl;
+
+		result.first.rotation() = R_x;
+		result.second.rotation() = R_y;
+
+		return result;
+
+	}
+	
+	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveClosedForm_Dornaika1998(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
+		
+		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
+
+		//Create kronecker matrix K
+		int n = samplesA.size();
+		arma::mat44 C = arma::zeros(4,4);
+		for(int i = 0; i < n; i++){
+			const Transform3D& A = samplesA[i];
+			const Transform3D& B = samplesB[i];
+
+			const UnitQuaternion qA(A);
+			const UnitQuaternion qB(B);
+
+			arma::mat44 C_i = -qA.getLeftQuatMultMatrix().t() * qB.getRightQuatMultMatrix();
+
+			C += C_i;
+
+		}
+
+		arma::mat44 CTC = C.t() * C;
+
+		Rotation3D R_x;
+		Rotation3D R_y;
 
 		std::cout << "det(R_x) = \n" << arma::det(R_x) << std::endl;
 		std::cout << "det(R_y) = \n" << arma::det(R_y) << std::endl;

@@ -173,7 +173,7 @@ namespace geometry {
         *this = arma::normalise(*this);
     }
 
-    arma::mat44 UnitQuaternion::getLeftQuatMultMatrix(){
+    arma::mat44 UnitQuaternion::getLeftQuatMultMatrix() const{
         arma::mat44 Q;
         Q << kW() << -kX() << -kY() << -kZ() << arma::endr
           << kX() <<  kW() << -kZ() <<  kY() << arma::endr
@@ -182,7 +182,7 @@ namespace geometry {
         return Q;
     }
 
-    arma::mat44 UnitQuaternion::getRightQuatMultMatrix(){
+    arma::mat44 UnitQuaternion::getRightQuatMultMatrix() const{
         arma::mat44 W;
         W << kW() << -kX() << -kY() << -kZ() << arma::endr
           << kX() <<  kW() <<  kZ() << -kY() << arma::endr
