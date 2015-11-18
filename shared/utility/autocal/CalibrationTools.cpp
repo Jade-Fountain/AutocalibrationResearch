@@ -124,12 +124,12 @@ namespace autocal{
 
 			//Get Quaternions for rotations
 			const UnitQuaternion quat_a(A.rotation()); 
-			a0 = quat_a[0]; 
-			a = quat_a.rows(1,3); 
+			a0 = quat_a.real(); 
+			a = quat_a.imaginary(); 
 			
 			const UnitQuaternion quat_b(B.rotation()); 
-			b0 = quat_b[0]; 
-			b = quat_b.rows(1,3); 
+			b0 = quat_b.real(); 
+			b = quat_b.imaginary(); 
 
 			//Compute G in Gw = C
 			if(std::fabs(a0) < 1e-10){
@@ -179,19 +179,19 @@ namespace autocal{
 		
 		//Compute x and y Quaternions
 		UnitQuaternion x, y; 
-		y[0] = 1 / std::sqrt(1 + w[3]*w[3] + w[4]*w[4] + w[5]*w[5]); 
-		if (std::fabs(y[0])< 1e-3){
-			std::cout << "\n\n\n\n\n\n\ny[0] == 0 so you need to rotate the ref base with respect to the base\n\n\n\n\n\n\n" << std::endl; 
+		y.real() = 1 / std::sqrt(1 + w[3]*w[3] + w[4]*w[4] + w[5]*w[5]); 
+		if (std::fabs(y.real())< 1e-3){
+			std::cout << "\n\n\n\n\n\n\ny.real() == 0 so you need to rotate the ref base with respect to the base\n\n\n\n\n\n\n" << std::endl; 
 			success = false;
 			return std::pair<Transform3D, Transform3D>(); 
 		}
-		y.rows(1,3) = y[0] * w.rows(3,5); 
-		x.rows(1,3) = y[0] * w.rows(0,2); 
+		y.imaginary() = y.real() * w.rows(3,5); 
+		x.imaginary() = y.real() * w.rows(0,2); 
 		
-		float x0 = arma::dot((a/a0), x.rows(1,3)) + (b0/a0) * y[0] - arma::dot((b/a0) , y.rows(1,3)); 
+		float x0 = arma::dot((a/a0), x.rows(1,3)) + (b0/a0) * y.real() - arma::dot((b/a0) , y.rows(1,3)); 
 		int x_sign = x0 > 0 ? 1 : -1; 
 		//TODO: figure out how to handle when x is nan
-		x[0] = x_sign * std::sqrt(1 - std::fmin(1, x[1]*x[1] + x[2]*x[2] + x[3]*x[3]) ); 
+		x.real() = x_sign * std::sqrt(1 - std::fmin(1, x[1]*x[1] + x[2]*x[2] + x[3]*x[3]) ); 
 		// check:
 		// check = tr.quaternion_multiply(tr.quaternion_inverse(tr.quaternion_multiply(quat_a,x)), tr.quaternion_multiply(y,quat_b))
 
@@ -227,11 +227,11 @@ namespace autocal{
 			return std::pair<Transform3D, Transform3D>(X,Y);
 		}
 		
-		X.submat(0,0,2,2) = Rx; 
-		Y.submat(0,0,2,2) = Ry; 
+		X.rotation() = Rx; 
+		Y.rotation() = Ry; 
 
-		X.submat(0,3,2,3) = pxpy.rows(0,2); 
-		Y.submat(0,3,2,3) = pxpy.rows(3,5); 
+		X.translation() = pxpy.rows(0,2); 
+		Y.translation() = pxpy.rows(3,5); 
 
 		return std::pair<Transform3D, Transform3D>(X,Y);
 	}
