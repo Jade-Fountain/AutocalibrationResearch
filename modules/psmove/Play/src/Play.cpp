@@ -132,25 +132,23 @@ namespace psmove {
 		    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		    //PSmove pose stream
-		    autocal::MocapStream psmoveStream("psmove", false);
-		    psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
+		    autocal::MocapStream psmoveStream("psmove", true);
 
 		    //Mocap pose stream
-		    autocal::MocapStream optitrackStream("mocap", true);
+		    autocal::MocapStream optitrackStream("mocap", false, true);
 		    //coordinate system is LH while psmove is RH
-		    bool optitrackReflectZ = true;
 		    std::set<int> mocapAllowedIDs = {1,2};
-		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), optitrackReflectZ, mocapAllowedIDs);
+		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), mocapAllowedIDs);
 
 		    //Initialise sensor plant
-		    sensorPlant = SensorPlant(use_simulation);
+		    sensorPlant = SensorPlant();
 		    //Optional simulation parameters
 		    if(use_simulation){
 		        //Exp 4 -...
-		        autocal::MocapStream::SimulationParameters a1; 
-		        autocal::MocapStream::SimulationParameters a2;
-		        autocal::MocapStream::SimulationParameters d1; 
-		        autocal::MocapStream::SimulationParameters d2; 
+		        autocal::SimulationParameters a1; 
+		        autocal::SimulationParameters a2;
+		        autocal::SimulationParameters d1; 
+		        autocal::SimulationParameters d2; 
 		        a1.noise.angle_stddev = 0;
 		        // a2.noise.angle_stddev = 1;
 		        d1.noise.disp_stddev = 0;
@@ -162,15 +160,19 @@ namespace psmove {
 		        std::map<int,int> answers;
 		        answers[1] = 1;
 		        // answers[2] = 2;
-		        sensorPlant.setAnswers(answers);
+		        sensorPlant.setAnswers("psmove","mocap",answers);
+		        psmoveStream.setupSimulation(optitrackStream, answers);
+
 		    } else {
+		    	psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
 		        std::map<int,int> answers;
 		        answers[0] = 2;
-		        sensorPlant.setAnswers(answers);
+		        sensorPlant.setAnswers("psmove","mocap",answers);
 		    }
 
 		    //Push back the loaded streams
-		    if(!use_simulation) sensorPlant.addStream(psmoveStream);
+		    //Ensure simulation is setup for sensor plant prior to adding
+		    sensorPlant.addStream(psmoveStream);
 		    sensorPlant.addStream(optitrackStream);
 
 		    //Ground Truth computation
@@ -189,7 +191,7 @@ namespace psmove {
 		    
 		    arma::vec3 psuedoX =  arma::normalise(left - right);
 		    psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
-		    psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+		    psmoveToMocap.x() = -arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
 
 			//--------------------------------------------------------------------
 			    // Ground truth exp 1

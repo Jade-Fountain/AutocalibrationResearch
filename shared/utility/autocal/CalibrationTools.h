@@ -25,8 +25,11 @@ namespace autocal{
 
 		static arma::mat unvectorize(arma::mat v, int n_rows);
 
+		static std::pair<arma::vec3,arma::vec3> getTranslationComponent(const std::vector<utility::math::matrix::Transform3D>& samplesA, const std::vector<utility::math::matrix::Transform3D>& samplesB, const utility::math::matrix::Rotation3D& Ry, bool& success);
+
 		static std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> solveZhuang1994(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success);
 		static std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> solveKronecker_Shah2013(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success);
+		static std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> solveClosedForm_Dornaika1998(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success);
 
 	};
 }

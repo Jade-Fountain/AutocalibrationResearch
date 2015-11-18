@@ -42,8 +42,10 @@ namespace modules {
 namespace psmove {
 
     using messages::support::Configuration;
-    using utility::math::geometry::UnitQuaternion;
+    using messages::input::RigidBodyFrame;
 	using messages::input::MotionCapture;
+    
+    using utility::math::geometry::UnitQuaternion;
     using utility::math::matrix::Rotation3D;
     using utility::math::matrix::Transform3D;
 
@@ -53,6 +55,22 @@ namespace psmove {
 		{
 		    std::cout << "Exiting .." << std::endl;
 		    running = false;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)){
+			pitchComp += 0.1;
+			std::cout << "Pitch comp = " << pitchComp << std::endl;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)){
+			pitchComp -= 0.1;
+			std::cout << "Pitch comp = " << pitchComp << std::endl;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+			yawComp += 0.1;
+			std::cout << "Yaw comp = " << yawComp << std::endl;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
+			yawComp -= 0.1;
+			std::cout << "Yaw comp = " << yawComp << std::endl;
 		}
 	}
 
@@ -68,27 +86,49 @@ namespace psmove {
 	    	fps = config["fps"].as<float>();
 	    	frame_duration = 1.0 / fps;
 	    	use_simulation = config["use_simulation"].as<bool>();
+
+	    	sensorPlant.mocapRecording.performStats = config["perform_stats"].as<bool>();
         });
 
         on<Startup>().then([this]{
-        	//Initialise sensor plant
-		    sensorPlant = autocal::SensorPlant(use_simulation);
+        	//49.3 is the measured vFOV of the pseye camera on blue setting
+		    proj =
+
+		        // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
+		        // image->width, image->height, 0.01f, 10.0f);
+
+		        glm::perspective(   float(49.3 * 3.14159 / 180.0),            //VERTICAL FOV
+		                            float(width) / float(height),  //aspect ratio
+		                            0.1f,         //near plane distance (min z)
+		                            1000.0f           //Far plane distance (max z)
+		                            );
+
 		    //Optional simulation parameters
+		    autocal::MocapStream psmoveStream("psmove", false);
+		    autocal::MocapStream optitrackStream("mocap", false, false);
+
 		    if(use_simulation){
 		        //Exp 4 -...
-		        autocal::MocapStream::SimulationParameters a1; 
-		        autocal::MocapStream::SimulationParameters a2;
-		        autocal::MocapStream::SimulationParameters d1; 
-		        autocal::MocapStream::SimulationParameters d2; 
+		        autocal::SimulationParameters a1; 
+		        autocal::SimulationParameters a2;
+		        autocal::SimulationParameters d1; 
+		        autocal::SimulationParameters d2;
+		        // a1.noise.angle_stddev = 0.1;
+		        // a1.noise.disp_stddev = 0.1;
 		        int aN = 1;
 		        int dN = 1;
 		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
 				
 				//set the simulated connections between rigid bodies
 		        std::map<int,int> answers;
-		        answers[1] = 1;
-		        sensorPlant.setAnswers(answers);
+		        answers[1] = 3;
+		        sensorPlant.setAnswers("psmove","mocap",answers);
+		        psmoveStream.setupSimulation(optitrackStream, answers);
+
 		    }
+
+		    sensorPlant.addStream(psmoveStream);
+		    sensorPlant.addStream(optitrackStream);
 
 	        window.setActive(true);
 
@@ -100,8 +140,9 @@ namespace psmove {
 			    powerplant.shutdown();
 			}
 			//Psmove
+		    psmoveTracker.setProjection(proj);
 		    psmoveTracker.init();
-		    
+
 		    //Check errors
 		    checkGLError();
 	        
@@ -110,8 +151,8 @@ namespace psmove {
         });
 
 		   //Main Loop  
-        on<Every<60,Per<std::chrono::seconds>>, Optional<With<MotionCapture>>,Single>().then([this]
-        	(const std::shared_ptr<const MotionCapture>& mocap){
+        on<Every<60,Per<std::chrono::seconds>>, Optional<With<RigidBodyFrame>>,Single>().then([this]
+        	(const std::shared_ptr<const RigidBodyFrame>& mocap){
 	        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
 
@@ -125,28 +166,18 @@ namespace psmove {
 
 	        //Add measurement for mocap
 	        if(mocap){
-		        for(auto& rigidBody : mocap->rigidBodies){
-		        	int id = rigidBody.id;
-		        	Transform3D pose;
-		        	pose.translation() = arma::vec3({double(rigidBody.position[0]),
-													 double(rigidBody.position[1]),
-													 double(rigidBody.position[2])});
-	                UnitQuaternion q(rigidBody.rotation[3], // real part
-	                				 arma::vec3({
-	                				 	double(rigidBody.rotation[0]),//imaginary part
-										double(rigidBody.rotation[1]),
-										double(rigidBody.rotation[2])
-											 	})
-	                				 );
-					pose.rotation() = Rotation3D(q);
-		        	// pose = Transform3D::createScale(arma::vec3({-1,1,1})) * pose;
+		        for(auto& rigidBody : mocap->poses){
+		        	int id = rigidBody.first;
+		        	const Transform3D& pose = rigidBody.second;
 		        	if(id != 1){ 
-						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false,false);
+						sensorPlant.mocapRecording.addMeasurement("mocap", current_timestamp, id, pose,false);
 		        	} else {
 						// std::cout << "pose: " << id << " = \n" << pose << std::endl; 
 						// std::cout << "quat: " << id << " = " << q.t() << std::endl; 
 						// pose.x() = -pose.x();
-		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pose.i());
+						Transform3D pitchRot = Transform3D::createRotationX(pitchComp * M_PI / 180);
+						Transform3D yawRot = Transform3D::createRotationY(yawComp * M_PI / 180);
+		        		sensorPlant.setGroundTruthTransform("mocap", "psmove", pitchRot * yawRot * pose.i());
 		        	}
 		        }	
 	        } else {
@@ -156,7 +187,7 @@ namespace psmove {
 
 	        //Update and add measurement for psmove
 	        psmoveTracker.update();
-			if(!use_simulation) psmoveTracker.addMeasurementsToStream(sensorPlant, current_timestamp);
+			if(!use_simulation) psmoveTracker.addMeasurementsToStream(sensorPlant, "psmove", current_timestamp);
 
 	        window.setActive(true);
 
@@ -166,23 +197,16 @@ namespace psmove {
 	        psmoveTracker.render();
 
 	        glMatrixMode(GL_PROJECTION);
-	        //49.3 is the measured vFOV of the pseye camera on blue setting
-		    glm::mat4 proj =
-
-		        // glm::perspectiveFov<float>(PSEYE_FOV_BLUE_DOT,
-		        // image->width, image->height, 0.01f, 10.0f);
-
-		        glm::perspective(   float(49.3 * 3.14159 / 180.0),            //VERTICAL FOV
-		                            float(width) / float(height),  //aspect ratio
-		                            0.01f,         //near plane distance (min z)
-		                            10.0f           //Far plane distance (max z)
-		                            );
+	        
 		    glLoadMatrixf(glm::value_ptr(proj));
 
 	        //TODO: perform matching
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, 0);
 
 	        drawSensorStreams(sensorPlant, "psmove", "mocap", current_timestamp, matches);
+
+	        //Draw red crosshair for aiming camera
+	        // drawCrossHair();
 
 	        //Get interaction
 	        handleInput(window, frame_time_since_start);
@@ -192,7 +216,30 @@ namespace psmove {
 
 	        //Shutdown if necessary
 	        if(!running){
-	            powerplant.shutdown();
+			    //Load next sim params, or end if there are none
+		    	bool next = sensorPlant.next();
+		    	
+		    	if(next) {
+		    		// reset();
+		    	} else {
+		    	}
+		    	powerplant.shutdown();
+
+		    }
+        });
+
+
+        on<Every<10,std::chrono::seconds>>().then([this]{
+	        for(auto& stats : sensorPlant.mocapRecording.stats){	
+	        	log("Stream name: ",stats.first);
+	        	for(auto rb : stats.second){
+	        		log("===================");
+	        		log("RB ", rb.first);
+	        		log("mean = \n", rb.second.mean().t());
+	        		log("variance = \n", rb.second.cov());
+	        		log("stddev = \n", rb.second.stddev().t());
+	        		log("===================");
+	        	}
 	        }
         });
 

@@ -141,10 +141,10 @@ int main(int argc, char* argv[])
     autocal::SensorPlant sensorPlant(useSimulation);
     if(useSimulation){
         //Exp 4 -...
-        autocal::MocapStream::SimulationParameters a1; 
-        autocal::MocapStream::SimulationParameters a2;
-        autocal::MocapStream::SimulationParameters d1; 
-        autocal::MocapStream::SimulationParameters d2; 
+        autocal::SimulationParameters a1; 
+        autocal::SimulationParameters a2;
+        autocal::SimulationParameters d1; 
+        autocal::SimulationParameters d2; 
         a2.noise.angle_stddev = 1;
         d1.noise.disp_stddev = 2;
         d2.noise.disp_stddev = 10;

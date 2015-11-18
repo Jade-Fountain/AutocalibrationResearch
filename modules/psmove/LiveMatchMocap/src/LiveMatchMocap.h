@@ -48,12 +48,18 @@ namespace psmove {
 		
 		//Window object to draw to
 		sf::Window window;
+
 		
 		//Video output properties
 		float fps;
 		float frame_duration;
 		int width;
 		int height;
+
+		//Camera calibration compensation tuning
+		float pitchComp = 0;
+		float yawComp = 0;
+		glm::mat4 proj;
 
 		autocal::SensorPlant sensorPlant;
 		bool use_simulation = false;

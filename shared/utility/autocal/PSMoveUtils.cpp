@@ -1,11 +1,10 @@
 
 #include "PSMoveUtils.h"
 
+
 Tracker::Tracker()
     : m_moves(NULL),
       m_count(psmove_count_connected()),
-      m_tracker(psmove_tracker_new()),
-      m_fusion(psmove_fusion_new(m_tracker, 1., 1000.)),
       mocapRecorder("psmovedata")
 {
     // PSMove *move;
@@ -28,7 +27,8 @@ Tracker::Tracker()
     //         printf("Unknown connection type.\n");
     //         break;
     // }
-
+    m_tracker = psmove_tracker_new();
+    m_fusion = psmove_fusion_new(m_tracker, 1., 1000.);
 
     psmove_tracker_set_mirror(m_tracker, PSMove_False);
     psmove_tracker_set_exposure(m_tracker, Exposure_HIGH);
@@ -41,9 +41,12 @@ Tracker::Tracker()
 
         psmove_enable_orientation(m_moves[i], PSMove_True);
         assert(psmove_has_orientation(m_moves[i]));
+
         
         while (psmove_tracker_enable(m_tracker, m_moves[i]) != Tracker_CALIBRATED);
     }
+    // psmove_tracker_set_dimming(m_tracker,1);
+
 }
 
 Tracker::~Tracker()
@@ -56,6 +59,18 @@ Tracker::~Tracker()
     free(m_items);
     free(m_moves);
 }
+
+void Tracker::setProjection(glm::mat4 proj){
+    float* proj_ptr = psmove_fusion_get_projection_matrix(m_fusion);
+    for(int i = 0 ; i < 16; i++){
+        std::cout << proj_ptr[i] << std::endl;
+    }
+    memcpy(proj_ptr, glm::value_ptr(proj), sizeof(float)*16);
+    for(int i = 0 ; i < 16; i++){
+        std::cout << proj_ptr[i] << std::endl;
+    }
+}
+
 
 void
 Tracker::update()
@@ -141,12 +156,16 @@ Tracker::render()
     /* Draw the camera image, filling the screen */
     glColor3f(1., 1., 1.);
     glBegin(GL_QUADS);
+    //BL
     glTexCoord2f(0., 1.);
     glVertex2f(-1., -1.);
+    //BR
     glTexCoord2f(1., 1.);
     glVertex2f(1., -1.);
+    //TR
     glTexCoord2f(1., 0.);
     glVertex2f(1., 1.);
+    //TL
     glTexCoord2f(0., 0.);
     glVertex2f(-1., 1.);
     glEnd();
@@ -227,17 +246,18 @@ void Tracker::saveFrame(CvVideoWriter *writer){
         std::cout << "Frame failed to save" << std::endl;
     }
 }
-void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, autocal::TimeStamp t){
+void Tracker::addMeasurementsToStream(autocal::SensorPlant& plant, std::string stream_name, autocal::TimeStamp t){
     for (int i=0; i<m_count; i++) {
         GLfloat* m = psmove_fusion_get_modelview_matrix(m_fusion, m_moves[i]);
         Transform3D pose;
         // units = decimeters
-        pose << m[0] << m[4] << m[8] << unit_factor * m[12] << arma::endr
-             << m[1] << m[5] << m[9] << unit_factor * m[13] << arma::endr
-             << m[2] << m[6] << m[10] << unit_factor * m[14] << arma::endr
+        //HACK O.5 FOR HALF DISTANCE
+        pose << m[0] << m[4] << m[8] << unit_factor * m[12] * 0.5 << arma::endr
+             << m[1] << m[5] << m[9] << unit_factor * m[13] * 0.5 << arma::endr
+             << m[2] << m[6] << m[10] << unit_factor * m[14] * 0.5 << arma::endr
              << m[3] << m[7] << m[11] << m[15] << arma::endr;
 
-        plant.mocapRecording.addMeasurement("psmove", t, i, pose);
+        plant.mocapRecording.addMeasurement(stream_name, t, i, pose);
     }
 }
 

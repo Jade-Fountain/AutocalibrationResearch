@@ -23,14 +23,14 @@ namespace autocal {
 	std::string MocapStream::toString(){
 		std::stringstream os;
 		os << "Mocap Stream: " << name()  << " || Size: " << size() << std::endl;
-		for(auto& x : stream){
-			os << "stream[" << int(x.first) << "] = \n" << x.second.toString() << std::endl;
+		for(auto& x : *stream){
+			os << "(*stream)["<< int(x.first) << "] = \n" << x.second.toString() << std::endl;
 		}
 		return os.str();
 	}
 
 
-	MocapStream::Frame MocapStream::createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs){
+	MocapStream::Frame MocapStream::createFrame(arma::mat m, const std::set<int>& allowedIDs){
 		Frame f;
 		// std::cout << "Loading " << m.n_cols << " rigid bodies" << std::endl;
 		// std::cout << m << std::endl;
@@ -67,8 +67,8 @@ namespace autocal {
 				r.pose.rotation() = rot;
 			}
 
-			if(reflectZ){
-				r.pose.z() = -r.pose.z();
+			if(LHInput){
+				transformLHtoRH(r.pose);
 			}
 
 			// std::cout << "data: " <<  data << std::endl;
@@ -95,15 +95,17 @@ namespace autocal {
 	
 	MocapStream::Frame MocapStream::getInterpolatedFrame(const TimeStamp& t){
 		//Get last frame at current time point
-		if(stream.count(t) != 0){
-			return stream[t];
+		if(simulated) return getSimulatedFrame(t);
+
+		if(stream->count(t) != 0){
+			return (*stream)[t];
 		} else {
-			const auto ub = stream.lower_bound(t);
-			// auto ub = stream.upper_bound(t);
-			if(ub == stream.begin()) return ub->second;
+			const auto ub = stream->lower_bound(t);
+			// auto ub = stream->upper_bound(t);
+			if(ub == stream->begin()) return ub->second;
 			auto lb = ub;
 			lb--;
-			if(ub == stream.end()) return lb->second;
+			if(ub == stream->end()) return lb->second;
 			float alpha = float(t - lb->first)/float(ub->first - lb->first);
 			return Frame::interpolate(lb->second, ub->second, alpha);
 		}
@@ -111,34 +113,49 @@ namespace autocal {
 	
 	MocapStream::Frame MocapStream::getFrame(const TimeStamp& t){
 		//Get last frame at current time point
-		if(stream.count(t) != 0){
-			return stream[t];
+		if(simulated) return getSimulatedFrame(t);
+
+		if(stream->count(t) != 0){
+			return (*stream)[t];
 		} else {
-			auto ub = stream.lower_bound(t);
-			if(ub == stream.begin()) return ub->second;
+			auto ub = stream->lower_bound(t);
+			if(ub == stream->begin()) return ub->second;
 			ub--;
 			return ub->second;
 		}
 	}
+
+	MocapStream::Frame MocapStream::getParentFrame(const TimeStamp& t){
+		//Get last frame at current time point
+		if(parentStream->count(t) != 0){
+			return (*parentStream)[t];
+		} else {
+			auto ub = parentStream->lower_bound(t);
+			if(ub == parentStream->begin()) return ub->second;
+			ub--;
+			return ub->second;
+		}
+	}
+
 	TimeStamp MocapStream::getFrameTime(const TimeStamp& t){
-		if(stream.count(t) != 0){
+		if(stream->count(t) != 0){
 			return t;
 		} else {
-			return stream.lower_bound(t)->first;
+			return stream->lower_bound(t)->first;
 		}
 	}
 
 	std::map<TimeStamp,MocapStream::Frame>::iterator MocapStream::getUpperBoundIter(const TimeStamp& t){
 		//Get last frame at current time point
-		return stream.upper_bound(t);
+		return stream->upper_bound(t);
 	}
 	
 	std::map<TimeStamp,MocapStream::Frame>::iterator MocapStream::getLowerBoundIter(const TimeStamp& t){
 		//Get last frame at current time point
-		return stream.lower_bound(t);
+		return stream->lower_bound(t);
 	}
 	
-	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ, const std::set<int>& allowedIDs){
+	bool MocapStream::loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, const std::set<int>& allowedIDs){
 		std::cout << "Loading data ..." << std::endl;
 
 		TimeStamp min = start_time;
@@ -173,7 +190,7 @@ namespace autocal {
 				if(success){ 
 					//Do not store frame if it has no info
 					if(frame.n_cols!=0){
-						stream[timestamp] = createFrame(frame, reflectZ, allowedIDs);
+						(*stream)[timestamp] = createFrame(frame, allowedIDs);
 					}
 				} else {
 					continue;
@@ -187,7 +204,7 @@ namespace autocal {
 		if(max != min_loaded && min != max_loaded){
 			float period_sec = float(max_loaded - min_loaded) * 1e-6;
 			std::cout << "Loaded data from " << min_loaded << " to " << max_loaded << ". i.e. " 
-					  << int(period_sec) << " seconds at " << stream.size() / period_sec << "Hz measurement frequency" << std::endl; 
+					  << int(period_sec) << " seconds at " << stream->size() / period_sec << "Hz measurement frequency" << std::endl; 
 		}
 
 	   	(void)closedir(dir);
@@ -197,20 +214,20 @@ namespace autocal {
 		return success;
 	}
 
-	bool MocapStream::setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis){
+	bool MocapStream::setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem){
 		//Check that the frame doesn't already exist
 		TimeStamp t = getTimeStamp(frame_time);
-		setRigidBodyInFrame(t,id,pose, correctCoordinateSystem, reflectZAxis);
+		setRigidBodyInFrame(t,id,pose, correctCoordinateSystem);
 	}
 
-	bool MocapStream::setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis){
+	bool MocapStream::setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const Transform3D& pose, bool correctCoordinateSystem){
 		//Check that the frame doesn't already exist
 		TimeStamp t = frame_time;
-		if(stream.count(t) == 0){
-			stream[t] = Frame();
+		if(stream->count(t) == 0){
+			(*stream)[t] = Frame();
 		}
-		stream[t].rigidBodies[id] = RigidBody({pose});
-		RigidBody& r = stream[t].rigidBodies[id];
+		(*stream)[t].rigidBodies[id] = RigidBody({pose});
+		RigidBody& r = (*stream)[t].rigidBodies[id];
 		
 		arma::vec3 pos = r.pose.translation();
 		Rotation3D rot = r.pose.rotation();
@@ -229,66 +246,16 @@ namespace autocal {
 			r.pose.translation() = arma::vec3{-pos[1],pos[2],-pos[0]};
 		}
 
-		if(reflectZAxis){
-			r.pose.z() = -r.pose.z();
-		}
-	}
-
-	std::map<MocapStream::RigidBodyID, arma::vec> MocapStream::getInvariates(TimeStamp now){
-		std::map<MocapStream::RigidBodyID, arma::vec> invariates;
-		if(stream.size() != 0){
-			
-			auto initial = stream.upper_bound(streamStart);
-			if(initial == stream.end()){
-				return invariates;
-			}
-			Frame firstFrame = initial->second;
-			Frame latestFrame = getFrame(now);
-
-			for (auto& rb : firstFrame.rigidBodies){
-				auto rbID = rb.first;
-				auto initialTransform = rb.second.pose;
-				if(latestFrame.rigidBodies.count(rbID)!=0){
-
- 					auto latestTransform = latestFrame.rigidBodies[rbID].pose;
-					//TODO generalise to other sensors and invariates
- 					Rotation3D rotation = latestTransform.rotation().i() * initialTransform.rotation();
- 					UnitQuaternion q(rotation);
- 					float rotationMagnitude = q.getAngle();
-
-					arma::vec3 displacement = latestTransform.translation() - initialTransform.translation();
-					invariates[rbID] = arma::vec{rotationMagnitude};
-
-				}
-			}
+		if(LHInput){
+			transformLHtoRH(r.pose);
 		}
 
-		return invariates;
 	}
-
-	std::map<MocapStream::RigidBodyID, arma::vec> MocapStream::getStates(TimeStamp now){
-		std::map<MocapStream::RigidBodyID, arma::vec> states;
-		
-		if(stream.size() != 0){
-			
-			Frame latestFrame = getFrame(now);
-
-			for (auto& rb : latestFrame.rigidBodies){
-				auto rbID = rb.first;
-				auto transform = rb.second.pose;
-
-				states[rbID] = transform.translation();
-			}
-		}
-
-		return states;
-	}
-
 
 	std::map<MocapStream::RigidBodyID, Transform3D> MocapStream::getCompleteStates(TimeStamp now){
 		std::map<MocapStream::RigidBodyID, Transform3D> states;
 		
-		if(stream.size() != 0){
+		if(stream->size() != 0){
 			
 			Frame latestFrame = getFrame(now);
 
@@ -303,48 +270,36 @@ namespace autocal {
 		return states;
 	}
 
-
-	std::map<MocapStream::RigidBodyID, arma::vec> MocapStream::getSimulatedStates(TimeStamp now, std::vector<RigidBodyID> ids){
-		std::map<MocapStream::RigidBodyID, arma::vec> states;
-		
-		//TODO:make this better
-		Transform3D worldTransform; //M
-		worldTransform = worldTransform.rotateY(1);
-		worldTransform = worldTransform.translateX(1);
-		worldTransform = worldTransform.rotateZ(0.4);
-		worldTransform = worldTransform.translateY(0.1);
-		
-		//TODO: 
-		Transform3D localTransform; //L^-1
-		localTransform = localTransform.translateX(1);
-		localTransform = localTransform.rotateX(-0.4);
-		localTransform = localTransform.translateY(0.1);
-
-		if(stream.size() != 0){
-			
-			Frame latestFrame = getFrame(now);
-			RigidBodyID i = 1;
-			for (auto& rbID : ids){
-				Transform3D transform = worldTransform * latestFrame.rigidBodies[rbID].pose * localTransform;
-
-				states[i++] = transform.translation();
+	void MocapStream::transform(utility::math::matrix::Transform3D T){
+		for(auto& frame : *stream){
+			//Loop through and record transformed rigid body poses
+			for (auto& rb : frame.second.rigidBodies){
+				Transform3D newPose = T * rb.second.pose;
+				rb.second.pose = newPose;
 			}
 		}
-
-		return states;
 	}
 
+	void MocapStream::setupSimulation(const MocapStream& parentStream_, std::map<int,int> simulationIDs_){
+		simulated = true;
+		simulationIDs = simulationIDs_;
+		parentStream = parentStream_.stream;
+	}
 
-	std::map<MocapStream::RigidBodyID, Transform3D> MocapStream::getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim){
-		std::map<MocapStream::RigidBodyID, Transform3D> states;
+	void MocapStream::setSimulationParameters(const SimulationParameters& sim){
+		simulationParameters = sim;
+	}
 
-		int lag_milliseconds = sim.latency_ms;
+	MocapStream::Frame MocapStream::getSimulatedFrame(TimeStamp now){
+		MocapStream::Frame frame;
+
+		int lag_milliseconds = simulationParameters.latency_ms;
 		now -= lag_milliseconds * 1000;
 		
-		if(stream.size() != 0){
+		if(parentStream->size() != 0){
 			
-			Frame latestFrame = getFrame(now);
-			for (auto& key : ids){
+			MocapStream::Frame latestFrame = getParentFrame(now);
+			for (auto& key : simulationIDs){
 				int artificialID = key.first;
 				int derivedID = key.second;
 				
@@ -362,40 +317,37 @@ namespace autocal {
 					// simLocalTransform[key] = simLocalTransform[key].rotateX(M_PI_2);
 					std::cout << "simLocalTransform = \n" << simLocalTransform[key] << std::endl;
 				}
+
 				//Noise:
-				Transform3D localNoise = Transform3D::getRandomN(sim.noise.angle_stddev ,sim.noise.disp_stddev);
+				Transform3D localNoise = Transform3D::getRandomN(simulationParameters.noise.angle_stddev ,simulationParameters.noise.disp_stddev);
 				// std::cout << "noise = " << arma::vec4(localNoise * arma::vec4({0,0,0,1})).t() << std::endl;
-				Transform3D globalNoise = Transform3D::getRandomN(sim.noise.angle_stddev ,sim.noise.disp_stddev);
+				Transform3D globalNoise = Transform3D::getRandomN(simulationParameters.noise.angle_stddev ,simulationParameters.noise.disp_stddev);
 				// Transform3D globalNoise = Transform3D::getRandomN(0.310524198 ,0.052928682);
-				// Transform3D noise = Transform3D();
 				
-		 	//  	if(slippage.count(derivedID) == 0){
-		 	//  		slippage[derivedID] = Transform3D();
-		 	//  	}
-		 	//  	float df = sim.slip.disp.f;
-		 	//  	float displacement = sim.slip.disp.A;
-
-		 	//  	float af = sim.slip.angle.f;
-		 	//  	float angleAmp = sim.slip.angle.A;
-
-		 	//  	float x = displacement * std::sin(2 * M_PI * now * 1e-6 * df);
-		 	//  	float angle = angleAmp * std::sin(2 * M_PI * now * 1e-6 * af);
-
-				// slippage[derivedID] = Transform3D(Rotation3D::createRotationZ(angle),arma::vec3({x,0,0}));
-				// std::cout << "slippage[" << derivedID << "] = " << Transform3D::norm(slippage[derivedID]) << std::endl;
-				// std::cout << "localNoise[" << derivedID << "] = " << Transform3D::norm(localNoise) << std::endl;
-				// std::cout << "globalNoise[" << derivedID << "] = " << Transform3D::norm(globalNoise) << std::endl;
-				// std::cout << "slippage/noise[" << derivedID << "] = " << Transform3D::norm(slippage[derivedID])/Transform3D::norm(noise) << std::endl;
-
 				Transform3D transform = simWorldTransform[key] * latestFrame.rigidBodies[derivedID].pose * globalNoise * simLocalTransform[key] * localNoise;
+				
+				//Debugging
 				// std::cout << "transform = " << transform.translation().t() << std::endl;
 				// transform.translation() = arma::vec{0,0,-1};
-				states[artificialID] = transform;
+				
+				frame.rigidBodies[artificialID] = RigidBody();
+				frame.rigidBodies[artificialID].pose = transform;
 			}
 		}
 
-		return states;
+		(*stream)[now] = frame;
+
+		return frame;
 	}
+
+
+	void MocapStream::transformLHtoRH(Transform3D& T){
+		if(LHInput){
+			Transform3D L = Transform3D::createScale(arma::vec3({-1,1,1}));
+			T = L * T * L;//last L is actually L.i() = L;
+		}
+	}
+
 
 
 

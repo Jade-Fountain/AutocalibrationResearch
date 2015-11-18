@@ -56,6 +56,8 @@ namespace autocal {
 								Hypothesis key);
 		
 		void resetRecordedStates();
+
+		bool stateIsNew(const utility::math::matrix::Transform3D& T, const Stream& states);
 		
 	public:
 

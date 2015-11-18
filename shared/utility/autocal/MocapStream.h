@@ -6,6 +6,7 @@ This code is part of mocap-kinect experiments*/
 #include <dirent.h>
 #include <map>
 #include <set>
+#include "Simulation.h"
 #include "utility/math/matrix/Transform3D.h"
 #include "utility/math/matrix/Rotation3D.h"
 #include "utility/math/geometry/UnitQuaternion.h"
@@ -47,144 +48,95 @@ namespace autocal {
 
 		};
 
-		struct SimulationParameters{
-			
-			struct SinFunc{
-				float f = 0;//frequency
-				float A = 0;//amplitude
-			};
-
-			struct Noise{
-				float angle_stddev = 0;
-				float disp_stddev = 0;
-			};
-
-			struct {
-				SinFunc disp;
-				SinFunc angle;
-			} slip;
-			float latency_ms = 0;
-			Noise noise;
-
-			SimulationParameters operator+(const SimulationParameters& s){
-				SimulationParameters s_;
-				
-				s_.latency_ms = s.latency_ms + this->latency_ms;
-				
-				s_.noise.angle_stddev = s.noise.angle_stddev + this->noise.angle_stddev;
-				s_.noise.disp_stddev = s.noise.disp_stddev + this->noise.disp_stddev;
-
-				s_.slip.disp.f = s.slip.disp.f + this->slip.disp.f;
-				s_.slip.disp.A = s.slip.disp.A + this->slip.disp.A;
-				s_.slip.angle.f = s.slip.angle.f + this->slip.angle.f;
-				s_.slip.angle.A = s.slip.angle.A + this->slip.angle.A;
-
-				return s_;
-			}
-			SimulationParameters operator-(const SimulationParameters& s){
-				SimulationParameters s_;
-				
-				s_.latency_ms = this->latency_ms - s.latency_ms ;
-				
-				s_.noise.angle_stddev = this->noise.angle_stddev - s.noise.angle_stddev ;
-				s_.noise.disp_stddev = this->noise.disp_stddev - s.noise.disp_stddev ;
-
-				s_.slip.disp.f = this->slip.disp.f - s.slip.disp.f ;
-				s_.slip.disp.A = this->slip.disp.A - s.slip.disp.A ;
-				s_.slip.angle.f = this->slip.angle.f - s.slip.angle.f ;
-				s_.slip.angle.A = this->slip.angle.A - s.slip.angle.A ;
-
-				return s_;
-			}
-			SimulationParameters operator*(const float& f){
-				SimulationParameters s_;
-				
-				s_.latency_ms = this->latency_ms * f;
-				
-				s_.noise.angle_stddev = this->noise.angle_stddev * f;
-				s_.noise.disp_stddev = this->noise.disp_stddev * f;
-
-				s_.slip.disp.f = this->slip.disp.f * f;
-				s_.slip.disp.A = this->slip.disp.A * f;
-				s_.slip.angle.f = this->slip.angle.f * f;
-				s_.slip.angle.A = this->slip.angle.A * f;
-
-				return s_;
-			}
-
-		};
-
-		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simWorldTransform;
-		std::map<std::pair<int,int>, utility::math::matrix::Transform3D> simLocalTransform;
 	private:
+		//Simulation parameters
+		bool simulated = false;
+		std::map<int,int> simulationIDs;
+		SimulationParameters simulationParameters;
+		using Hypothesis = std::pair<int,int>;
 
-		std::map<TimeStamp, Frame> stream;
+		std::map<Hypothesis, utility::math::matrix::Transform3D> simWorldTransform;
+		std::map<Hypothesis, utility::math::matrix::Transform3D> simLocalTransform;
+
+		//Standard parameters
+		std::shared_ptr<std::map<TimeStamp, Frame>> parentStream;
 
 		std::string stream_name;
 
+		TimeStamp streamStart;
+
+		bool correctForAutocalibrationCoordinateSystem;
+
+		//If we are loading sensor stream from a left hand coordinate system, 
+		//we must carefully transform it to be compatible with the calibration system
+		bool LHInput;
+		
 		TimeStamp getTimeStamp(const std::chrono::system_clock::time_point& t){
 			return std::chrono::duration_cast<std::chrono::microseconds>(t.time_since_epoch()).count();
 		}
 
-		Frame createFrame(arma::mat m, bool reflectZ, const std::set<int>& allowedIDs);
+		Frame createFrame(arma::mat m, const std::set<int>& allowedIDs);
 
-		TimeStamp streamStart;
+		void transformLHtoRH(utility::math::matrix::Transform3D& T);
 
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> slippage;
-
-		bool correctForAutocalibrationCoordinateSystem;
-
+		std::shared_ptr<std::map<TimeStamp, Frame>> stream;
 	public:
-		//Constructors
-		MocapStream() : stream_name(""), slippage(), correctForAutocalibrationCoordinateSystem(false){}
-
-		MocapStream(std::string name, bool correction) : stream_name(name), correctForAutocalibrationCoordinateSystem(correction){}
+		//Constructor
+		MocapStream(std::string name = "", bool LHInput_ = false, bool correction = false) 
+		: stream_name(name), 
+		  correctForAutocalibrationCoordinateSystem(correction),
+		  LHInput(LHInput_)
+		{
+			stream = std::make_shared<std::map<TimeStamp, Frame>>();
+		}
 
 		//Accessors and small utilities
 		void markStart(TimeStamp t){
 			streamStart = t;
 		}
 
-		int size() const {return stream.size();}
+		int size() const {return stream->size();}
 
-		bool isEmpty() const {return stream.empty();}
+		bool isEmpty() const {return stream->empty();}
 		
 		std::string name() const {return stream_name;}
 
 		std::string toString();
 
-		std::map<TimeStamp, Frame>& frameList(){return stream;}
+		void transform(utility::math::matrix::Transform3D T);
 		
-		std::map<TimeStamp,Frame>::iterator begin(){return stream.begin();}
-		std::map<TimeStamp,Frame>::iterator end(){return stream.end();}
+		std::map<TimeStamp,Frame>::iterator begin(){return stream->begin();}
+		std::map<TimeStamp,Frame>::iterator end(){return stream->end();}
 		
 		//Frame retrieval
 		Frame getFrame(const std::chrono::system_clock::time_point& t);
 		Frame getInterpolatedFrame(const TimeStamp& t);
 		Frame getFrame(const TimeStamp& t);
+		Frame getParentFrame(const TimeStamp& t);
 		TimeStamp getFrameTime(const TimeStamp& t);
 
+		//Iterator accessor
 		std::map<TimeStamp,Frame>::iterator getUpperBoundIter(const TimeStamp& t);
 		std::map<TimeStamp,Frame>::iterator getLowerBoundIter(const TimeStamp& t);
 		
+		//Load data from files
+		bool loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, const std::set<int>& allowedIDs = std::set<int>());
 
-		//Heavy functions
-		bool loadMocapData(std::string folder_path, const TimeStamp& start_time, const std::chrono::system_clock::time_point& end_time, bool reflectZ = false, const std::set<int>& allowedIDs = std::set<int>());
-
-		bool setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
+		//set data using different time indicators
+		bool setRigidBodyInFrame(const std::chrono::system_clock::time_point& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem);
+		bool setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem);
 		
-		bool setRigidBodyInFrame(const TimeStamp& frame_time, const unsigned int& id, const utility::math::matrix::Transform3D& pose, bool correctCoordinateSystem, bool reflectZAxis);
+		//Get the latest poses of the recorded data
+		std::map<RigidBodyID, utility::math::matrix::Transform3D> getCompleteStates(TimeStamp now);
 
-		std::map<MocapStream::RigidBodyID, arma::vec> getInvariates(TimeStamp now);
-		
-		std::map<MocapStream::RigidBodyID, arma::vec> getStates(TimeStamp now);
-		
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteStates(TimeStamp now);
+		//Simulation stuff
+		void setupSimulation(const MocapStream& parentStream_, std::map<int,int> simulationIDs_);
 
-		std::map<MocapStream::RigidBodyID, arma::vec> getSimulatedStates(TimeStamp now, std::vector<RigidBodyID> ids);
-		
-		std::map<MocapStream::RigidBodyID, utility::math::matrix::Transform3D> getCompleteSimulatedStates(TimeStamp now, std::map<int,int> ids, const SimulationParameters& sim);
+		void setSimulationParameters(const SimulationParameters& sim);
 
+		Frame getSimulatedFrame(TimeStamp now);
+
+		
 	};
 
 }

@@ -4,6 +4,6 @@ ADD_ROLE(
     support::logging::ConsoleLogHandler
     support::extension::FileWatcher
 
-    support::MocapRecorder
-    psmove::Record
+    input::NatNet
+    support::MocapNoiseAnalysis
 )

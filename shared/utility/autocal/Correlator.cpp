@@ -3,7 +3,7 @@ author Jake Fountain
 This code is part of mocap-kinect experiments*/
 
 #include "Correlator.h"
-
+#include <limits>
 namespace autocal {
 
 	using utility::math::matrix::Transform3D;
@@ -11,8 +11,8 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 20;
-			difference_threshold = 1;
+			number_of_samples = 10;
+			difference_threshold = 0.1;
 			elimination_score_threshold = 0.1;
 		}
 
@@ -28,15 +28,7 @@ namespace autocal {
 				//Initialise if key missing. (true => calculate cov)
 				recordedStates[key] = StreamPair();
 			} else {
-				//Add current stats to the vector
-				bool noRecordedStates = recordedStates[key].first.empty() || recordedStates[key].second.empty();
 				
-				Transform3D lastTransform1 = recordedStates[key].first.empty() ? Transform3D() : recordedStates[key].first.back().i();
-				float diff1 = Transform3D::norm(lastTransform1 * T1);
-				
-				Transform3D lastTransform2 = recordedStates[key].second.empty() ? Transform3D() : recordedStates[key].second.back().i();
-				float diff2 = Transform3D::norm(lastTransform2 * T2);
-
 				// std::cout << "number of samples = " << recordedStates[key].first.size() << std::endl;
 				// std::cout << "diff1 = " << diff1 << std::endl; 
 				// if( id1 == 1 && id2 == 18) std::cout << "T2 = " << T2 << std::endl; 
@@ -44,15 +36,26 @@ namespace autocal {
 				// std::cout << "T2 = " << T2 << std::endl; 
 
 				//If we have no recorded states yet, or the new states differ significantly from the previous, add the new states
-				if( noRecordedStates ||
-					diff1 > difference_threshold || 
-					diff2 > difference_threshold)
+				if( stateIsNew(T1, recordedStates[key].first) 
+					|| stateIsNew(T2, recordedStates[key].second) )
 				{
 					//Check if bad sample (for the particular solver we are using):	
-					UnitQuaternion q1(Rotation3D(T1.rotation()));
-					UnitQuaternion q2(Rotation3D(T2.rotation()));
+					Rotation3D R1 = T1.rotation();
+					UnitQuaternion q1(R1);
+					Rotation3D R2 = T2.rotation();
+					UnitQuaternion q2(R2);
 					if(q1.kW() == 0 || q2.kW() == 0) return;
 
+					//Check det
+					if(std::fabs(arma::det(R1) - 1) > 0.1){
+						std::cout << __FILE__ << " : Det R1 = " << arma::det(R1) << std::endl;
+					}
+					if(std::fabs(arma::det(R2) - 1) > 0.1){
+						std::cout << __FILE__ << " : Det R2 = " << arma::det(R2) << std::endl;
+
+					}
+
+					std::cout << "Recording Sample..." << std::endl; 
 
 					if(recordedStates[key].first.size() >= number_of_samples){
 						recordedStates[key].first.erase(recordedStates[key].first.begin());
@@ -80,7 +83,7 @@ namespace autocal {
 				
 				if(totalScores[id1] != 0){
 					//Normalise
-					score = score;// / totalScores[id1];
+					// score = score / totalScores[id1];
 					//Eliminate
 					if(score < elimination_score_threshold && eliminatedHypotheses.count(pairID) == 0){
 						eliminatedHypotheses.insert(pairID);
@@ -125,9 +128,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				float score = getSylvesterScore(states1, states2, key);
+				// float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				// float score = getRotationScore(states1, states2, key);
+				float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -167,11 +170,37 @@ namespace autocal {
 			computableStreams.clear();
 		}
 
+		bool Correlator::stateIsNew(const utility::math::matrix::Transform3D& T, const Stream& states){
+			if(states.empty()) return true;
+
+			//OLD METHOD
+			//Add current stats to the vector			
+			const Transform3D& lastTransform = states.back().i();
+			float diff = Transform3D::norm(lastTransform * T);
+			return diff > difference_threshold;
+
+			//New method
+			// float minDiffAngle = std::numeric_limits<float>::max();
+			// float minDiffPos = std::numeric_limits<float>::max();
+			// for(auto& S : states){
+			// 	float diffAngle = Rotation3D::norm(S.rotation().t() * T.rotation());
+			// 	float diffPos = arma::norm(T.translation() - S.translation());
+			// 	if(diffAngle < minDiffAngle && diffPos < minDiffPos ){
+			// 		minDiffAngle = diffAngle;
+			// 		minDiffPos = diffPos;
+			// 	}
+			// }
+			// // std::cout << "angle = " << minDiffAngle << " pos = " << minDiffPos << std::endl;
+			// return minDiffAngle > difference_threshold && minDiffPos > difference_threshold;
+		}
+
+
 		float Correlator::getSylvesterScore(const Correlator::Stream& states1, const Correlator::Stream& states2, 
 											Correlator::Hypothesis key){
 			//Fit data
 			bool success = true;
-			auto result = CalibrationTools::solveZhuang1994(states1,states2,success);
+			// auto result = CalibrationTools::solveZhuang1994(states1,states2,success);
+			auto result = CalibrationTools::solveKronecker_Shah2013(states1,states2,success);
 
 			//if the fit failed, return zero score
 			if(!success) return 0;
@@ -190,10 +219,14 @@ namespace autocal {
 				totalError += error;
 				UnitQuaternion rotA(Rotation3D(A.rotation()));
 				UnitQuaternion rotB(Rotation3D(B.rotation()));
-				// std::cout << "Error = " << error 
-				// 		  << " A = " << rotA.getAngle() << "rads about axis " << rotA.getAxis().t()
-				// 		  << " B = " << rotB.getAngle() << "rads about axis " << rotB.getAxis().t()
+				// std::cout << "Error = " << error << std::endl  
+				// 		  << " A = " << rotA.getAngle() << " rads about axis " << rotA.getAxis().t()
+				// 		  << " B = " << rotB.getAngle() << " rads about axis " << rotB.getAxis().t()
 				// 		  << std::endl;
+				// std::cout << "det(A.rotation()) = " << arma::det(A.rotation()) << std::endl;
+				// std::cout << "det(B.rotation()) = " << arma::det(B.rotation()) << std::endl;
+				// std::cout << "det(X.rotation()) = " << arma::det(X.rotation()) << std::endl;
+				// std::cout << "det(Y.rotation()) = " << arma::det(Y.rotation()) << std::endl;
 			}
 			std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
 			return likelihood(totalError / float(number_of_samples));
@@ -209,8 +242,8 @@ namespace autocal {
 			}
 
 			//Fit data
-			Rotation3D R1 = states1.back().rotation().t() * firstRotationReadings[key].first;
-			Rotation3D R2 = states2.back().rotation().t() * firstRotationReadings[key].second;
+			Rotation3D R1 = states1.back().rotation().t() * states1.front().rotation();
+			Rotation3D R2 = states2.back().rotation().t() * states2.front().rotation();
 
 			float angle1 = Rotation3D::norm(R1);
 			float angle2 = Rotation3D::norm(R2);

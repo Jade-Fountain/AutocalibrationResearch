@@ -11,15 +11,16 @@ namespace autocal {
 	using utility::math::matrix::Transform3D;
 
 	//match each rigid body in stream 1 with a rigid body in stream 2
-	std::vector<std::pair<int,int>> SensorPlant::matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1){
+	std::vector<SensorPlant::Hypothesis> SensorPlant::matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1){
 		// std::cout << "FRAME BEGIN"  << std::endl;
 		auto start = std::chrono::high_resolution_clock::now();
 
-		std::vector<std::pair<int,int>> empty_result;
+		std::vector<SensorPlant::Hypothesis> empty_result;
 
+		MocapStream& stream1 = mocapRecording.getStream(stream_name_1);
 		MocapStream& stream2 = mocapRecording.getStream(stream_name_2);
 		
-		std::pair<std::string,std::string> hypothesisKey({stream_name_1,stream_name_2});
+		NamePair hypothesisKey({stream_name_1,stream_name_2});
 
 		//Initialise eliminated hypotheses if necessary
 		if(correlators.count(hypothesisKey) == 0){
@@ -28,30 +29,13 @@ namespace autocal {
 		auto& correlator = correlators[hypothesisKey];
 
 		//Check we have data to compare
-		if(stream2.size() == 0){
+		if(stream2.size() == 0 || stream1.size() == 0 ){
 			return empty_result;
 		}
 
+		std::map<MocapStream::RigidBodyID, Transform3D> currentState1 = stream1.getCompleteStates(now + latencyOfStream1);
 		std::map<MocapStream::RigidBodyID, Transform3D> currentState2 = stream2.getCompleteStates(now);
-		std::map<MocapStream::RigidBodyID, Transform3D> currentState1;
 		
-		//if we simulate the data, derive it from the second stream
-		if(simulate){
-			if(simParams.size() == 0){
-				std::cout << "NO SIM PARAMETERS LEFT. CRASHING" << std::endl;
-				throw std::range_error("NO SIM PARAMETERS LEFT. CRASHING");
-			}
-			currentState1 = stream2.getCompleteSimulatedStates(now, simulatedCorrelations, simParams.front());
-			for(auto& m : currentState1){
-				mocapRecording.addMeasurement(stream_name_1, now, m.first, m.second);
-				// std::cout  << "adding measurement to " << stream_name_1 << "[" << m.first << "\n" << m.second << std::endl;
-					// std::cout  << "based on" << stream_name_2 << "[" << 2 << "\n" << stream2.getFrame(now).rigidBodies[2].pose << std::endl;
-			}
-		} else {
-			MocapStream& stream1 = mocapRecording.getStream(stream_name_1);
-			if(stream1.size() == 0) return empty_result;
-     		currentState1 = stream1.getCompleteStates(now + latencyOfStream1);
-		}
 
 		//Update statistics
 		for(auto& state1 : currentState1){
@@ -70,19 +54,18 @@ namespace autocal {
 			correlator.compute();
 		}
 
-		// std::cout << "FRAME END"  << std::endl;
-
-		std::vector<std::pair<int,int>> correlations = correlator.getBestCorrelations();
+		std::vector<SensorPlant::Hypothesis> correlations = correlator.getBestCorrelations();
 
 		auto finish = std::chrono::high_resolution_clock::now();
 		computeTimes(double(std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() * 1e-6));
 		
 		//Compute correct guesses:
+		auto answers = correctMatchings[hypothesisKey];
 		for (auto& cor : correlations){
 			if(correctGuesses.count(cor.first) == 0) correctGuesses[cor.first] = 0;
 			if(totalGuesses.count(cor.first) == 0) totalGuesses[cor.first] = 0;
-			if(simulatedCorrelations.count(cor.first) > 0){
-				correctGuesses[cor.first] += int(simulatedCorrelations[cor.first] == cor.second);
+			if(answers.count(cor.first) > 0){
+				correctGuesses[cor.first] += int(answers[cor.first] == cor.second);
 			}
 			totalGuesses[cor.first] ++;
 		}
@@ -134,17 +117,11 @@ namespace autocal {
 			//Get the transform between coordinate systems
 			Transform3D streamToDesiredBasis = groundTruthTransforms[key];
 
-			for(auto& frame : mocapRecording.getStream(streamA).frameList()){
-				//Loop through and record transformed rigid body poses
-				for (auto& rb : frame.second.rigidBodies){
-					Transform3D T = streamToDesiredBasis * rb.second.pose;
-					rb.second.pose = T;
-				}
-			}
+			mocapRecording.getStream(streamA).transform(streamToDesiredBasis);
+
 		} else {
 			std::cout << "WARNING: ATTEMPTING TO ACCESSING GROUND TRUTH WHEN NONE EXISTS!!!" << std::endl;
 		}
-
 
 	}
 	
@@ -176,12 +153,19 @@ namespace autocal {
 		return truth;
 	}
 
+	void SensorPlant::addStream(const MocapStream& s){
+		mocapRecording.getStream(s.name()) = s;
+		if(simParams.size()!=0){
+			mocapRecording.getStream(s.name()).setSimulationParameters(simParams.front());
+		}
+	}
+
 	bool SensorPlant::next(){
 		for(auto& c : correlators){
 			c.second.reset();
 		}
 		if(simParams.size()!=0){
-			MocapStream::SimulationParameters s = simParams.front();
+			SimulationParameters s = simParams.front();
 			simParams.pop();
 			std::cerr << "Finished simulating: " << s.latency_ms << " " << s.noise.angle_stddev << " " << s.noise.disp_stddev << " " 
 					  << s.slip.disp.f << " " << s.slip.disp.A << " "
@@ -195,34 +179,33 @@ namespace autocal {
 		correctGuesses.clear();
 		totalGuesses.clear();
 		computeTimes.reset();
+		if(simParams.size() != 0){
+			setCurrentSimParameters(simParams.front());
+		}
 		return simParams.size() != 0;
 	}
 
-	void SensorPlant::setAnswers(std::map<int,int> answers){
-		simulatedCorrelations = answers;
-	}
-
 	void SensorPlant::setSimParameters(
-		MocapStream::SimulationParameters a1, MocapStream::SimulationParameters a2, int aN,
-		MocapStream::SimulationParameters d1, MocapStream::SimulationParameters d2, int dN){
+		SimulationParameters a1, SimulationParameters a2, int aN,
+		SimulationParameters d1, SimulationParameters d2, int dN){
 		
-		simParams = std::queue<MocapStream::SimulationParameters>();//clear queue
+		simParams = std::queue<SimulationParameters>();//clear queue
 		
-		MocapStream::SimulationParameters aStep;	
+		SimulationParameters aStep;	
 		if(aN != 1){
 			aStep = (a2 - a1) * (1 / float(aN-1));	
 		}
 
-		MocapStream::SimulationParameters dStep;
+		SimulationParameters dStep;
 		if(dN != 1){
 			dStep = (d2 - d1) * (1 / float(dN-1));
 		}
 
 		for(int i = 0; i < aN; i++){
-			MocapStream::SimulationParameters a;
+			SimulationParameters a;
 			a = a1 + aStep * i;
 			for(int j = 0; j < dN; j++){
-				MocapStream::SimulationParameters d;
+				SimulationParameters d;
 				d = d1 + dStep * j;
 
 				simParams.push(a+d);
@@ -230,16 +213,16 @@ namespace autocal {
 		}
 	}
 
+	void SensorPlant::setAnswers(std::string s1, std::string s2, std::map<int,int> answers){
+		NamePair key = NamePair({s1,s2});
+		correctMatchings[key] = answers;
+	}
 
-
-
-
-
-
-
-
-
-
+	void SensorPlant::setCurrentSimParameters(const SimulationParameters& sim){
+		for(auto& stream : mocapRecording.streams){
+			stream.second.setSimulationParameters(sim);
+		}	
+	}	
 
 
 

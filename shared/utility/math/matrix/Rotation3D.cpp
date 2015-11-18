@@ -34,6 +34,12 @@ namespace matrix {
         eye(); // identity matrix by default
     }
 
+    Rotation3D::Rotation(const arma::mat& m){
+        *this = m.submat(0,0,2,2);
+        *this = this->orthogonalise();
+    }
+
+
     Rotation3D::Rotation(const UnitQuaternion& q) {
         // quaternion to rotation conversion
         // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
@@ -64,6 +70,15 @@ namespace matrix {
 
         *this *= Rotation3D::createRotationX(angle) * i();
     }
+
+    Rotation3D Rotation3D::orthogonalise() const{
+        Rotation3D R;
+        R.x() = this->x();
+        R.z() = arma::cross(this->x(),this->y());
+        R.y() = arma::cross(R.z(),R.x());
+        return R;
+    }
+
 
     Rotation3D Rotation3D::rotateX(double radians) const {
         return *this * createRotationX(radians);

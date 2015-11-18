@@ -21,9 +21,15 @@
 #define MESSAGES_INPUT_SERVOID_H
 
 #include <string>
+#include "utility/math/matrix/Transform3D.h"
 
 namespace messages {
     namespace input {
+
+        struct RigidBodyFrame{
+            std::map<int, utility::math::matrix::Transform3D> poses;
+        };
+
         struct MotionCapture {
 
             struct Marker {

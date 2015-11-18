@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <limits>
 #include "CalibrationTools.h"
 
 namespace autocal{
@@ -19,7 +20,11 @@ namespace autocal{
 	using utility::math::matrix::Transform3D;
 
 	int CalibrationTools::kroneckerDelta(int i, int j){
-		return (i == j) ? 1 : 0;
+		return (i == j);
+	}
+
+	template <typename T> int sgn(T val) {
+	    return (T(0) < val) - (val < T(0));
 	}
 
 	/*
@@ -75,9 +80,49 @@ namespace autocal{
 		bool success = arma::pinv(pinvA,A);
 		//Compute x in Ax=b
 		if(success) x = pinvA * b;
+
+		auto error = A*x-b;
+		// std::cout << "SVD error: A*x - b = \n" << error.t() << " size = " << arma::norm(error) << std::endl;
+
 		//Return whether or not the SVD was performed correctly
 		return success;
 	}
+
+	std::pair<arma::vec3,arma::vec3> CalibrationTools::getTranslationComponent(const std::vector<Transform3D>& samplesA, const std::vector<Transform3D>& samplesB,const Rotation3D& Ry, bool& success){
+		arma::mat combinedF; 
+		arma::vec combinedD; 
+
+		for (int i = 0; i < samplesA.size(); i++){
+			Rotation3D RA = samplesA[i].rotation(); 
+			arma::vec3 pA = samplesA[i].translation(); 
+			arma::vec3 pB = samplesB[i].translation(); 
+
+			arma::mat F = arma::join_rows(RA,-arma::eye(3,3)); 
+
+			arma::vec D = Ry * pB - pA; 
+
+			if (i == 0){	
+				combinedF = F; 
+				combinedD = D; 
+			}else{	
+				combinedF = arma::join_cols(combinedF,F); 
+				combinedD = arma::join_cols(combinedD,D); 
+			}
+		}
+		arma::vec pxpy;
+		bool pxpySuccess = solveWithSVD(combinedF,combinedD,pxpy); 
+
+		if(!pxpySuccess){
+			//If SVD fails, return identity
+			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;
+			success = false;
+			return std::pair<arma::vec3, arma::vec3>();
+		}
+		
+		std::pair<arma::vec3,arma::vec3> txty(pxpy.rows(0,2),pxpy.rows(3,5));
+		return txty;
+	}
+
 
 		/*
 		solves AX=YB for X,Y and A in sampleA, B in sampleB
@@ -115,13 +160,13 @@ namespace autocal{
 			const Transform3D& B = samplesB[i]; 
 
 			//Get Quaternions for rotations
-			UnitQuaternion quat_a(A.rotation()); 
-			a0 = quat_a[0]; 
-			a = quat_a.rows(1,3); 
+			const UnitQuaternion quat_a(A.rotation()); 
+			a0 = quat_a.real(); 
+			a = quat_a.imaginary(); 
 			
-			UnitQuaternion quat_b(B.rotation()); 
-			b0 = quat_b[0]; 
-			b = quat_b.rows(1,3); 
+			const UnitQuaternion quat_b(B.rotation()); 
+			b0 = quat_b.real(); 
+			b = quat_b.imaginary(); 
 
 			//Compute G in Gw = C
 			if(std::fabs(a0) < 1e-10){
@@ -151,7 +196,7 @@ namespace autocal{
 		}
 
 		arma::vec w;
-		bool wSuccess = solveWithSVD(combinedG,combinedC, w); 
+		bool wSuccess = solveWithSVD(combinedG,combinedC, w);
 		if(!wSuccess){
 			//If SVD fails, return identity
 			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;
@@ -171,59 +216,32 @@ namespace autocal{
 		
 		//Compute x and y Quaternions
 		UnitQuaternion x, y; 
-		y[0] = 1 / std::sqrt(1 + w[3]*w[3] + w[4]*w[4] + w[5]*w[5]); 
-		if (std::fabs(y[0])< 1e-3){
-			std::cout << "\n\n\n\n\n\n\ny[0] == 0 so you need to rotate the ref base with respect to the base\n\n\n\n\n\n\n" << std::endl; 
+		y.real() = 1 / std::sqrt(1 + w[3]*w[3] + w[4]*w[4] + w[5]*w[5]); 
+		if (std::fabs(y.real())< 1e-3){
+			std::cout << "\n\n\n\n\n\n\ny.real() == 0 so you need to rotate the ref base with respect to the base\n\n\n\n\n\n\n" << std::endl; 
 			success = false;
 			return std::pair<Transform3D, Transform3D>(); 
 		}
-		y.rows(1,3) = y[0] * w.rows(3,5); 
-		x.rows(1,3) = y[0] * w.rows(0,2); 
+		y.imaginary() = y.real() * w.rows(3,5); 
+		x.imaginary() = y.real() * w.rows(0,2); 
 		
-		float x0 = arma::dot((a/a0), x.rows(1,3)) + (b0/a0) * y[0] - arma::dot((b/a0) , y.rows(1,3)); 
+		float x0 = arma::dot((a/a0), x.rows(1,3)) + (b0/a0) * y.real() - arma::dot((b/a0) , y.rows(1,3)); 
 		int x_sign = x0 > 0 ? 1 : -1; 
 		//TODO: figure out how to handle when x is nan
-		x[0] = x_sign * std::sqrt(1 - std::fmin(1, x[1]*x[1] + x[2]*x[2] + x[3]*x[3]) ); 
+		x.real() = x_sign * std::sqrt(1 - std::fmin(1, x[1]*x[1] + x[2]*x[2] + x[3]*x[3]) ); 
 		// check:
 		// check = tr.quaternion_multiply(tr.quaternion_inverse(tr.quaternion_multiply(quat_a,x)), tr.quaternion_multiply(y,quat_b))
 
 		Rotation3D Rx(x); 
 		Rotation3D Ry(y); 
 
-		arma::mat combinedF; 
-		arma::vec combinedD; 
+		X.rotation() = Rx; 
+		Y.rotation() = Ry; 
 
-		for (int i = 0; i < samplesA.size(); i++){
-			Rotation3D RA = samplesA[i].submat(0,0,2,2); 
-			arma::vec3 pA = samplesA[i].submat(0,3,2,3); 
-			arma::vec3 pB = samplesB[i].submat(0,3,2,3); 
+		auto translation = getTranslationComponent(samplesA, samplesB, Ry, success);
 
-			arma::mat F = arma::join_rows(RA,-arma::eye(3,3)); 
-
-			arma::vec D = Ry * pB - pA; 
-
-			if (i == 0){	
-				combinedF = F; 
-				combinedD = D; 
-			}else{	
-				combinedF = arma::join_cols(combinedF,F); 
-				combinedD = arma::join_cols(combinedD,D); 
-			}
-		}
-		arma::vec pxpy;
-		bool pxpySuccess = solveWithSVD(combinedF,combinedD,pxpy); 
-		if(!pxpySuccess){
-			//If SVD fails, return identity
-			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;
-			success = false;
-			return std::pair<Transform3D, Transform3D>(X,Y);
-		}
-		
-		X.submat(0,0,2,2) = Rx; 
-		Y.submat(0,0,2,2) = Ry; 
-
-		X.submat(0,3,2,3) = pxpy.rows(0,2); 
-		Y.submat(0,3,2,3) = pxpy.rows(3,5); 
+		X.translation() = translation.first; 
+		Y.translation() = translation.second; 
 
 		return std::pair<Transform3D, Transform3D>(X,Y);
 	}
@@ -248,12 +266,18 @@ namespace autocal{
 
 	// solves AX=YB for X,Y and A in sampleA, B in sampleB
 	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveKronecker_Shah2013(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
-		
+		if(samplesA.size() < 3 || samplesB.size() < 3){
+			std::cout << "CalibrationTools - NEED MORE THAN 2 SAMPLES" << std::endl;
+			throw std::domain_error("CalibrationTools - NEED MORE THAN 2 SAMPLES");
+		}
 		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
 
+		//Rotation part
+
 		//Create kronecker matrix K
-		arma::mat K(9,9);
-		for(int i = 0; i < samplesA.size(); i++){
+		int n = samplesA.size();
+		arma::mat K = arma::zeros(9,9);
+		for(int i = 0; i < n; i++){
 			const Transform3D& A = samplesA[i];
 			const Transform3D& B = samplesB[i];
 
@@ -262,14 +286,126 @@ namespace autocal{
 		}
 
 		//Take singular value decomposition of K
-		arma::mat u,v;
+		arma::mat U,V;
 		arma::vec s;
-		arma::svd(u,s,v,K);
+		arma::svd(U,s,V,K);
 
-		arma::mat V_x = unvectorize(v,3);
-		arma::mat V_y = unvectorize(u,3);
+		// std::cout << "U = \n" << U << std::endl;
+		// std::cout << "s = \n" << s << std::endl;
+		// std::cout << "V = \n" << V << std::endl;
 
-		//TODO: finish
+		//Get index of singular values closest to n
+		// arma::vec sMinusN = arma::abs(s-double(n));
+		// sMinusN.min(index);
+		
+		//Use largest singular value
+		arma::uword index = 0;
+
+		arma::vec u = U.col(index);
+		arma::vec v = V.col(index);
+		
+		// std::cout << "u = \n" << u << std::endl;
+		// std::cout << "s(index)  = \n" << s(index) << std::endl;
+		// std::cout << "v = \n" << v << std::endl;
+
+		arma::mat V_x = unvectorize(u,3);
+		arma::mat V_y = unvectorize(v,3);
+
+		float detV_x = arma::det(V_x);
+		float detV_y = arma::det(V_y);
+
+		// std::cout << "det(V_x) = \n" << detV_x << std::endl;
+		// std::cout << "det(V_y) = \n" << detV_y << std::endl;
+
+		float alpha_x =  1 / std::cbrt(detV_x);
+		float alpha_y =  1 / std::cbrt(detV_y);
+
+		// std::cout << "alpha_x = \n" << alpha_x << std::endl;
+		// std::cout << "alpha_y = \n" << alpha_y << std::endl;
+
+		Rotation3D R_y(alpha_x * V_x);
+		Rotation3D R_x(alpha_y * V_y);
+
+		// std::cout << "det(R_x) = \n" << arma::det(R_x) << std::endl;
+		// std::cout << "det(R_y) = \n" << arma::det(R_y) << std::endl;
+
+		//Translation part
+
+		auto translation = getTranslationComponent(samplesA, samplesB, R_y, success);
+
+		result.first.rotation() = R_x;
+		result.second.rotation() = R_y;
+
+		result.first.translation() = translation.first;
+		result.second.translation() = translation.second;
+
+		return result;
+
+	}
+	
+	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveClosedForm_Dornaika1998(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
+		
+		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
+
+		//Create kronecker matrix K
+		int n = samplesA.size();
+		arma::mat44 C = arma::zeros(4,4);
+		for(int i = 0; i < n; i++){
+			const Transform3D& A = samplesA[i];
+			const Transform3D& B = samplesB[i];
+
+			const UnitQuaternion qA(Rotation3D(A.rotation()));
+			const UnitQuaternion qB(Rotation3D(B.rotation()));
+
+			arma::mat44 C_i = -qA.getLeftQuatMultMatrix().t() * qB.getRightQuatMultMatrix();
+
+			C += C_i;
+
+		}
+
+		arma::mat44 CTC = C.t() * C;
+		
+		arma::vec eigval;
+		arma::mat eigvec;
+		arma::eig_sym( eigval, eigvec, CTC );
+		std::cout << "eigval = " << eigval << std::endl;
+		std::cout << "eigvec = " << eigvec << std::endl;
+
+		arma::vec lamda1 = n + arma::sqrt(eigval);
+		arma::vec lamda2 = n - arma::sqrt(eigval);
+		arma::vec lamda = arma::join_cols(lamda1,lamda2);
+		std::cout << "lamda1 = " << lamda1 << std::endl;
+		std::cout << "lamda2 = " << lamda2 << std::endl;
+		std::cout << "lamda = " << lamda << std::endl;
+
+		//Find index of smallest non-negative lambda
+		float minLamda = std::numeric_limits<float>::max();
+		int index = 0;
+		for(int i = 0; i < lamda.size(); i++){
+			if(lamda[i] < minLamda && lamda[i] >= 0){
+				minLamda = lamda[i];
+				index = i;
+			}
+		}
+		std::cout << "minLamda = " << minLamda << std::endl;
+		std::cout << "index = " << index << std::endl;
+
+		UnitQuaternion qy = eigvec.col(index % lamda1.size());
+		std::cout << "qy = " << qy << std::endl;
+
+		UnitQuaternion qx = (1 / (minLamda - n)) * C * qy;
+		std::cout << "qx = " << qx << std::endl;
+
+		Rotation3D R_y(qy);
+		Rotation3D R_x(qx);
+
+		auto translation = getTranslationComponent(samplesA, samplesB, R_y, success);
+
+		result.first.rotation() = R_x;
+		result.second.rotation() = R_y;
+
+		result.first.translation() = translation.first;
+		result.second.translation() = translation.second;
 
 		return result;
 
