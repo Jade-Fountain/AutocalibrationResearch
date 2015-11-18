@@ -29,7 +29,7 @@ namespace geometry {
     UnitQuaternion::UnitQuaternion() {
         real() = 1;
         imaginary().zeros();
-        rectify();
+        // rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const Rotation3D& a) {
@@ -102,7 +102,7 @@ namespace geometry {
           (*this)[k+1] = (a(k,i)+a(i,k))*t;
         }
 
-        rectify();
+        // rectify();
         
         if(!is_finite()){
             std::cout << "Quaternion is not finite!" << std::endl;
@@ -113,19 +113,19 @@ namespace geometry {
     UnitQuaternion::UnitQuaternion(double realPart, const arma::vec3& imaginaryPart) {
         real() = realPart;
         imaginary() = imaginaryPart;
-        rectify();
+        // rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const arma::vec3& v) {
         real() = 0;
     	imaginary() = v;
-        rectify();
+        // rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const arma::vec3& axis, double angle) {
     	real() = std::cos(angle / 2.0);
     	imaginary() = std::sin(angle / 2.0) * arma::normalise(axis);
-        rectify();
+        // rectify();
     }
 
     void UnitQuaternion::rectify(){

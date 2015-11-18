@@ -84,7 +84,8 @@ namespace support {
 					bool success = true;
 
 					// std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveZhuang1994(samplesA , samplesB, success);
-					std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveKronecker_Shah2013(samplesA , samplesB, success);
+					// std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveKronecker_Shah2013(samplesA , samplesB, success);
+					std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveClosedForm_Dornaika1998(samplesA , samplesB, success);
 
 					auto measuredX = result.first;
 					auto measuredY = result.second;

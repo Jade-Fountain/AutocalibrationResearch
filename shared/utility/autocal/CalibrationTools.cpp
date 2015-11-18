@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <limits>
 #include "CalibrationTools.h"
 
 namespace autocal{
@@ -81,7 +82,7 @@ namespace autocal{
 		if(success) x = pinvA * b;
 
 		auto error = A*x-b;
-		std::cout << "SVD error: A*x - b = \n" << error.t() << " size = " << arma::norm(error) << std::endl;
+		// std::cout << "SVD error: A*x - b = \n" << error.t() << " size = " << arma::norm(error) << std::endl;
 
 		//Return whether or not the SVD was performed correctly
 		return success;
@@ -353,8 +354,8 @@ namespace autocal{
 			const Transform3D& A = samplesA[i];
 			const Transform3D& B = samplesB[i];
 
-			const UnitQuaternion qA(A);
-			const UnitQuaternion qB(B);
+			const UnitQuaternion qA(Rotation3D(A.rotation()));
+			const UnitQuaternion qB(Rotation3D(B.rotation()));
 
 			arma::mat44 C_i = -qA.getLeftQuatMultMatrix().t() * qB.getRightQuatMultMatrix();
 
@@ -367,12 +368,44 @@ namespace autocal{
 		arma::vec eigval;
 		arma::mat eigvec;
 		arma::eig_sym( eigval, eigvec, CTC );
+		std::cout << "eigval = " << eigval << std::endl;
+		std::cout << "eigvec = " << eigvec << std::endl;
 
+		arma::vec lamda1 = n + arma::sqrt(eigval);
+		arma::vec lamda2 = n - arma::sqrt(eigval);
+		arma::vec lamda = arma::join_cols(lamda1,lamda2);
+		std::cout << "lamda1 = " << lamda1 << std::endl;
+		std::cout << "lamda2 = " << lamda2 << std::endl;
+		std::cout << "lamda = " << lamda << std::endl;
 
+		//Find index of smallest non-negative lambda
+		float minLamda = std::numeric_limits<float>::max();
+		int index = 0;
+		for(int i = 0; i < lamda.size(); i++){
+			if(lamda[i] < minLamda && lamda[i] >= 0){
+				minLamda = lamda[i];
+				index = i;
+			}
+		}
+		std::cout << "minLamda = " << minLamda << std::endl;
+		std::cout << "index = " << index << std::endl;
 
+		UnitQuaternion qy = eigvec.col(index % lamda1.size());
+		std::cout << "qy = " << qy << std::endl;
 
-		// result.first = R_x;
-		// result.second = R_y;
+		UnitQuaternion qx = (1 / (minLamda - n)) * C * qy;
+		std::cout << "qx = " << qx << std::endl;
+
+		Rotation3D R_y(qy);
+		Rotation3D R_x(qx);
+
+		auto translation = getTranslationComponent(samplesA, samplesB, R_y, success);
+
+		result.first.rotation() = R_x;
+		result.second.rotation() = R_y;
+
+		result.first.translation() = translation.first;
+		result.second.translation() = translation.second;
 
 		return result;
 

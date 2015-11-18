@@ -11,8 +11,8 @@ namespace autocal {
 	using utility::math::geometry::UnitQuaternion;
 
 		Correlator::Correlator():firstRotationReadings(){
-			number_of_samples = 3;
-			difference_threshold = 1;
+			number_of_samples = 10;
+			difference_threshold = 0.1;
 			elimination_score_threshold = 0.1;
 		}
 
@@ -128,9 +128,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				float score = getSylvesterScore(states1, states2, key);
+				// float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				// float score = getRotationScore(states1, states2, key);
+				float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -173,25 +173,25 @@ namespace autocal {
 		bool Correlator::stateIsNew(const utility::math::matrix::Transform3D& T, const Stream& states){
 			if(states.empty()) return true;
 
-			// //OLD METHOD
-			// //Add current stats to the vector			
-			// const Transform3D& lastTransform = states.back().i();
-			// float diff = Transform3D::norm(lastTransform * T);
-			// return diff > difference_threshold;
+			//OLD METHOD
+			//Add current stats to the vector			
+			const Transform3D& lastTransform = states.back().i();
+			float diff = Transform3D::norm(lastTransform * T);
+			return diff > difference_threshold;
 
 			//New method
-			float minDiffAngle = std::numeric_limits<float>::max();
-			float minDiffPos = std::numeric_limits<float>::max();
-			for(auto& S : states){
-				float diffAngle = Rotation3D::norm(S.rotation().t() * T.rotation());
-				float diffPos = arma::norm(T.translation() - S.translation());
-				if(diffAngle < minDiffAngle && diffPos < minDiffPos ){
-					minDiffAngle = diffAngle;
-					minDiffPos = diffPos;
-				}
-			}
-			// std::cout << "angle = " << minDiffAngle << " pos = " << minDiffPos << std::endl;
-			return minDiffAngle > difference_threshold && minDiffPos > difference_threshold;
+			// float minDiffAngle = std::numeric_limits<float>::max();
+			// float minDiffPos = std::numeric_limits<float>::max();
+			// for(auto& S : states){
+			// 	float diffAngle = Rotation3D::norm(S.rotation().t() * T.rotation());
+			// 	float diffPos = arma::norm(T.translation() - S.translation());
+			// 	if(diffAngle < minDiffAngle && diffPos < minDiffPos ){
+			// 		minDiffAngle = diffAngle;
+			// 		minDiffPos = diffPos;
+			// 	}
+			// }
+			// // std::cout << "angle = " << minDiffAngle << " pos = " << minDiffPos << std::endl;
+			// return minDiffAngle > difference_threshold && minDiffPos > difference_threshold;
 		}
 
 
@@ -199,7 +199,8 @@ namespace autocal {
 											Correlator::Hypothesis key){
 			//Fit data
 			bool success = true;
-			auto result = CalibrationTools::solveZhuang1994(states1,states2,success);
+			// auto result = CalibrationTools::solveZhuang1994(states1,states2,success);
+			auto result = CalibrationTools::solveKronecker_Shah2013(states1,states2,success);
 
 			//if the fit failed, return zero score
 			if(!success) return 0;

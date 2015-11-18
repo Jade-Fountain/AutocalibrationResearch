@@ -5,8 +5,6 @@
 Tracker::Tracker()
     : m_moves(NULL),
       m_count(psmove_count_connected()),
-      m_tracker(psmove_tracker_new()),
-      m_fusion(psmove_fusion_new(m_tracker, 1., 1000.)),
       mocapRecorder("psmovedata")
 {
     // PSMove *move;
@@ -29,7 +27,8 @@ Tracker::Tracker()
     //         printf("Unknown connection type.\n");
     //         break;
     // }
-
+    m_tracker = psmove_tracker_new();
+    m_fusion = psmove_fusion_new(m_tracker, 1., 1000.);
 
     psmove_tracker_set_mirror(m_tracker, PSMove_False);
     psmove_tracker_set_exposure(m_tracker, Exposure_HIGH);
@@ -42,9 +41,11 @@ Tracker::Tracker()
 
         psmove_enable_orientation(m_moves[i], PSMove_True);
         assert(psmove_has_orientation(m_moves[i]));
+
         
         while (psmove_tracker_enable(m_tracker, m_moves[i]) != Tracker_CALIBRATED);
     }
+    // psmove_tracker_set_dimming(m_tracker,1);
 
 }
 
