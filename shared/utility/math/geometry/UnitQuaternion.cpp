@@ -29,6 +29,7 @@ namespace geometry {
     UnitQuaternion::UnitQuaternion() {
         real() = 1;
         imaginary().zeros();
+        rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const Rotation3D& a) {
@@ -40,39 +41,68 @@ namespace geometry {
         //     (rotation(1,0) - rotation(0,1)) / w4
         // });
 
-        //Code from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-        float trace = a(0,0) + a(1,1) + a(2,2); // I removed + 1.0f; see discussion with Ethan
-        if( trace > 0 ) {// I changed M_EPSILON to 0
-            float s = 0.5f / sqrtf(trace+ 1.0f);
-            kW() = 0.25f / s;
-            kX() = ( a(2,1) - a(1,2) ) * s;
-            kY() = ( a(0,2) - a(2,0) ) * s;
-            kZ() = ( a(1,0) - a(0,1) ) * s;
-        } else {
-            if ( a(0,0) > a(1,1) && a(0,0) > a(2,2) ) {
-                float s = 2.0f * sqrtf( 1.0f + a(0,0) - a(1,1) - a(2,2));
-                kW() = (a(2,1) - a(1,2) ) / s;
-                kX() = 0.25f * s;
-                kY() = (a(0,1) + a(1,0) ) / s;
-                kZ() = (a(0,2) + a(2,0) ) / s;
-            } else if (a(1,1) > a(2,2)) {
-                float s = 2.0f * sqrtf( 1.0f + a(1,1) - a(0,0) - a(2,2));
-                kW() = (a(0,2) - a(2,0) ) / s;
-                kX() = (a(0,1) + a(1,0) ) / s;
-                kY() = 0.25f * s;
-                kZ() = (a(1,2) + a(2,1) ) / s;
-            } else {
-                float s = 2.0f * sqrtf( 1.0f + a(2,2) - a(0,0) - a(1,1) );
-                kW() = (a(1,0) - a(0,1) ) / s;
-                kX() = (a(0,2) + a(2,0) ) / s;
-                kY() = (a(1,2) + a(2,1) ) / s;
-                kZ() = 0.25f * s;
-            }
+        // //Code from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+        // float trace = a(0,0) + a(1,1) + a(2,2); // I removed + 1.0f; see discussion with Ethan
+        // if( trace > 0 ) {// I changed M_EPSILON to 0
+        //     float s = 0.5f / sqrtf(trace+ 1.0f);
+        //     kW() = 0.25f / s;
+        //     kX() = ( a(2,1) - a(1,2) ) * s;
+        //     kY() = ( a(0,2) - a(2,0) ) * s;
+        //     kZ() = ( a(1,0) - a(0,1) ) * s;
+        // } else {
+        //     if ( a(0,0) > a(1,1) && a(0,0) > a(2,2) ) {
+        //         float s = 2.0f * sqrtf( 1.0f + a(0,0) - a(1,1) - a(2,2));
+        //         kW() = (a(2,1) - a(1,2) ) / s;
+        //         kX() = 0.25f * s;
+        //         kY() = (a(0,1) + a(1,0) ) / s;
+        //         kZ() = (a(0,2) + a(2,0) ) / s;
+        //     } else if (a(1,1) > a(2,2)) {
+        //         float s = 2.0f * sqrtf( 1.0f + a(1,1) - a(0,0) - a(2,2));
+        //         kW() = (a(0,2) - a(2,0) ) / s;
+        //         kX() = (a(0,1) + a(1,0) ) / s;
+        //         kY() = 0.25f * s;
+        //         kZ() = (a(1,2) + a(2,1) ) / s;
+        //     } else {
+        //         float s = 2.0f * sqrtf( 1.0f + a(2,2) - a(0,0) - a(1,1) );
+        //         kW() = (a(1,0) - a(0,1) ) / s;
+        //         kX() = (a(0,2) + a(2,0) ) / s;
+        //         kY() = (a(1,2) + a(2,1) ) / s;
+        //         kZ() = 0.25f * s;
+        //     }
+        // }
+
+        //From eigen
+        // This algorithm comes from  "Quaternion Calculus and Fast Animation",
+        // Ken Shoemake, 1987 SIGGRAPH course notes
+        float t = arma::trace(a);
+        if (t > 0)
+        {
+          t = std::sqrt(t + 1.0);
+          kW() = 0.5*t;
+          t = (0.5)/t;
+          kX() = (a(2,1) - a(1,2)) * t;
+          kY() = (a(0,2) - a(2,0)) * t;
+          kZ() = (a(1,0) - a(0,1)) * t;
+        }
+        else
+        {
+          int i = 0;
+          if (a(1,1) > a(0,0))
+            i = 1;
+          if (a(2,2) > a(i,i))
+            i = 2;
+          int j = (i+1)%3;
+          int k = (j+1)%3;
+
+          t = sqrt(a(i,i)-a(j,j)-a(k,k) + (1.0));
+          (*this)[i+1] = (0.5) * t;
+          t = (0.5)/t;
+          kW() = (a(k,j)-a(j,k))*t;
+          (*this)[j+1] = (a(j,i)+a(i,j))*t;
+          (*this)[k+1] = (a(k,i)+a(i,k))*t;
         }
 
-        if(std::fabs(getAngle()) > M_PI){
-            *this = -*this;
-        }
+        rectify();
         
         if(!is_finite()){
             std::cout << "Quaternion is not finite!" << std::endl;
@@ -83,16 +113,25 @@ namespace geometry {
     UnitQuaternion::UnitQuaternion(double realPart, const arma::vec3& imaginaryPart) {
         real() = realPart;
         imaginary() = imaginaryPart;
+        rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const arma::vec3& v) {
         real() = 0;
     	imaginary() = v;
+        rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const arma::vec3& axis, double angle) {
     	real() = std::cos(angle / 2.0);
     	imaginary() = std::sin(angle / 2.0) * arma::normalise(axis);
+        rectify();
+    }
+
+    void UnitQuaternion::rectify(){
+        if(kW() < 0){
+            *this = -*this;
+        }
     }
 
     UnitQuaternion UnitQuaternion::i() const {

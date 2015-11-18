@@ -79,6 +79,10 @@ namespace autocal{
 		bool success = arma::pinv(pinvA,A);
 		//Compute x in Ax=b
 		if(success) x = pinvA * b;
+
+		auto error = A*x-b;
+		std::cout << "SVD error: A*x - b = \n" << error.t() << " size = " << arma::norm(error) << std::endl;
+
 		//Return whether or not the SVD was performed correctly
 		return success;
 	}
@@ -119,11 +123,11 @@ namespace autocal{
 			const Transform3D& B = samplesB[i]; 
 
 			//Get Quaternions for rotations
-			UnitQuaternion quat_a(A.rotation()); 
+			const UnitQuaternion quat_a(A.rotation()); 
 			a0 = quat_a[0]; 
 			a = quat_a.rows(1,3); 
 			
-			UnitQuaternion quat_b(B.rotation()); 
+			const UnitQuaternion quat_b(B.rotation()); 
 			b0 = quat_b[0]; 
 			b = quat_b.rows(1,3); 
 
@@ -155,7 +159,7 @@ namespace autocal{
 		}
 
 		arma::vec w;
-		bool wSuccess = solveWithSVD(combinedG,combinedC, w); 
+		bool wSuccess = solveWithSVD(combinedG,combinedC, w);
 		if(!wSuccess){
 			//If SVD fails, return identity
 			std::cout << __FILE__ << " : " << __LINE__ << " - WARNING: SVD FAILED" << std::endl;

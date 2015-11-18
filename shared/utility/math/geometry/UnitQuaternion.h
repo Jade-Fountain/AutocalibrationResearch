@@ -56,6 +56,10 @@ namespace geometry {
             /*! @brief Creates quaternion which rotates about 3D axis by angle radians
             */
             UnitQuaternion(const arma::vec3& axis, double angle);
+            
+            /*! @brief Swaps quat to -quat if kW < 0
+            */
+            void rectify();
 
             /*! @brief Gets the inverse of the quaternion
             */
