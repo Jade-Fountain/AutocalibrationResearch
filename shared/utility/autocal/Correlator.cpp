@@ -206,6 +206,23 @@ namespace autocal {
 			//if the fit failed, return zero score
 			if(!success) return 0;
 
+			/////////////////////
+			/////////////////////
+			/////////////////////
+			/////////////////////
+			//TODO/NOTE
+			// note that the equation for the system is
+			// M Ai = Bi N
+			// and so by putting the samples in order A,B we are actually solving
+			// Ai N.i() = M.i() Bi
+			// so 
+			// X = N.i()
+			// and
+			// Y = M.i()
+			/////////////////////
+			/////////////////////
+			/////////////////////
+			/////////////////////
 			auto X = result.first;
 			auto Y = result.second;
 

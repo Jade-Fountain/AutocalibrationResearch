@@ -276,9 +276,41 @@ bool drawCamera(CvCapture* video, float verticalFOV){
     return true;
 }
 
+struct ResultsFrame{
+    int groundMatched = 0;
+    int matched = 0;
+    float distance;
+};
+
 void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceFrame, std::string matchStreamRange, autocal::TimeStamp t, const std::vector<std::pair<int,int>>& matches = std::vector<std::pair<int,int>>()){
     float basisScale = 0.05;
     autocal::MocapRecording& recording = sensorPlant.mocapRecording;
+    
+    //record timeseries results for this frame:
+    std::map<int,ResultsFrame> results;
+    auto refFrame = sensorPlant.getGroundTruth(referenceFrame, referenceFrame, t);
+    auto rangeFrame = sensorPlant.getGroundTruth(matchStreamRange, referenceFrame, t);
+    std::cout << t << " ";
+    for(auto& pair : refFrame.rigidBodies){
+        Transform3D refPose = pair.second.pose;
+        for(auto& rb : rangeFrame.rigidBodies){
+            auto& res = results[rb.first];
+            auto& rigidBodyID = rb.first;
+            Transform3D pose = rb.second.pose;
+
+            res.distance = arma::norm(pose.translation() - refPose.translation());
+            res.groundMatched = int(res.distance < 0.2);
+            bool drawMatch = false;
+            for(auto& m : matches){
+                drawMatch = drawMatch || (m.second == rigidBodyID);
+            }
+            res.matched = int(drawMatch);
+
+            std::cout << res.distance << " " << res.groundMatched << " "<< res.matched << " ";
+        }
+    }
+    std::cout << std::endl;
+
     for(auto& stream : recording.streams){
         std::string name = stream.first;
         autocal::MocapStream::Frame frame = sensorPlant.getGroundTruth(name, referenceFrame, t);
@@ -299,11 +331,13 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
             for(auto& m : matches){
                 drawMatch = drawMatch || (m.second == rigidBodyID);
             }
-            if(drawMatches && drawMatch) {
-                glEnable(GL_LIGHTING);
-                GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
-                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
-                glutSolidSphere(0.5 * basisScale, 10, 10);
+            if(drawMatches){
+                if(drawMatch) {
+                    glEnable(GL_LIGHTING);
+                    GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+                    glutSolidSphere(0.5 * basisScale, 10, 10);
+                }
             }
             drawBasis(basisScale);
         }
