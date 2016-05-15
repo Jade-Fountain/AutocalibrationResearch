@@ -4,6 +4,294 @@
 		"selected_items":
 		[
 			[
+				"time",
+				"time_microsec"
+			],
+			[
+				"Rigi",
+				"rigidBodyID"
+			],
+			[
+				"best",
+				"bestScores"
+			],
+			[
+				"PS",
+				"PSMove_False"
+			],
+			[
+				"lam",
+				"lamda"
+			],
+			[
+				"index",
+				"index1"
+			],
+			[
+				"lamd",
+				"lamda1"
+			],
+			[
+				"join",
+				"join_rows"
+			],
+			[
+				"tranas",
+				"translation"
+			],
+			[
+				"trans",
+				"translation"
+			],
+			[
+				"samp",
+				"samplesB"
+			],
+			[
+				"Rotat",
+				"Rotation3D"
+			],
+			[
+				"k",
+				"kW"
+			],
+			[
+				"minDi",
+				"minDiffPos"
+			],
+			[
+				"elimi",
+				"elimination_score_threshold"
+			],
+			[
+				"alpha",
+				"alpha_x"
+			],
+			[
+				"V",
+				"V_x"
+			],
+			[
+				"moca",
+				"mocapRecording"
+			],
+			[
+				"r",
+				"rigidBodyId"
+			],
+			[
+				"pro",
+				"proj_ptr"
+			],
+			[
+				"psmo",
+				"psmoveTracker"
+			],
+			[
+				"ya",
+				"yawRot"
+			],
+			[
+				"pitc",
+				"pitchRot"
+			],
+			[
+				"rig",
+				"rigidBodies"
+			],
+			[
+				"rigid",
+				"rigidBodies"
+			],
+			[
+				"Mocap",
+				"MotionCapture"
+			],
+			[
+				"LH",
+				"LHInput_"
+			],
+			[
+				"Simul",
+				"SimulationParameters"
+			],
+			[
+				"simParam",
+				"simParameters"
+			],
+			[
+				"psmove",
+				"psmoveStream"
+			],
+			[
+				"hyo",
+				"hypothesisKey"
+			],
+			[
+				"rigi",
+				"rigidBodies"
+			],
+			[
+				"draw",
+				"drawMatch"
+			],
+			[
+				"sensor",
+				"sensorPlant"
+			],
+			[
+				"Cal",
+				"CalibrationTools"
+			],
+			[
+				"Transfo",
+				"Transform3D"
+			],
+			[
+				"Trans",
+				"Transform3D"
+			],
+			[
+				"stream",
+				"stream_name_1"
+			],
+			[
+				"curren",
+				"currentState1"
+			],
+			[
+				"error",
+				"errorThreshold"
+			],
+			[
+				"number",
+				"number_of_trials"
+			],
+			[
+				"measure",
+				"measuredX"
+			],
+			[
+				"transf",
+				"Transform3D"
+			],
+			[
+				"total",
+				"totalScores"
+			],
+			[
+				"recorded",
+				"recordedStates"
+			],
+			[
+				"eliminated",
+				"eliminatedHypotheses"
+			],
+			[
+				"Rig",
+				"RigidBody"
+			],
+			[
+				"window",
+				"window"
+			],
+			[
+				"allo",
+				"allowedIDs"
+			],
+			[
+				"all",
+				"mocapAllowedIDs"
+			],
+			[
+				"Rigib",
+				"RigidBodyID"
+			],
+			[
+				"quat",
+				"quat_a"
+			],
+			[
+				"sam",
+				"samplesA"
+			],
+			[
+				"comn",
+				"combinedC"
+			],
+			[
+				"psm",
+				"psmoveStream"
+			],
+			[
+				"laten",
+				"latencyOfStream1"
+			],
+			[
+				"late",
+				"latencyOfStream2"
+			],
+			[
+				"auto",
+				"autocal"
+			],
+			[
+				"use",
+				"useSimulation"
+			],
+			[
+				"opti",
+				"optitrackStream"
+			],
+			[
+				"opt",
+				"optitrackStream"
+			],
+			[
+				"Mo",
+				"MocapStream"
+			],
+			[
+				"high",
+				"high_resolution_clock"
+			],
+			[
+				"cone",
+				"coneRadius"
+			],
+			[
+				"PSEY",
+				"PSEYE_FOV_BLUE_DOT"
+			],
+			[
+				"ri",
+				"rigidBody"
+			],
+			[
+				"frame",
+				"frame_time_since_start"
+			],
+			[
+				"vid",
+				"videoStartTime"
+			],
+			[
+				"video",
+				"video_frames"
+			],
+			[
+				"form",
+				"format"
+			],
+			[
+				"folder",
+				"foldername"
+			],
+			[
+				"OPENCV",
+				"OPENCV_INCLUDE_DIR"
+			],
+			[
 				"PSMOV",
 				"PSMOVEAPI_TRACKER_LIBRARY"
 			],
@@ -14,10 +302,6 @@
 			[
 				"plane",
 				"plane_model"
-			],
-			[
-				"trans",
-				"transparentMat"
 			],
 			[
 				"cube",
@@ -52,16 +336,8 @@
 				"FrameBuffer"
 			],
 			[
-				"frame",
-				"frameBuffer"
-			],
-			[
 				"tex",
 				"texName"
-			],
-			[
-				"window",
-				"window_width"
 			],
 			[
 				"cam",
@@ -82,10 +358,6 @@
 			[
 				"model",
 				"model_path"
-			],
-			[
-				"number",
-				"number_of_elements"
 			],
 			[
 				"FOV",
@@ -188,10 +460,6 @@
 				"firstRotationReadings"
 			],
 			[
-				"elimi",
-				"eliminatedHypotheses"
-			],
-			[
 				"rese",
 				"resetRecordedStates"
 			],
@@ -228,10 +496,6 @@
 				"timestamp"
 			],
 			[
-				"sam",
-				"samplesB"
-			],
-			[
 				"tra",
 				"translation"
 			],
@@ -250,313 +514,121 @@
 			[
 				"recorde",
 				"recordedStates"
-			],
-			[
-				"sta",
-				"states1"
-			],
-			[
-				"glColor",
-				"glColor4f"
-			],
-			[
-				"best",
-				"bestMatches"
-			],
-			[
-				"tot",
-				"totalScores"
-			],
-			[
-				"piar",
-				"pairID"
-			],
-			[
-				"hy",
-				"hypothesisKey"
-			],
-			[
-				"hyp",
-				"hypothesis"
-			],
-			[
-				"last",
-				"lastTransform2"
-			],
-			[
-				"record",
-				"recordedStates"
-			],
-			[
-				"toto",
-				"totalError"
-			],
-			[
-				"correlation",
-				"correlations"
-			],
-			[
-				"elim",
-				"eliminatedHypotheses"
-			],
-			[
-				"pin",
-				"pinvA"
-			],
-			[
-				"total",
-				"totalScore"
-			],
-			[
-				"recor",
-				"recordedStates"
-			],
-			[
-				"stream",
-				"stream_name_2"
-			],
-			[
-				"size",
-				"size1"
-			],
-			[
-				"corr",
-				"correlationStats"
-			],
-			[
-				"RigidBo",
-				"RigidBodyID"
-			],
-			[
-				"lates",
-				"latestFrame"
-			],
-			[
-				"core",
-				"correlation"
-			],
-			[
-				"self",
-				"selfCorInv"
-			],
-			[
-				"max_",
-				"max_score_id"
-			],
-			[
-				"eig",
-				"eigval"
-			],
-			[
-				"cova",
-				"covariance"
-			],
-			[
-				"cure",
-				"currentState1"
-			],
-			[
-				"stat",
-				"statVec"
-			],
-			[
-				"state",
-				"state1"
-			],
-			[
-				"curre",
-				"currentState1"
-			],
-			[
-				"late",
-				"latestFrame"
-			],
-			[
-				"ri",
-				"rigidBodies"
-			],
-			[
-				"rigid",
-				"rigidBodies"
-			],
-			[
-				"rigi",
-				"rigidBodyID"
-			],
-			[
-				"rig",
-				"rigidBodyID1"
-			],
-			[
-				"INV",
-				"inv2"
-			],
-			[
-				"rot",
-				"rotation"
-			],
-			[
-				"init",
-				"initialTransform"
-			],
-			[
-				"Rigi",
-				"RigidBodyID"
-			],
-			[
-				"us",
-				"useTruthInMatching"
-			],
-			[
-				"RIGID",
-				"RigidBodyID"
-			],
-			[
-				"XN_SKEL_LEFT",
-				"XN_SKEL_LEFT_SHOULDER"
-			],
-			[
-				"sphere",
-				"sphereRadius"
-			],
-			[
-				"mocap",
-				"mocapToKinect"
-			],
-			[
-				"x",
-				"x"
-			],
-			[
-				"Tex",
-				"TextureMapDrawCursor"
-			],
-			[
-				"pDepth",
-				"pDepthMD"
-			],
-			[
-				"pDe",
-				"pDepthMD"
-			],
-			[
-				"TextureMapD",
-				"TextureMapDraw"
-			],
-			[
-				"filter",
-				"filterType"
-			],
-			[
-				"weight",
-				"weight_map"
-			],
-			[
-				"time",
-				"timeStamp"
-			],
-			[
-				"strea",
-				"streamStart"
-			],
-			[
-				"skel",
-				"skeletonID"
-			],
-			[
-				"link",
-				"linkWeights"
-			],
-			[
-				"fr",
-				"frame"
-			],
-			[
-				"Rigid",
-				"RigidBody"
-			],
-			[
-				"moca",
-				"mocap"
-			],
-			[
-				"R",
-				"RigidBody"
-			],
-			[
-				"Mocap",
-				"MocapStream"
-			],
-			[
-				"lin",
-				"linkWeights"
-			],
-			[
-				"inv",
-				"inv1"
-			],
-			[
-				"error",
-				"error_map"
-			],
-			[
-				"Trn",
-				"Transform3D"
-			],
-			[
-				"an",
-				"angle"
-			],
-			[
-				"in",
-				"invariates2"
-			],
-			[
-				"invra",
-				"invariates2"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "CMakeLists.txt",
+			"file": "modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp",
 			"settings":
 			{
-				"buffer_size": 4173,
+				"buffer_size": 6909,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "cmake/modules/FindGLFW.cmake",
+			"file": "shared/utility/autocal/Correlator.cpp",
 			"settings":
 			{
-				"buffer_size": 7696,
+				"buffer_size": 10689,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": ".gitignore",
+			"file": "modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp",
 			"settings":
 			{
-				"buffer_size": 5,
+				"buffer_size": 8859,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "shared/utility/math/matrix/Rotation3D.cpp",
+			"settings":
+			{
+				"buffer_size": 7422,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "shared/utility/math/matrix/Rotation3D.h",
+			"settings":
+			{
+				"buffer_size": 6540,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "shared/utility/math/matrix/Transform3D.h",
+			"settings":
+			{
+				"buffer_size": 10004,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "shared/utility/autocal/CalibrationTools.h",
+			"settings":
+			{
+				"buffer_size": 1797,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "shared/utility/math/geometry/UnitQuaternion.cpp",
+			"settings":
+			{
+				"buffer_size": 9384,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "shared/utility/math/geometry/UnitQuaternion.h",
+			"settings":
+			{
+				"buffer_size": 3814,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "shared/utility/autocal/CalibrationTools.cpp",
+			"settings":
+			{
+				"buffer_size": 13698,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "shared/utility/autocal/GraphicsTools.h",
+			"settings":
+			{
+				"buffer_size": 9795,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Simultaneous use of multiple sensor systems provides improved accuracy and tracking range compared to use of a single system. However, this advantage comes at the cost of the user performing calibration procedures. This work contributes to the development of ambient calibration procedures which are performed in the background during normal sensor use. In particular, we present techniques for automatically identifying relationships between rigidly linked 6DoF and 3DoF sensors belonging to different sensor systems. The techniques allow for subsequent automatic alignment of the sensor systems. Two techniques (IF method and CE method) are presented and analysed in simulation for performance under varying noise and latency conditions. The methods were applied to two case studies. The first study identified sensors tracked with a gold standard rigid body tracker with one of six rigid bodies tracked by the first generation Kinect sensor. Good results were achieved, with each sensor identified correctly in at least 76% of estimates, or 4.5 times greater than random selection. The second case study is an interactive version of the system, which can match sensors very reliably. The system can detect a change in the configuration of the sensors in as little as 1-2 seconds, requiring movements on the order of 15cm or 90◦. It is recommended that the much simpler IF method is used for small systems, while the CE method can be used when many sensors must be distinguished.",
+			"settings":
+			{
+				"buffer_size": 1481,
 				"line_ending": "Unix",
-				"name": ".gitignore"
+				"name": "Simultaneous use of multiple sensor systems provid"
 			}
 		},
 		{
-			"file": "cmake/modules/FindGLM.cmake",
+			"file": "shared/utility/autocal/Correlator.h",
 			"settings":
 			{
-				"buffer_size": 2466,
+				"buffer_size": 2101,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/main.cpp",
+			"file": "shared/utility/autocal/PSMoveUtils.cpp",
 			"settings":
 			{
-				"buffer_size": 9613,
+				"buffer_size": 8555,
 				"line_ending": "Unix"
 			}
 		}
@@ -584,10 +656,34 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 227.0,
-		"last_filter": "new",
+		"height": 392.0,
+		"last_filter": "Package",
 		"selected_items":
 		[
+			[
+				"Package",
+				"Package Control: Disable Package"
+			],
+			[
+				"proto",
+				"Set Syntax: Protocol Buffer"
+			],
+			[
+				"p",
+				"Package Control: Add Repository"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				"cmak",
+				"Set Syntax: CMakeEditor"
+			],
 			[
 				"new",
 				"ANF: New File"
@@ -603,10 +699,6 @@
 			[
 				"anf",
 				"ANF: New File"
-			],
-			[
-				"insta",
-				"Package Control: Install Package"
 			],
 			[
 				"instal",
@@ -695,151 +787,161 @@
 	"expanded_folders":
 	[
 		"/Users/jake/Kinect/Autocalibration",
-		"/Users/jake/Kinect/Autocalibration/cmake",
-		"/Users/jake/Kinect/Autocalibration/cmake/modules",
-		"/Users/jake/Kinect/Autocalibration/src",
+		"/Users/jake/Kinect/Autocalibration/modules",
+		"/Users/jake/Kinect/Autocalibration/modules/input",
+		"/Users/jake/Kinect/Autocalibration/modules/support",
+		"/Users/jake/Kinect/Autocalibration/roles",
+		"/Users/jake/Kinect/Autocalibration/shared",
+		"/Users/jake/Kinect/Autocalibration/shared/messages",
+		"/Users/jake/Kinect/Autocalibration/shared/messages/input",
 		"/Users/jake/Kinect/psmoveapi"
 	],
 	"file_history":
 	[
-		"/Users/jake/Kinect/Autocalibration/src/main.cpp",
-		"/Users/jake/Kinect/psmoveapi/src/tracker/psmove_tracker.c",
-		"/Users/jake/Kinect/psmoveapi/usercal/macbookprocaldata.csv",
-		"/Users/jake/Kinect/psmoveapi/examples/c/test_record_video.c",
-		"/Users/jake/Kinect/Autocalibration/src/test_opengl.cpp",
-		"/Users/jake/Kinect/psmoveapi/examples/c/tuio_server.cpp",
-		"/Users/jake/Kinect/psmoveapi/examples/c/tracker_camera_calibration.cpp",
-		"/Users/jake/Kinect/psmoveapi/bindings/opentracker/PSMoveSource.cxx",
-		"/Users/jake/Kinect/psmoveapi/include/psmove_tracker.h",
-		"/Users/jake/Kinect/psmoveapi/examples/c/test_opengl.cpp",
-		"/Users/jake/Kinect/psmoveapi/build/CMakeFiles/psmoveapi_tracker.dir/link.txt",
-		"/Users/jake/Kinect/psmoveapi/build/cmake_install.cmake",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/ransac/RansacResult.h",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/ransac/Ransac.h",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/ransac/NPartiteRansac.h",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/matrix/Transform3D.cpp",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/kalman/InverseDepthPointModel.cpp",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/kalman/AdaptiveIMUModel.cpp",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/kalman/ParticleFilter.h",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/kalman/LinearVec3Model.cpp",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/kalman/UKF.h",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/matrix/Transform2D.cpp",
-		"/Users/jake/Kinect/Autocalibration/src/MocapStream.h",
-		"/Users/jake/Kinect/Autocalibration/src/Correlator.h",
-		"/Users/jake/Kinect/Autocalibration/src/MocapRecording.h",
-		"/Users/jake/Kinect/Autocalibration/src/SensorPlant.cpp",
-		"/Users/jake/Kinect/Autocalibration/src/SensorPlant.h",
-		"/Users/jake/Kinect/Autocalibration/src/utility/math/vision.h",
-		"/Users/jake/Kinect/Autocalibration/src/CMakeLists.txt",
-		"/Users/jake/Kinect/psmoveapi/build/tmp/opt/psmoveapi_3.0.0~2015-10-12+3.0.0-270-g0ac355f/share/psmoveapi/README",
-		"/Users/jake/Kinect/psmoveapi/src/psmove.c",
-		"/Users/jake/Kinect/psmoveapi/src/tracker/camera_control.c",
-		"/Users/jake/Kinect/psmoveapi/opencv/modules/imgproc/src/undistort.cpp",
-		"/Users/jake/Kinect/psmoveapi/examples/c/test_tracker.c",
-		"/Users/jake/Kinect/psmoveapi/examples/c/distance_calibration.c",
-		"/Users/jake/Kinect/psmoveapi/examples/python/test_fusion.py",
-		"/Users/jake/Kinect/psmoveapi/examples/python/test_fusion_pygame.py",
-		"/Users/jake/Kinect/psmoveapi/examples/python/test_tracker.py",
-		"/Users/jake/Kinect/psmoveapi/CMakeLists.txt",
-		"/Users/jake/Downloads/opencv-3.0.0/README.md",
-		"/Users/jake/Kinect/psmoveapi/contrib/pattern.png",
-		"/Users/jake/Kinect/psmoveapi/examples/c/test_tracker_camera_calibration.c",
-		"/Users/jake/Kinect/psmoveapi/src/psmove_private.h",
-		"/Users/jake/Kinect/psmoveapi/build/tmp/opt/psmoveapi_3.0.0~2015-10-12+3.0.0-270-g0ac355f/include/psmoveapi/psmove_tracker.h",
-		"/Users/jake/Kinect/psmoveapi/examples/c/test_end2end_latency.c",
-		"/Users/jake/Kinect/psmoveapi/build/test_end2end_latency",
-		"/Users/jake/NUGraphics/src/Shader.cpp",
-		"/Users/jake/NUGraphics/src/Light.h",
-		"/Users/jake/NUGraphics/src/MultipassRenderer.cpp",
-		"/Users/jake/NUGraphics/src/MultipassRenderer.h",
-		"/Users/jake/NUGraphics/src/Material.h",
-		"/Users/jake/NUGraphics/assets/cube.obj",
-		"/Users/jake/NUGraphics/assets/monkey.obj",
-		"/Users/jake/NUGraphics/src/main.cpp",
-		"/Users/jake/Documents/OneDrive/Computer Graphics 2015/Jake 2015 Tutes/LabWeek2/LabW2_Code_2015_Solution/GLFW_EXAMPLE/GLFW_EXAMPLE/shader.vert",
-		"/Users/jake/Documents/OneDrive/Computer Graphics 2015/Jake 2015 Tutes/LabWeek2/LabW2_Code_2015_Solution/GLFW_EXAMPLE/GLFW_EXAMPLE/shader.frag",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserSelection/SceneDrawer.cpp",
-		"/Users/jake/Library/Application Support/Sublime Text 3/Packages/AdvancedNewFile/AdvancedNewFile.sublime-settings",
-		"/Users/jake/Library/Application Support/Sublime Text 3/Packages/TidyTabs-Sublime/TidyTabs.sublime-settings",
-		"/Users/jake/Library/Application Support/Sublime Text 3/Packages/User/TidyTabs.sublime-settings",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/MocapStream.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/math/matrix/Transform3D.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/math/geometry/UnitQuaternion.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/LinearFitter.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/MocapStream.cpp",
-		"/Users/jake/SoftwareLibraries/mutinfopack/libMI/test/test.c",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/math/geometry/UnitQuaternion.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/math/matrix/Transform3D.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/CalibrationTools.cpp",
-		"/Users/jake/SoftwareLibraries/mutinfopack/libMI/mutinfo.c",
-		"/Users/jake/SoftwareLibraries/mutinfopack/ann_1.1.1/Makefile",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/SceneDrawer.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/main.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/arma_xn_tools.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/math/matrix/Rotation3D.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/math/matrix/Rotation3D.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/SceneDrawer.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/Makefile",
-		"/Users/jake/Library/Application Support/Sublime Text 3/Packages/User/AdvancedNewFile.sublime-settings",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/Config/test",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/SensorPlant.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/CalibrationTools.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/MocapRecording.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/MocapRecording.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/SensorPlant.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiViewer/Capture.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiViewer/Draw.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/io_tools.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserSelection/SceneDrawer.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/Build/Common/CommonDefs.mak",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/Build/Common/CommonCppMakefile",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/utility/CMakeLists.txt",
-		"/Users/jake/NUbots/shared/utility/math/geometry/UnitQuaternion.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/Build/Common/Platform.x86",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/Build/Makefile",
-		"/Users/jake/NUbots/shared/utility/math/geometry/UnitQuaternion.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiViewer/NiViewer.cpp",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiViewer/glh/glh_linear.h",
-		"/Users/jake/Kinect/OpenNI-Bin-Dev-MacOSX-v1.5.7.10/Samples/NiUserTracker/glh/glh_linear.h",
-		"/Users/jake/error.txt",
-		"/Users/jake/Documents/OneDrive/PhD/Lit Reveiw/sensor_fusion_literature_review.tex",
-		"/Users/jake/Documents/OneDrive/PhD/H3DAndOculus/calibrationtools.py",
-		"/Users/jake/Documents/OneDrive/PhD/H3DAndOculus/Calibrationtest.py",
-		"/Users/jake/Documents/OneDrive/PhD/References/library.bib",
-		"/C/Users/Jake/OneDrive/PhD/IE2016Paper/agsmnoURL.bst",
-		"/C/Users/Jake/OneDrive/PhD/References/library.bib",
-		"/C/Users/Jake/OneDrive/PhD/IE2016Paper/natbib.sty",
-		"/C/Users/Jake/OneDrive/PhD/IE2016Paper/agsm.bst",
-		"/C/Users/Jake/OneDrive/PhD/IE2016Paper/CRPITStyle.cls",
-		"/C/Users/Jake/AppData/Roaming/Sublime Text 2/Packages/User/SublimeWritingStyle.sublime-settings",
-		"/C/Users/Jake/AppData/Roaming/Sublime Text 2/Packages/SublimeWritingStyle/SublimeWritingStyle.sublime-settings",
-		"/C/Users/Jake/OneDrive/PhD/H3DAndOculus/CalibrationTools.h",
-		"/C/Users/Jake/OneDrive/PhD/H3DAndOculus/CalibrationTools.cpp",
-		"/C/Users/Jake/OneDrive/Honours/Courses/Computer Vision/Documents/Report/source.tex",
-		"/C/Users/Jake/OneDrive/Honours/Courses/Computer Vision/Documents/Report/bibliography.bib",
-		"/C/Users/Jake/OneDrive/PhD/References/Exported Items.bib",
-		"/C/Users/Jake/OneDrive/PhD/CrazyFlie/crazyflie-clients-python-2014.12.3/README.md",
-		"/C/Users/Jake/OneDrive/PhD/Lit Reveiw/haptics_literature_review.tex",
-		"/C/Users/Jake/OneDrive/PhD/Lit Reveiw/literature_review.tex",
-		"/C/Users/Jake/OneDrive/Oculus Research Application/moderncv/examples/valveapp.tex",
-		"/C/Users/Jake/Downloads/proxy.pac",
-		"/C/Users/Jake/Desktop/psmoveapi_3.0.0_win32/README",
-		"/C/Users/Jake/OneDrive/PhD/Lit Reveiw/library.bib",
-		"/C/H3D/H3DUtil/include/H3DUtil/Matrix3f.h",
-		"/C/H3D/H3DAPI/include/H3D/DeviceInfo.h",
-		"/C/H3D/H3DAPI/include/H3D/MFNode.h",
-		"/C/H3D/H3DAPI/include/H3D/H3DHapticsDevice.h",
-		"/C/H3D/HAPI/include/HAPI/HAPIHapticsDevice.h"
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/support/MocapNoiseAnalysis/src/MocapNoiseAnalysis.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/support/MocapNoiseAnalysis/src/MocapNoiseAnalysis.h",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Record/src/Record.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Play/src/Play.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/support/MocapRecorder/src/MocapRecorder.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/LiveMatchMocap/src/LiveMatchMocap.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/GraphicsTools.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/PSMoveUtils.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/Correlator.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/MocapStream.cpp",
+		"/Users/jake/Kinect/Autocalibration/build/config/LiveMatchMocap.yaml",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Transform3D.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/MocapRecording.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/MocapRecording.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/MocapStream.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/UnitQuaternion.h",
+		"/Users/jake/Kinect/Autocalibration/modules/input/NatNet/src/NatNet.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/input/NatNet/src/NatNet.h",
+		"/Users/jake/Kinect/Autocalibration/build/config/TestCalibrationTools.yaml",
+		"/Users/jake/Kinect/Autocalibration/roles/record.role",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/View/src/View.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/Correlator.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Transform3D.cpp",
+		"/Users/jake/Kinect/Autocalibration/roles/noiseanalysis.role",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/SensorPlant.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/SensorPlant.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/Simulation.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/UnitQuaternion.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/PSMoveUtils.h",
+		"/Users/jake/Kinect/Autocalibration/shared/messages/input/MotionCapture.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/CalibrationTools.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/CalibrationTools.h",
+		"/Users/jake/Kinect/Autocalibration/modules/support/PSMoveNoiseAnalysis/src/PSMoveNoiseAnalysis.h",
+		"/Users/jake/Kinect/Autocalibration/modules/support/PSMoveNoiseAnalysis/src/PSMoveNoiseAnalysis.cpp",
+		"/Users/jake/Kinect/Autocalibration/roles/play.role",
+		"/Users/jake/Kinect/Autocalibration/b",
+		"/Users/jake/Kinect/Autocalibration/modules/support/MocapRecorder/config/MocapRecorder.yaml",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/MocapRecorder.cpp",
+		"/Users/jake/Kinect/Autocalibration/build/roles/record.cpp",
+		"/Users/jake/Kinect/Autocalibration/roles/play/main.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Play/src/Play.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/SimulatedSensor.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/SimulatedSensor.h",
+		"/Users/jake/Kinect/Autocalibration/roles/testcalibrationtools.role",
+		"/Users/jake/Kinect/Autocalibration/modules/support/TestCalibrationTools/src/TestCalibrationTools.h",
+		"/Users/jake/Kinect/Autocalibration/roles/livemocap.role",
+		"/Users/jake/Kinect/Autocalibration/modules/input/NatNet/config/NatNet.yaml",
+		"/Users/jake/Kinect/Autocalibration/shared/messages/input/proto/MotionCapture.proto",
+		"/Users/jake/Kinect/Autocalibration/shared/messages/Vector.proto",
+		"/Users/jake/Kinect/Autocalibration/modules/support/MocapRecorder/src/MocapRecorder.h",
+		"/Users/jake/Kinect/Autocalibration/modules/input/NatNet/src/Parse.h",
+		"/Users/jake/Kinect/Autocalibration/modules/support/NUcap/src/NUcap.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Rotation3D.cpp",
+		"/Users/jake/Kinect/Autocalibration/build/shared/messages/proto/MotionCapture.pb.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/autocal/MocapRecorder.h",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/ViewPSMove/src/View.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Play/config/Play.yaml",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/ViewPSMove/src/View.h",
+		"/Users/jake/Kinect/Autocalibration/roles/view.role",
+		"/Users/jake/Kinect/Autocalibration/build/config/Play.yaml",
+		"/Users/jake/Kinect/Autocalibration/tests/shared/utility/motion/TestKinematics.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Record/src/Record.h",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Record/tests/RecordTest.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/ViewPSMove/config/View.yaml",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/ViewPSMove/tests/ViewTest.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/input/NatNet/tests/NatNetTest.cpp",
+		"/Users/jake/Kinect/Autocalibration/modules/psmove/Record/config/Record.yaml",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/error/openal_error_category.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/file/fileutil.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/file/fileutil.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/image/ColorModelConversions.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/image/ColorModelConversions.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/image/HSV.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/image/RGB.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/image/YCbCr.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/angle.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/comparison.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/coordinates.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Circle.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Circle.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Intersection.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Intersection.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Line.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Line.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/ParametricLine.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Plane.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Polygon.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Polygon.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Quad.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/Quad.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/RotatedRectangle.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/geometry/RotatedRectangle.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/AdaptiveIMUModel.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/AdaptiveIMUModel.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/IMUModel.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/IMUModel.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/LinearVec3Model.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/LinearVec3Model.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/ParticleFilter.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/kalman/UKF.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/matrix.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Rotation2D.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Rotation2D.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Rotation3D.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Transform2D.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/matrix/Transform2D.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/optimisation/PGAoptimiser.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/NPartiteRansac.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/Ransac.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/RansacCircleModel.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/RansacCircleModel.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/RansacLineModel.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/RansacLineModel.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/ransac/RansacResult.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/math/vision.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/nubugger/NUhelpers.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/strutil/ansi.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/strutil/banner.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/strutil/strutil.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/support/proto_armadillo.cpp",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/support/proto_armadillo.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/support/yaml_armadillo.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/support/yaml_expression.h",
+		"/Users/jake/Kinect/Autocalibration/shared/utility/time/time.h",
+		"/Users/jake/Kinect/Autocalibration/tests/test.cpp",
+		"/Users/jake/Kinect/Autocalibration/tools/build/compile.py"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 46.0
 	},
 	"find_in_files":
 	{
 		"height": 93.0,
 		"where_history":
 		[
+			"/Users/jake/Kinect/Autocalibration",
+			"/Users/jake/Kinect/psmoveapi",
+			"",
+			"/Users/jake/Kinect/Autocalibration/record",
+			"",
+			"/Users/jake/Kinect/Autocalibration/src",
 			"/Users/jake/Kinect/psmoveapi",
 			"/Users/jake/Kinect/Autocalibration/src",
 			"/Users/jake/Kinect/psmoveapi",
@@ -866,137 +968,137 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": false,
+		"case_sensitive": true,
 		"find_history":
 		[
-			"program",
-			"game",
-			"-dynamiclib",
-			"dynamic",
-			".dylib",
-			"utility::",
-			"/opt/psmoveapi_3.0.0~2015-10-12+3.0.0-270-g0ac355f",
-			"NUClear",
-			"nuclear",
-			"xn",
-			"arma_xn_tools.h",
-			"opencv",
-			"_cvCalibrate",
-			"tracker_camera",
-			"tracker_camera_calibration",
-			"psmoveapi",
-			"Madgwick AHRS",
-			"psmove_update_leds",
-			"Assertion fail in",
-			"Assertion fail in psmove_update_leds",
-			" Assertion fail in psmove_update_leds",
-			"move != NULL",
-			"Assertion fail in psmove_update_leds: move != NULL",
-			"psmove_tracker_distance_from_radius",
-			"distance_parameters",
-			"psmove_tracker_distance_from_radius",
-			"\"dist:",
-			"\"dist",
-			"{dist",
-			"CvMat",
-			"cvMat",
-			"cvInitUndistortMap",
-			"PSMOVE_TRACKER_WIDTH",
-			"getenv",
-			"psmove_util_get_env_int",
-			"PSMOVE_TRACKER_DEFAULT",
-			"PSMOVE_TRACKER_WIDTH_ENV",
-			"get_metrics",
-			"INTRINSICS_XML",
-			"psmove_util_get_file_path",
-			"camera_control_read_calibration",
-			"Warning: No lens calibration files found.",
-			"psmove_tracker_new_with_camera",
-			"psmove_tracker_new",
-			"Could not init PSMoveTracker",
-			"Could not init PSMoveTracker]",
-			"100",
-			"plane_model",
-			"transparentMat",
-			"0.2",
-			"1",
-			"/ ",
-			"frame_time",
-			"std::cout ",
-			"-1",
-			"-",
-			"[3]",
-			"lightShader",
-			"diffuse",
-			"GBuffer",
-			"FrameBuffer",
-			"FRAME",
-			"FrameBuffer",
-			"frameBuffer",
-			" std::cout ",
-			"getAmbientID",
-			"shininess",
-			"= ",
-			"specular",
-			"diffuse",
-			"MESH",
-			"Diffuse",
-			"id",
-			"FramebufferName",
-			"Texture",
-			"tex",
-			"GL_RGB",
-			"std::cout",
-			"M_PI_3",
-			"case",
-			"0.05",
-			"cam",
-			"01",
-			"moveForward",
-			"j",
-			"i",
-			"tex",
-			"Tex",
-			"number_of_elements",
-			"1",
-			"GLfloat",
-			"x",
-			"positions",
-			"loadasset",
+			"- ",
+			"pair",
 			"    std::cout << __LINE__ << std::endl;\n",
-			"int",
-			"})",
-			"i",
-			"mNormals",
-			"mVertices",
-			"0",
-			"glEnableClientState",
-			"glBindBuffer",
-			"glColor3f",
-			"1.0f",
-			"GL_ELEMENT_BUFFER",
-			"number_of_vertices",
-			"vertexBuffer",
-			"[1-9]*",
+			"std::cout << __LINE__ << std::endl;",
+			"rectify",
+			"min",
 			"1",
-			"    ",
-			"   ",
-			"  ",
-			"    ",
-			"   ",
-			" ",
-			"vertices",
-			"colourBuffer",
-			"vertexBuffer",
-			"0.2",
-			"cam",
-			"X",
-			"window_height",
-			"window_width",
-			"position",
-			"0",
-			"glBindFragDataLocation",
-			"normalTexture"
+			"orth",
+			"Transform3D",
+			"secon",
+			"first",
+			"R",
+			"std::cout ",
+			"std::cout",
+			"\n		std::cout",
+			"solveKronecker_Shah2013",
+			"error",
+			"pxpy",
+			"submat(0,3,2,3)",
+			"submat(0,0,2,2)",
+			"y[0]",
+			"rows(1,3)",
+			">",
+			"solveWithSVD",
+			"q",
+			"qx",
+			"q",
+			"qx",
+			"q",
+			"x",
+			"mat",
+			"q[",
+			"q.",
+			"[",
+			"q.",
+			"Scalar",
+			"Index",
+			".coeff(",
+			"coeff",
+			"q",
+			"-q2",
+			"q",
+			"minDiffPos",
+			"Angle",
+			"elimination_score_threshold",
+			"resetRe",
+			"W",
+			"Q",
+			"normalise",
+			"x",
+			"v",
+			"u",
+			"s",
+			"u",
+			"rotation",
+			"l",
+			"x",
+			"Mocap",
+			"MOCAP",
+			"MocapNoiseAnalysis",
+			"running_stat_vec",
+			"MotionCapture",
+			"simParams",
+			"std::cout << __LINE__ << std::endl;",
+			"psmoveTracker",
+			"glm",
+			"0.01",
+			"pitch",
+			"positio",
+			"const",
+			"dMocapStream",
+			"1",
+			"correctForAutocalibrationCoordinateSystem",
+			"r.pose",
+			"RHInput",
+			"addMeasurement",
+			"setRigidBodyInFrame",
+			"r.pose.translation()",
+			"B",
+			"A",
+			"		std::cout << __FILE__ << \" : \" <<  __LINE__ << std::endl;\n",
+			"std::cout << __FILE__ << \" : \" <<  __LINE__ << std::endl;",
+			"getFrame",
+			"states",
+			"parentStream",
+			"parent",
+			"ForAll",
+			"simParam",
+			"simParameters",
+			"isRunning",
+			"MocapStream",
+			"{",
+			"getSimulatedFrame",
+			"simulationParameters",
+			"stream",
+			"parentStream",
+			"adds",
+			"std::pair<std::string,std::string>",
+			"simulatedCorrelations",
+			"latencyOfStream1",
+			"sim",
+			"stream",
+			"ids",
+			"stream",
+			"(*stream)",
+			"tmestamp",
+			"(*stream)",
+			"stream[",
+			"stream.",
+			"StreamNamePair",
+			"std::pair<std::string,std::string>",
+			"std::pair<int,int>",
+			"MocapStream::SimulationParameters",
+			"MocapStream::SimulationParamters",
+			"sim",
+			"rbID",
+			"norm",
+			"simParams",
+			"SimulationParameters",
+			"simParams",
+			",",
+			"rbID",
+			"simulatedCorrelations",
+			"A",
+			"solveHomogeneousDualSylvester",
+			"A",
+			"Scale",
+			"pose"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1004,6 +1106,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"SimulationParameters",
+			"solveZhuang1994",
+			"Autocalibration",
 			"pose",
 			"OVR::Matrix4f",
 			"OVR::Quatf",
@@ -1063,109 +1168,526 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 15,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "CMakeLists.txt",
+					"file": "modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4173,
+						"buffer_size": 6909,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3627,
-								3627
-							],
-							[
-								3681,
-								3681
-							],
-							[
-								3690,
-								3690
-							],
-							[
-								3725,
-								3725
-							],
-							[
-								3786,
-								3786
+								3179,
+								3179
 							]
 						],
 						"settings":
 						{
 							"glslvalidator_configured": true,
 							"glslvalidator_enabled": 1,
-							"syntax": "Packages/CMakeEditor/CMakeEditor.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1522.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "shared/utility/autocal/Correlator.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10689,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6544,
+								6544
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"history_list_is_closing": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2740.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8859,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7374,
+								7379
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2252.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "shared/utility/math/matrix/Rotation3D.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7422,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2795,
+								2795
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 437.0,
+						"translation.y": 404.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "shared/utility/math/matrix/Rotation3D.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6540,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4454,
+								4454
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "shared/utility/math/matrix/Transform3D.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10004,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7651,
+								7208
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"history_list_is_closing": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2990.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "shared/utility/autocal/CalibrationTools.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1797,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1002,
+								1002
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "shared/utility/math/geometry/UnitQuaternion.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9384,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1057,
+								1064
+							],
+							[
+								3813,
+								3820
+							],
+							[
+								4110,
+								4117
+							],
+							[
+								4239,
+								4246
+							],
+							[
+								4446,
+								4453
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1192.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "shared/utility/math/geometry/UnitQuaternion.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3814,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2583,
+								2583
+							],
+							[
+								2768,
+								2768
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 802.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "shared/utility/autocal/CalibrationTools.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13698,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9747,
+								9747
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"history_list_is_closing": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3588.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "cmake/modules/FindGLFW.cmake",
+					"buffer": 10,
+					"file": "shared/utility/autocal/GraphicsTools.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7696,
+						"buffer_size": 9795,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6139,
-								6139
+								8416,
+								8423
 							]
 						],
 						"settings":
 						{
 							"glslvalidator_configured": true,
 							"glslvalidator_enabled": 1,
-							"syntax": "Packages/CMakeEditor/CMakeEditor.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 2231.0,
+						"translation.x": 191.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": ".gitignore",
+					"buffer": 6,
+					"file": "shared/utility/autocal/CalibrationTools.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5,
+						"buffer_size": 1797,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5,
-								5
+								1797,
+								1797
 							]
 						],
 						"settings":
 						{
-							"auto_name": ".gitignore",
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "shared/utility/math/geometry/UnitQuaternion.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9384,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								9384
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "shared/utility/math/geometry/UnitQuaternion.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3814,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								3814
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "shared/utility/autocal/Correlator.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10689,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4689,
+								4689
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"history_list_is_closing": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1626.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1481,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								1481
+							]
+						],
+						"settings":
+						{
+							"WordCountShouldRun": true,
+							"WordCountSyntax": "plain text",
+							"auto_name": "Simultaneous use of multiple sensor systems provid",
 							"glslvalidator_configured": true,
 							"glslvalidator_enabled": 1,
 							"syntax": "Packages/Text/Plain text.tmLanguage"
@@ -1174,31 +1696,63 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "cmake/modules/FindGLM.cmake",
-					"semi_transient": true,
+					"buffer": 0,
+					"file": "modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2466,
+						"buffer_size": 6909,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								3822,
+								3828
 							]
 						],
 						"settings":
 						{
 							"glslvalidator_configured": true,
 							"glslvalidator_enabled": 1,
-							"syntax": "Packages/CMakeEditor/CMakeEditor.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 54.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "shared/utility/math/matrix/Transform3D.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10004,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								456,
+								456
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"history_list_is_closing": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -1206,45 +1760,70 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 7,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
+				},
 				{
-					"buffer": 4,
-					"file": "src/main.cpp",
+					"buffer": 12,
+					"file": "shared/utility/autocal/Correlator.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9613,
+						"buffer_size": 2101,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1612,
-								1634
+								651,
+								651
 							]
 						],
 						"settings":
 						{
 							"glslvalidator_configured": true,
 							"glslvalidator_enabled": 1,
-							"syntax": "Packages/C++/C.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 187.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "shared/utility/autocal/PSMoveUtils.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8555,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1379,
+								1379
+							]
+						],
+						"settings":
+						{
+							"glslvalidator_configured": true,
+							"glslvalidator_enabled": 1,
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 11,
 					"type": "text"
 				}
 			]
@@ -1267,18 +1846,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.5,
 			1.0
 		],
 		"rows":
@@ -1314,20 +1886,492 @@
 		"selected_items":
 		[
 			[
+				"livema",
+				"Autocalibration/modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp"
+			],
+			[
+				"grahpi",
+				"Autocalibration/shared/utility/autocal/GraphicsTools.h"
+			],
+			[
+				"testca",
+				"Autocalibration/modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp"
+			],
+			[
+				"transf",
+				"Autocalibration/shared/utility/math/matrix/Transform3D.h"
+			],
+			[
+				"unit",
+				"Autocalibration/shared/utility/math/geometry/UnitQuaternion.cpp"
+			],
+			[
+				"psmoveut",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.cpp"
+			],
+			[
+				"corre",
+				"Autocalibration/shared/utility/autocal/Correlator.cpp"
+			],
+			[
+				"transform3d",
+				"Autocalibration/shared/utility/math/matrix/Transform3D.h"
+			],
+			[
+				"rotation",
+				"Autocalibration/shared/utility/math/matrix/Rotation3D.cpp"
+			],
+			[
+				"rotation3",
+				"Autocalibration/shared/utility/math/matrix/Rotation3D.cpp"
+			],
+			[
+				"testc",
+				"Autocalibration/modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp"
+			],
+			[
+				"calibra",
+				"Autocalibration/shared/utility/autocal/CalibrationTools.cpp"
+			],
+			[
+				"unitq",
+				"Autocalibration/shared/utility/math/geometry/UnitQuaternion.h"
+			],
+			[
+				"testcaya",
+				"Autocalibration/build/config/TestCalibrationTools.yaml"
+			],
+			[
+				"calibrati",
+				"Autocalibration/shared/utility/autocal/CalibrationTools.cpp"
+			],
+			[
+				"corr",
+				"Autocalibration/shared/utility/autocal/Correlator.cpp"
+			],
+			[
+				"unitqua",
+				"Autocalibration/shared/utility/math/geometry/UnitQuaternion.h"
+			],
+			[
+				"testcali",
+				"Autocalibration/build/config/TestCalibrationTools.yaml"
+			],
+			[
+				"calibrat",
+				"Autocalibration/shared/utility/autocal/CalibrationTools.cpp"
+			],
+			[
+				"mocaprecord",
+				"Autocalibration/shared/utility/autocal/MocapRecording.cpp"
+			],
+			[
+				"psmoveu",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.cpp"
+			],
+			[
+				"livem",
+				"Autocalibration/modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp"
+			],
+			[
+				"view.",
+				"Autocalibration/modules/psmove/View/src/View.cpp"
+			],
+			[
+				"psmoveno",
+				"Autocalibration/modules/support/PSMoveNoiseAnalysis/src/PSMoveNoiseAnalysis.cpp"
+			],
+			[
+				"play",
+				"Autocalibration/modules/psmove/Play/src/Play.cpp"
+			],
+			[
+				"motionca",
+				"Autocalibration/shared/messages/input/MotionCapture.h"
+			],
+			[
+				"liverole",
+				"Autocalibration/roles/livemocap.role"
+			],
+			[
+				"pla.role",
+				"Autocalibration/roles/play.role"
+			],
+			[
+				"mocapn",
+				"Autocalibration/modules/support/MocapNoiseAnalysis/src/MocapNoiseAnalysis.cpp"
+			],
+			[
+				"b",
+				"Autocalibration/b"
+			],
+			[
+				"simul",
+				"Autocalibration/shared/utility/autocal/Simulation.h"
+			],
+			[
+				"correl",
+				"Autocalibration/shared/utility/autocal/Correlator.cpp"
+			],
+			[
+				"grap",
+				"Autocalibration/shared/utility/autocal/GraphicsTools.h"
+			],
+			[
+				"mocaprecorder",
+				"Autocalibration/modules/support/MocapRecorder/src/MocapRecorder.cpp"
+			],
+			[
+				"mocaprec",
+				"Autocalibration/modules/support/MocapRecorder/config/MocapRecorder.yaml"
+			],
+			[
+				"record.cpp",
+				"Autocalibration/modules/psmove/Record/src/Record.cpp"
+			],
+			[
+				"record.rol",
+				"Autocalibration/roles/record.role"
+			],
+			[
+				"graph",
+				"Autocalibration/shared/utility/autocal/GraphicsTools.h"
+			],
+			[
+				"transform",
+				"Autocalibration/shared/utility/math/matrix/Transform3D.h"
+			],
+			[
+				"view.cp",
+				"Autocalibration/modules/psmove/View/src/View.cpp"
+			],
+			[
+				"nat",
+				"Autocalibration/modules/input/NatNet/src/NatNet.cpp"
+			],
+			[
+				"sensorplan",
+				"Autocalibration/shared/utility/autocal/SensorPlant.h"
+			],
+			[
+				"psmovuti",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.h"
+			],
+			[
+				"mocaps",
+				"Autocalibration/shared/utility/autocal/MocapStream.h"
+			],
+			[
+				"livemat",
+				"Autocalibration/modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp"
+			],
+			[
+				"psmoveutil",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.cpp"
+			],
+			[
+				"trans",
+				"Autocalibration/shared/utility/math/matrix/Transform3D.h"
+			],
+			[
 				"sensor",
-				"Autocalibration/src/SensorPlant.cpp"
+				"Autocalibration/shared/utility/autocal/SensorPlant.cpp"
+			],
+			[
+				"play.cp",
+				"Autocalibration/modules/psmove/Play/src/Play.cpp"
+			],
+			[
+				"mocapst",
+				"Autocalibration/shared/utility/autocal/MocapStream.cpp"
+			],
+			[
+				"sensorplant",
+				"Autocalibration/shared/utility/autocal/SensorPlant.cpp"
+			],
+			[
+				"mocapstrea",
+				"Autocalibration/shared/utility/autocal/MocapStream.cpp"
+			],
+			[
+				"live",
+				"Autocalibration/modules/psmove/LiveMatchMocap/src/LiveMatchMocap.cpp"
+			],
+			[
+				"testcal.cpp",
+				"Autocalibration/modules/support/TestCalibrationTools/src/TestCalibrationTools.cpp"
+			],
+			[
+				"play.cpp",
+				"Autocalibration/modules/psmove/Play/src/Play.cpp"
+			],
+			[
+				"graphics",
+				"Autocalibration/shared/utility/autocal/GraphicsTools.h"
+			],
+			[
+				"correlat",
+				"Autocalibration/shared/utility/autocal/Correlator.cpp"
+			],
+			[
+				"record",
+				"Autocalibration/modules/psmove/Record/src/Record.cpp"
+			],
+			[
+				"view.cpp",
+				"Autocalibration/modules/psmove/View/src/View.cpp"
+			],
+			[
+				"pla",
+				"Autocalibration/modules/psmove/Play/src/Play.cpp"
+			],
+			[
+				"sensorpla",
+				"Autocalibration/shared/utility/autocal/SensorPlant.cpp"
+			],
+			[
+				"psmoveutils",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.cpp"
+			],
+			[
+				"calibrationtools",
+				"Autocalibration/shared/utility/autocal/CalibrationTools.cpp"
+			],
+			[
+				"psmouti",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.cpp"
+			],
+			[
+				"transform3",
+				"Autocalibration/shared/utility/math/matrix/Transform3D.h"
+			],
+			[
+				"calibrationto",
+				"Autocalibration/shared/utility/autocal/CalibrationTools.cpp"
+			],
+			[
+				"tesyaml",
+				"Autocalibration/build/config/TestCalibrationTools.yaml"
+			],
+			[
+				"testcal",
+				"Autocalibration/roles/testcalibrationtools.role"
+			],
+			[
+				"sensorpa",
+				"Autocalibration/shared/utility/autocal/SensorPlant.cpp"
+			],
+			[
+				"livemy",
+				"Autocalibration/build/config/LiveMatchMocap.yaml"
+			],
+			[
+				"rotation3d",
+				"Autocalibration/shared/utility/math/matrix/Rotation3D.cpp"
+			],
+			[
+				"psmovutil",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.h"
+			],
+			[
+				"mocapreco",
+				"Autocalibration/shared/utility/autocal/MocapRecording.h"
+			],
+			[
+				"psmoveuti",
+				"Autocalibration/shared/utility/autocal/PSMoveUtils.cpp"
+			],
+			[
+				"nucap",
+				"Autocalibration/modules/support/NUcap/src/NUcap.cpp"
+			],
+			[
+				"parse",
+				"Autocalibration/modules/input/NatNet/src/Parse.h"
+			],
+			[
+				"natnet",
+				"Autocalibration/modules/input/NatNet/src/NatNet.cpp"
+			],
+			[
+				"natnetyaml",
+				"Autocalibration/modules/input/NatNet/config/NatNet.yaml"
+			],
+			[
+				"messagesinput",
+				"Autocalibration/shared/messages/input/MotionCapture.h"
+			],
+			[
+				"vector",
+				"Autocalibration/shared/messages/Vector.proto"
+			],
+			[
+				"motioncap",
+				"Autocalibration/build/shared/messages/proto/MotionCapture.pb.h"
 			],
 			[
 				"mocapre",
-				"Autocalibration/src/MocapRecording.h"
+				"Autocalibration/shared/utility/autocal/MocapRecording.h"
+			],
+			[
+				"mocapstream",
+				"Autocalibration/shared/utility/autocal/MocapStream.cpp"
+			],
+			[
+				"mocaprecording",
+				"Autocalibration/shared/utility/autocal/MocapRecording.cpp"
+			],
+			[
+				"grapt",
+				"Autocalibration/shared/utility/autocal/GraphicsTools.h"
+			],
+			[
+				"play.ya",
+				"Autocalibration/modules/psmove/Play/config/Play.yaml"
+			],
+			[
+				"play.yam",
+				"Autocalibration/modules/psmove/Play/config/Play.yaml"
+			],
+			[
+				"view.role",
+				"Autocalibration/roles/view.role"
+			],
+			[
+				"view",
+				"Autocalibration/modules/psmove/ViewPSMove/src/View.cpp"
+			],
+			[
+				"reco",
+				"Autocalibration/modules/psmove/Record/config/Record.yaml"
+			],
+			[
+				"findsfml",
+				"Autocalibration/tools/cmake/FindSFML.cmake"
+			],
+			[
+				"sha",
+				"Autocalibration/tools/cmake/SharedLibraries.cmake"
+			],
+			[
+				"shar",
+				"Autocalibration/tools/cmake/SharedLibraries.cmake"
+			],
+			[
+				"main.",
+				"Autocalibration/roles/play/main.cpp"
+			],
+			[
+				"main",
+				"Autocalibration/roles/record/main.cpp"
+			],
+			[
+				"main.cpp",
+				"Autocalibration/roles/play/main.cpp"
+			],
+			[
+				"play.",
+				"Autocalibration/roles/play.role"
+			],
+			[
+				"findglfw",
+				"Autocalibration/tools/cmake/FindGLFW.cmake"
+			],
+			[
+				"toolch",
+				"Autocalibration/tools/cmake/ToolchainLibraryFinder.cmake"
+			],
+			[
+				"findopen",
+				"Autocalibration/tools/cmake/FindOpenBLAS.cmake"
+			],
+			[
+				"cmakeold",
+				"Autocalibration/CMakeListsOld.txt"
+			],
+			[
+				"generat",
+				"Autocalibration/tools/scripts/generate_role.py"
+			],
+			[
+				"compiler",
+				"Autocalibration/tools/cmake/Compiler.cmake"
+			],
+			[
+				"nuclear",
+				"Autocalibration/tools/cmake/NUClearModuleBuilder.cmake"
+			],
+			[
+				"addrole",
+				"Autocalibration/tools/cmake/AddRole.cmake"
+			],
+			[
+				"filewat",
+				"Autocalibration/shared/messages/support/FileWatch.h"
+			],
+			[
+				"filewatch.h",
+				"Autocalibration/shared/messages/support/FileWatch.h"
+			],
+			[
+				"filewatcher.h",
+				"Autocalibration/modules/support/extension/FileWatcher/src/FileWatcher.h"
+			],
+			[
+				"filewa",
+				"Autocalibration/modules/support/extension/FileWatcher/src/FileWatcher.cpp"
+			],
+			[
+				"calib",
+				"Autocalibration/common/CalibrationTools.cpp"
+			],
+			[
+				"mocap",
+				"Autocalibration/common/MocapRecording.cpp"
+			],
+			[
+				"sensorp",
+				"Autocalibration/common/SensorPlant.h"
+			],
+			[
+				"psmove",
+				"Autocalibration/common/PSMoveUtils.cpp"
+			],
+			[
+				"psmove_trac",
+				"psmoveapi/src/tracker/psmove_tracker.c"
+			],
+			[
+				"psmove_exam",
+				"psmoveapi/examples/c/psmove_examples_opengl.h"
+			],
+			[
+				"correla",
+				"Autocalibration/common/Correlator.cpp"
+			],
+			[
+				"graphi",
+				"Autocalibration/common/GraphicsTools.h"
+			],
+			[
+				"mocapstre",
+				"Autocalibration/common/MocapStream.h"
+			],
+			[
+				"transfor",
+				"Autocalibration/utility/math/matrix/Transform3D.h"
+			],
+			[
+				"psmovetracker",
+				"psmoveapi/src/tracker/psmove_tracker.c"
+			],
+			[
+				"example",
+				"psmoveapi/examples/c/example.c"
 			],
 			[
 				"correlator",
 				"Autocalibration/src/Correlator.h"
-			],
-			[
-				"mocaps",
-				"Autocalibration/src/MocapStream.h"
 			],
 			[
 				"tracker_camer",
@@ -1352,478 +2396,6 @@
 			[
 				"psmove_tra",
 				"src/tracker/psmove_tracker.c"
-			],
-			[
-				"test_rec",
-				"examples/c/test_record_video.c"
-			],
-			[
-				"end2",
-				"examples/c/test_end2end_latency.c"
-			],
-			[
-				"lig",
-				"shaders/lightShader.frag"
-			],
-			[
-				"obj",
-				"shaders/objectShader.vert"
-			],
-			[
-				"texture",
-				"src/Texture.cpp"
-			],
-			[
-				"cam",
-				"src/Camera.h"
-			],
-			[
-				"mes",
-				"src/Mesh.cpp"
-			],
-			[
-				"main",
-				"src/main.cpp"
-			],
-			[
-				"camer",
-				"src/Camera.h"
-			],
-			[
-				"text",
-				"src/Texture.cpp"
-			],
-			[
-				"sha",
-				"src/Shader.h"
-			],
-			[
-				"sh",
-				"src/Shader.cpp"
-			],
-			[
-				"ob",
-				"shaders/objectShader.vert"
-			],
-			[
-				"gb",
-				"src/GBuffer.h"
-			],
-			[
-				"fram",
-				"src/FrameBuffer.cpp"
-			],
-			[
-				"shad",
-				"shaders/objectShader.frag"
-			],
-			[
-				"li",
-				"shaders/lightShader.vert"
-			],
-			[
-				"mesh",
-				"src/Mesh.cpp"
-			],
-			[
-				"camera",
-				"src/Camera.h"
-			],
-			[
-				"o",
-				"shaders/objectShader.vert"
-			],
-			[
-				"l",
-				"shaders/lightShader.vert"
-			],
-			[
-				"light",
-				"shaders/lightShader.frag"
-			],
-			[
-				"sa",
-				"src/Shader.cpp"
-			],
-			[
-				"obje",
-				"shaders/objectShader.vert"
-			],
-			[
-				"shaderver",
-				"shaders/shader.vert"
-			],
-			[
-				"shader",
-				"src/Shader.h"
-			],
-			[
-				"transform3d",
-				"NiUserTracker/utility/math/matrix/Transform3D.h"
-			],
-			[
-				"unit",
-				"NiUserTracker/utility/math/geometry/UnitQuaternion.cpp"
-			],
-			[
-				"cali",
-				"NiUserTracker/CalibrationTools.cpp"
-			],
-			[
-				"scene",
-				"NiUserTracker/SceneDrawer.cpp"
-			],
-			[
-				"sceen",
-				"NiUserSelection/SceneDrawer.cpp"
-			],
-			[
-				"tranfrom",
-				"NiUserTracker/utility/math/matrix/Transform3D.cpp"
-			],
-			[
-				"unitq",
-				"NiUserTracker/utility/math/geometry/UnitQuaternion.cpp"
-			],
-			[
-				"tranf",
-				"NiUserTracker/utility/math/matrix/Transform3D.cpp"
-			],
-			[
-				"rott",
-				"NiUserTracker/utility/math/matrix/Rotation3D.h"
-			],
-			[
-				"rotat",
-				"NiUserTracker/utility/math/matrix/Rotation3D.h"
-			],
-			[
-				"cal",
-				"NiUserTracker/CalibrationTools.cpp"
-			],
-			[
-				"makefi",
-				"NiUserTracker/Makefile"
-			],
-			[
-				"mai",
-				"NiUserTracker/main.cpp"
-			],
-			[
-				"scenedrawer",
-				"NiUserTracker/SceneDrawer.cpp"
-			],
-			[
-				"dra",
-				"NiUserSelection/SceneDrawer.cpp"
-			],
-			[
-				"sensorplant",
-				"NiUserTracker/SensorPlant.cpp"
-			],
-			[
-				"rotation3",
-				"NiUserTracker/utility/math/matrix/Rotation3D.h"
-			],
-			[
-				"uniq",
-				"NiUserTracker/utility/math/geometry/UnitQuaternion.cpp"
-			],
-			[
-				"transform",
-				"NiUserTracker/utility/math/matrix/Transform3D.cpp"
-			],
-			[
-				"unitquater",
-				"NiUserTracker/utility/math/geometry/UnitQuaternion.h"
-			],
-			[
-				"rotation",
-				"NiUserTracker/utility/math/matrix/Rotation3D.cpp"
-			],
-			[
-				"transfo",
-				"NiUserTracker/utility/math/matrix/Transform3D.h"
-			],
-			[
-				"rotati",
-				"NiUserTracker/utility/math/matrix/Rotation3D.h"
-			],
-			[
-				"trans",
-				"NiUserTracker/utility/math/matrix/Transform3D.h"
-			],
-			[
-				"senso",
-				"NiUserTracker/SensorPlant.cpp"
-			],
-			[
-				"calibrati",
-				"NiUserTracker/CalibrationTools.cpp"
-			],
-			[
-				"transf",
-				"NiUserTracker/utility/math/matrix/Transform3D.h"
-			],
-			[
-				"mocapstream",
-				"NiUserTracker/MocapStream.h"
-			],
-			[
-				"mocapst",
-				"NiUserTracker/MocapStream.cpp"
-			],
-			[
-				"io_",
-				"NiUserTracker/io_tools.h"
-			],
-			[
-				"xn_too",
-				"NiUserTracker/arma_xn_tools.h"
-			],
-			[
-				"tran",
-				"NiUserTracker/utility/math/matrix/Transform3D.cpp"
-			],
-			[
-				"rotatio",
-				"NiUserTracker/utility/math/matrix/Rotation3D.cpp"
-			],
-			[
-				"cmake",
-				"NiUserTracker/utility/CMakeLists.txt"
-			],
-			[
-				"make",
-				"NiUserTracker/Makefile"
-			],
-			[
-				"rotato",
-				"NiUserTracker/utility/math/matrix/Rotation3D.h"
-			],
-			[
-				"rotation3d",
-				"NiUserTracker/utility/math/matrix/Rotation3D.cpp"
-			],
-			[
-				"librar",
-				"PhD/References/library.bib"
-			],
-			[
-				"hapti",
-				"PhD/Lit Reveiw/haptics_literature_review.tex"
-			],
-			[
-				"liter",
-				"Lit Reveiw/literature_review.tex"
-			],
-			[
-				"pythonscr",
-				"H3D/H3DAPI/include/H3D/PythonScript.h"
-			],
-			[
-				"calib",
-				"H3DAndOculus/calibrationtools.py"
-			],
-			[
-				"pythont",
-				"H3D/H3DAPI/include/H3D/PythonTypes.h"
-			],
-			[
-				"ovrman",
-				"H3D/H3DAPI/src/OVRManager.cpp"
-			],
-			[
-				"h3ds",
-				"H3D/H3DAPI/include/H3D/H3DScriptNode.h"
-			],
-			[
-				"h3dscr",
-				"H3D/H3DAPI/src/H3DScriptNode.cpp"
-			],
-			[
-				"pythonh",
-				"H3D/H3DAPI/include/H3D/PythonScript.h"
-			],
-			[
-				"wxstring",
-				"H3D/External/include/wx/string.h"
-			],
-			[
-				"matrix4fh",
-				"H3D/H3DUtil/include/H3DUtil/Matrix4f.h"
-			],
-			[
-				"quaternion",
-				"H3D/H3DUtil/include/H3DUtil/Quaternion.h"
-			],
-			[
-				"node",
-				"H3D/H3DAPI/include/H3D/Node.h"
-			],
-			[
-				"treed",
-				"H3D/H3DAPI/H3DViewer/src/H3DViewerTreeViewDialog.h"
-			],
-			[
-				"field",
-				"H3D/H3DAPI/include/H3D/Field.h"
-			],
-			[
-				"treedial",
-				"H3D/H3DAPI/H3DViewer/src/H3DViewerTreeViewDialog.cpp"
-			],
-			[
-				"wxfram",
-				"H3D/H3DAPI/H3DViewer/src/WxFrame.cpp"
-			],
-			[
-				"h3dhapt",
-				"H3D/H3DAPI/include/H3D/H3DHapticsDevice.h"
-			],
-			[
-				"mfnode",
-				"H3D/H3DAPI/include/H3D/MFNode.h"
-			],
-			[
-				"deviceinfo",
-				"H3D/H3DAPI/include/H3D/DeviceInfo.h"
-			],
-			[
-				"world",
-				"H3D/H3DAPI/include/H3D/WorldInfo.h"
-			],
-			[
-				"treeviw",
-				"H3D/H3DAPI/H3DViewer/src/H3DViewerTreeViewDialog.cpp"
-			],
-			[
-				"treeview",
-				"H3D/H3DAPI/H3DViewer/src/H3DViewerTreeViewDialog.h"
-			],
-			[
-				"treevie",
-				"H3D/H3DAPI/H3DViewer/src/H3DViewerTreeViewDialog.h"
-			],
-			[
-				"wxw",
-				"H3D/H3DAPI/H3DViewer/src/WxWidgetsWindow.cpp"
-			],
-			[
-				"h3dwindow",
-				"H3D/H3DAPI/src/H3DWindowNode.cpp"
-			],
-			[
-				"ovrma",
-				"H3D/H3DAPI/LibOVR/Src/Kernel/OVR_Math.h"
-			],
-			[
-				"matrix4f",
-				"H3D/H3DUtil/include/H3DUtil/Matrix4f.h"
-			],
-			[
-				"ovr",
-				"H3D/H3DAPI/include/H3D/OVRManager.h"
-			],
-			[
-				"ovrm",
-				"H3D/H3DAPI/src/OVRManager.cpp"
-			],
-			[
-				"h3dwindo",
-				"H3D/H3DAPI/include/H3D/H3DWindowNode.h"
-			],
-			[
-				"wxwi",
-				"H3D/H3DAPI/H3DViewer/src/WxWidgetsWindow.h"
-			],
-			[
-				"pythonsc",
-				"H3D/H3DAPI/src/PythonScript.cpp"
-			],
-			[
-				"calibra",
-				"H3D/H3DAPI/include/H3D/CalibrationTools.h"
-			],
-			[
-				"matrih",
-				"H3D/H3DUtil/include/H3DUtil/Matrix3f.h"
-			],
-			[
-				"quatern",
-				"H3D/H3DUtil/include/H3DUtil/Quaternion.h"
-			],
-			[
-				"calibrat",
-				"H3D/H3DAPI/src/CalibrationTools.cpp"
-			],
-			[
-				"calibration",
-				"H3DAndOculus/CalibrationTools.h"
-			],
-			[
-				"wxfra",
-				"H3D/H3DAPI/H3DViewer/src/WxFrame.cpp"
-			],
-			[
-				"pyttype",
-				"H3D/H3DAPI/include/H3D/PythonTypes.h"
-			],
-			[
-				"pythonscrh",
-				"H3D/H3DAPI/include/H3D/PythonScript.h"
-			],
-			[
-				"ovrmath",
-				"H3D/H3DAPI/LibOVR/Src/Kernel/OVR_Math.h"
-			],
-			[
-				"h3dwind",
-				"H3DAPI/src/H3DWindowNode.cpp"
-			],
-			[
-				"sphersur",
-				"H3DAPI/examples/All/SphereSurfaceTypes.x3d"
-			],
-			[
-				"fttext",
-				"External/include/FTGL/FTGL/FTTextureGlyph.h"
-			],
-			[
-				"x3dn",
-				"H3DAPI/include/H3D/X3DNode.h"
-			],
-			[
-				"x3dnode",
-				"H3DAPI/src/X3DNode.cpp"
-			],
-			[
-				"x3dcho",
-				"H3DAPI/include/H3D/X3DChildNode.h"
-			],
-			[
-				"x3dch",
-				"H3DAPI/src/X3DChildNode.cpp"
-			],
-			[
-				"wxwid",
-				"H3DAPI/H3DViewer/src/WxWidgetsWindow.cpp"
-			],
-			[
-				"viewp",
-				"H3DAPI/src/Viewpoint.cpp"
-			],
-			[
-				"refco",
-				"H3DUtil/include/H3DUtil/RefCountedClass.h"
-			],
-			[
-				"ovr_capi.",
-				"H3DAPI/LibOVR/Src/OVR_CAPI.h"
-			],
-			[
-				"ovr.h",
-				"H3DAPI/LibOVR/Include/OVR.h"
 			]
 		],
 		"width": 0.0
@@ -1853,8 +2425,8 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
-	"side_bar_width": 257.0,
+	"side_bar_visible": false,
+	"side_bar_width": 334.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
