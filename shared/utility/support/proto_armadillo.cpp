@@ -102,147 +102,147 @@ struct Setter<4> {
     }
 };
 
-messages::vec2&  operator<< ( messages::vec2& proto,  const arma::vec2& vec) {
+message::vec2&  operator<< ( message::vec2& proto,  const arma::vec2& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::vec3&  operator<< ( messages::vec3& proto,  const arma::vec3& vec) {
+message::vec3&  operator<< ( message::vec3& proto,  const arma::vec3& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::vec4&  operator<< ( messages::vec4& proto,  const arma::vec4& vec) {
+message::vec4&  operator<< ( message::vec4& proto,  const arma::vec4& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::fvec2& operator<< (messages::fvec2& proto, const arma::fvec2& vec) {
+message::fvec2& operator<< (message::fvec2& proto, const arma::fvec2& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::fvec3& operator<< (messages::fvec3& proto, const arma::fvec3& vec) {
+message::fvec3& operator<< (message::fvec3& proto, const arma::fvec3& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::fvec4& operator<< (messages::fvec4& proto, const arma::fvec4& vec) {
+message::fvec4& operator<< (message::fvec4& proto, const arma::fvec4& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::ivec2& operator<< (messages::ivec2& proto, const arma::ivec2& vec) {
+message::ivec2& operator<< (message::ivec2& proto, const arma::ivec2& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::ivec3& operator<< (messages::ivec3& proto, const arma::ivec3& vec) {
+message::ivec3& operator<< (message::ivec3& proto, const arma::ivec3& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::ivec4& operator<< (messages::ivec4& proto, const arma::ivec4& vec) {
+message::ivec4& operator<< (message::ivec4& proto, const arma::ivec4& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::uvec2& operator<< (messages::uvec2& proto, const arma::uvec2& vec) {
+message::uvec2& operator<< (message::uvec2& proto, const arma::uvec2& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::uvec3& operator<< (messages::uvec3& proto, const arma::uvec3& vec) {
+message::uvec3& operator<< (message::uvec3& proto, const arma::uvec3& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::uvec4& operator<< (messages::uvec4& proto, const arma::uvec4& vec) {
+message::uvec4& operator<< (message::uvec4& proto, const arma::uvec4& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::vec2&  operator<< ( messages::vec2& proto,  const arma::vec& vec) {
+message::vec2&  operator<< ( message::vec2& proto,  const arma::vec& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::vec3&  operator<< ( messages::vec3& proto,  const arma::vec& vec) {
+message::vec3&  operator<< ( message::vec3& proto,  const arma::vec& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::vec4&  operator<< ( messages::vec4& proto,  const arma::vec& vec) {
+message::vec4&  operator<< ( message::vec4& proto,  const arma::vec& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::fvec2& operator<< (messages::fvec2& proto, const arma::fvec& vec) {
+message::fvec2& operator<< (message::fvec2& proto, const arma::fvec& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::fvec3& operator<< (messages::fvec3& proto, const arma::fvec& vec) {
+message::fvec3& operator<< (message::fvec3& proto, const arma::fvec& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::fvec4& operator<< (messages::fvec4& proto, const arma::fvec& vec) {
+message::fvec4& operator<< (message::fvec4& proto, const arma::fvec& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::ivec2& operator<< (messages::ivec2& proto, const arma::ivec& vec) {
+message::ivec2& operator<< (message::ivec2& proto, const arma::ivec& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::ivec3& operator<< (messages::ivec3& proto, const arma::ivec& vec) {
+message::ivec3& operator<< (message::ivec3& proto, const arma::ivec& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::ivec4& operator<< (messages::ivec4& proto, const arma::ivec& vec) {
+message::ivec4& operator<< (message::ivec4& proto, const arma::ivec& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::uvec2& operator<< (messages::uvec2& proto, const arma::uvec& vec) {
+message::uvec2& operator<< (message::uvec2& proto, const arma::uvec& vec) {
     return Setter<2>::set_vector(proto, vec);
 }
-messages::uvec3& operator<< (messages::uvec3& proto, const arma::uvec& vec) {
+message::uvec3& operator<< (message::uvec3& proto, const arma::uvec& vec) {
     return Setter<3>::set_vector(proto, vec);
 }
-messages::uvec4& operator<< (messages::uvec4& proto, const arma::uvec& vec) {
+message::uvec4& operator<< (message::uvec4& proto, const arma::uvec& vec) {
     return Setter<4>::set_vector(proto, vec);
 }
-messages::mat22&  operator<< ( messages::mat22& proto,  const arma::mat22& mat) {
+message::mat22&  operator<< ( message::mat22& proto,  const arma::mat22& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::mat33&  operator<< ( messages::mat33& proto,  const arma::mat33& mat) {
+message::mat33&  operator<< ( message::mat33& proto,  const arma::mat33& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::mat44&  operator<< ( messages::mat44& proto,  const arma::mat44& mat) {
+message::mat44&  operator<< ( message::mat44& proto,  const arma::mat44& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }
-messages::fmat22& operator<< (messages::fmat22& proto, const arma::fmat22& mat) {
+message::fmat22& operator<< (message::fmat22& proto, const arma::fmat22& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::fmat33& operator<< (messages::fmat33& proto, const arma::fmat33& mat) {
+message::fmat33& operator<< (message::fmat33& proto, const arma::fmat33& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::fmat44& operator<< (messages::fmat44& proto, const arma::fmat44& mat) {
+message::fmat44& operator<< (message::fmat44& proto, const arma::fmat44& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }
-messages::imat22& operator<< (messages::imat22& proto, const arma::imat22& mat) {
+message::imat22& operator<< (message::imat22& proto, const arma::imat22& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::imat33& operator<< (messages::imat33& proto, const arma::imat33& mat) {
+message::imat33& operator<< (message::imat33& proto, const arma::imat33& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::imat44& operator<< (messages::imat44& proto, const arma::imat44& mat) {
+message::imat44& operator<< (message::imat44& proto, const arma::imat44& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }
-messages::umat22& operator<< (messages::umat22& proto, const arma::umat22& mat) {
+message::umat22& operator<< (message::umat22& proto, const arma::umat22& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::umat33& operator<< (messages::umat33& proto, const arma::umat33& mat) {
+message::umat33& operator<< (message::umat33& proto, const arma::umat33& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::umat44& operator<< (messages::umat44& proto, const arma::umat44& mat) {
+message::umat44& operator<< (message::umat44& proto, const arma::umat44& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }
- messages::mat22& operator<< ( messages::mat22& proto,  const arma::mat& mat) {
+ message::mat22& operator<< ( message::mat22& proto,  const arma::mat& mat) {
     return Setter<2>::set_matrix(proto, mat);
  }
- messages::mat33& operator<< ( messages::mat33& proto,  const arma::mat& mat) {
+ message::mat33& operator<< ( message::mat33& proto,  const arma::mat& mat) {
     return Setter<3>::set_matrix(proto, mat);
  }
- messages::mat44& operator<< ( messages::mat44& proto,  const arma::mat& mat) {
+ message::mat44& operator<< ( message::mat44& proto,  const arma::mat& mat) {
     return Setter<4>::set_matrix(proto, mat);
  }
-messages::fmat22& operator<< (messages::fmat22& proto, const arma::fmat& mat) {
+message::fmat22& operator<< (message::fmat22& proto, const arma::fmat& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::fmat33& operator<< (messages::fmat33& proto, const arma::fmat& mat) {
+message::fmat33& operator<< (message::fmat33& proto, const arma::fmat& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::fmat44& operator<< (messages::fmat44& proto, const arma::fmat& mat) {
+message::fmat44& operator<< (message::fmat44& proto, const arma::fmat& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }
-messages::imat22& operator<< (messages::imat22& proto, const arma::imat& mat) {
+message::imat22& operator<< (message::imat22& proto, const arma::imat& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::imat33& operator<< (messages::imat33& proto, const arma::imat& mat) {
+message::imat33& operator<< (message::imat33& proto, const arma::imat& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::imat44& operator<< (messages::imat44& proto, const arma::imat& mat) {
+message::imat44& operator<< (message::imat44& proto, const arma::imat& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }
-messages::umat22& operator<< (messages::umat22& proto, const arma::umat& mat) {
+message::umat22& operator<< (message::umat22& proto, const arma::umat& mat) {
     return Setter<2>::set_matrix(proto, mat);
 }
-messages::umat33& operator<< (messages::umat33& proto, const arma::umat& mat) {
+message::umat33& operator<< (message::umat33& proto, const arma::umat& mat) {
     return Setter<3>::set_matrix(proto, mat);
 }
-messages::umat44& operator<< (messages::umat44& proto, const arma::umat& mat) {
+message::umat44& operator<< (message::umat44& proto, const arma::umat& mat) {
     return Setter<4>::set_matrix(proto, mat);
 }

@@ -1,2 +1,0 @@
-//hint.cpp
-int x;
