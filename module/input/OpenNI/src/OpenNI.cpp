@@ -26,17 +26,31 @@ namespace input {
     OpenNI::OpenNI(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment))
     {
-    	//Startup
-    	auto nRetVal = xnContext.Init();
-		CHECK_RC(nRetVal, "Init");
-		nRetVal = xnContext.OpenFileRecording(".oni", xnPlayer);
-		// CHECK_RC(nRetVal, "Load file");
-		log("main loop running");
+
+    	on<Startup>().then("OpenNI Start",[this](){
+	    	//Startup
+	    	auto nRetVal = xnContext.Init();
+			CHECK_RC(nRetVal, "Init");
+			nRetVal = xnContext.OpenFileRecording(".oni", xnPlayer);
+			// CHECK_RC(nRetVal, "Load file");
+
+			log("OpenNI Initialised");
+
+    	});
 
 		on<Every<30, Per<std::chrono::seconds>>>().then("OpenNI Read loop",[this](){
 			log("main loop running");
 		});
     }
+    
+    OpenNI::~OpenNI(){
+    	xnContext.Release();
+		xnScriptNode.Release();
+		xnDepthGenerator.Release();
+		xnUserGenerator.Release();
+		xnPlayer.Release();
+    }
+
 
 	XnStatus OpenNI::CHECK_RC(XnStatus nRetVal, std::string what){
 		if (nRetVal != XN_STATUS_OK)

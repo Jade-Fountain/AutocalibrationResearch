@@ -42,6 +42,7 @@ namespace input {
     public:
         /// @brief Called by the powerplant to build and setup the OpenNI reactor.
         explicit OpenNI(std::unique_ptr<NUClear::Environment> environment);
+        ~OpenNI();
     };
 
 }
