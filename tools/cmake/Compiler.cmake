@@ -18,7 +18,7 @@ set(CMAKE_MACOSX_RPATH 1)
 
 # Common C++ Flags
 # Enable c++11
-SET(COMMON_CXX_FLAGS "${COMMON_CXX_FLAGS} -std=c++11")
+SET(COMMON_CXX_FLAGS "${COMMON_CXX_FLAGS} -std=c++14")
 
 #64 bit for osx
 set(CMAKE_OSX_ARCHITECTURES "x86_64")

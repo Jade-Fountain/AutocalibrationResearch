@@ -84,8 +84,8 @@ namespace support {
 					bool success = true;
 
 					// std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveZhuang1994(samplesA , samplesB, success);
-					// std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveKronecker_Shah2013(samplesA , samplesB, success);
-					std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveClosedForm_Dornaika1998(samplesA , samplesB, success);
+					std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveKronecker_Shah2013(samplesA , samplesB, success);
+					// std::pair<Transform3D, Transform3D> result = autocal::CalibrationTools::solveClosedForm_Dornaika1998(samplesA , samplesB, success);
 
 					auto measuredX = result.first;
 					auto measuredY = result.second;
@@ -154,8 +154,9 @@ namespace support {
 					}
 				}
 			} 
-			else if(config["calibration_process_id"].as<int>() == 1)
+			else if(config["calibration_process_id"].as<int>() == 2)
 			{
+				//TODO: Implement
 				for(int j = 0; j < config["number_of_trials"].as<int>(); j++){	
 
 				}

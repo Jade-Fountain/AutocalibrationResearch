@@ -27,13 +27,13 @@ endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 #add a hint so that it can find it without the pkg-config
 find_path(OPENNI_INCLUDE_DIR XnStatus.h
-    HINTS ${PC_OPENNI_INCLUDEDIR} ${PC_OPENNI_INCLUDE_DIRS} /usr/include/ni /usr/include/openni
+    HINTS ${PC_OPENNI_INCLUDEDIR} ${PC_OPENNI_INCLUDE_DIRS} /usr/include/ni /usr/include/openni /usr/local/include/ni /usr/local/include/openni 
     "${PROGRAMFILES_}/OpenNI/Include"
     PATH_SUFFIXES openni)
 #add a hint so that it can find it without the pkg-config
 find_library(OPENNI_LIBRARY 
     NAMES OpenNI64 OpenNI
-    HINTS ${PC_OPENNI_LIBDIR} ${PC_OPENNI_LIBRARY_DIRS} /usr/lib "${PROGRAMFILES_}/OpenNI/Lib${OPENNI_SUFFIX}")
+    HINTS ${PC_OPENNI_LIBDIR} ${PC_OPENNI_LIBRARY_DIRS} /usr/lib /usr/local/lib "${PROGRAMFILES_}/OpenNI/Lib${OPENNI_SUFFIX}")
 
 set(OPENNI_INCLUDE_DIRS ${OPENNI_INCLUDE_DIR})
 set(OPENNI_LIBRARIES ${OPENNI_LIBRARY})
