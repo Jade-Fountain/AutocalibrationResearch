@@ -45,7 +45,7 @@ namespace psmove {
 		Tracker psmoveTracker;
 		
 		//Window object to draw to
-		sf::Window window;
+		std::unique_ptr<sf::Window> window;
 		
 		//Video output properties
 		float fps;

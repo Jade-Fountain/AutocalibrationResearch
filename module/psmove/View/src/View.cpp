@@ -49,9 +49,9 @@ namespace psmove {
 	}
 
     View::View(std::unique_ptr<NUClear::Environment> environment)
-    : Reactor(std::move(environment)), window(sf::VideoMode(640*2, 480*2), "OpenGL", sf::Style::Default, sf::ContextSettings(32)) {
+    : Reactor(std::move(environment)) {
 
-        on<Configuration>("View.yaml").then([this] (const Configuration& config) {
+        on<Configuration>("View.yaml").then("Config",[this] (const Configuration& config) {
             // Use configuration here from file View.yaml
         	width = config["width"].as<int>();
 		    height = config["height"].as<int>();
@@ -59,9 +59,9 @@ namespace psmove {
 	    	frame_duration = 1.0 / fps;
         });
 
-        on<Startup>().then([this]{
-
-	        window.setActive(true);
+        on<Startup>().then("Startup",[this]{
+			window = std::make_unique<sf::Window>(sf::VideoMode(640*2, 480*2), "OpenGL");
+	        window->setActive(true);
 
 		    //GLEW
 		    bool success = setUpOpenGL();
@@ -78,7 +78,7 @@ namespace psmove {
         });
 
 		   //Main Loop  
-        on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
+        on<Every<60,Per<std::chrono::seconds>>, Single>().then("Tracking/Render Loop",[this]{
 	        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
 	        // std::cout << "Frame time = " << frame_time_since_start << std::endl;
@@ -89,7 +89,7 @@ namespace psmove {
 	            return;
 	        }
 
-	        window.setActive(true);
+	        window->setActive(true);
 
 	        // // Clear color buffer  
 	        glClear(GL_COLOR_BUFFER_BIT);
@@ -101,10 +101,10 @@ namespace psmove {
 	        drawCrossHair();
 
 	        //Get interaction
-	        handleInput(window, frame_time_since_start);
+	        handleInput(*window, frame_time_since_start);
 	        
 	        //Display what we have drawn
-	        window.display();
+	        window->display();
 
 	        //Shutdown if necessary
 	        if(!running){

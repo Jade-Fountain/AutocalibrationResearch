@@ -32,7 +32,7 @@ namespace input {
 	    	auto nRetVal = xnContext.Init();
 			CHECK_RC(nRetVal, "Init");
 			nRetVal = xnContext.OpenFileRecording(".oni", xnPlayer);
-			// CHECK_RC(nRetVal, "Load file");
+			CHECK_RC(nRetVal, "Load file");
 
 			log("OpenNI Initialised");
 

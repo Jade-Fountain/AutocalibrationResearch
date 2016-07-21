@@ -27,8 +27,13 @@ Tracker::Tracker()
     //         printf("Unknown connection type.\n");
     //         break;
     // }
+    std::cout << "PSMOVE : Initialising Tracker..." << std::endl;
     m_tracker = psmove_tracker_new();
+    std::cout << "PSMOVE : Tracker Initialised" << std::endl;
+    
+    std::cout << "PSMOVE : Initialising Fusion..." << std::endl;
     m_fusion = psmove_fusion_new(m_tracker, 1., 1000.);
+    std::cout << "PSMOVE : Fusion Initialised" << std::endl;
 
     psmove_tracker_set_mirror(m_tracker, PSMove_False);
     psmove_tracker_set_exposure(m_tracker, Exposure_HIGH);
@@ -36,6 +41,7 @@ Tracker::Tracker()
     m_moves = (PSMove**)calloc(m_count, sizeof(PSMove*));
     m_items = (int*)calloc(m_count, sizeof(int));
     for (int i=0; i<m_count; i++) {
+        std::cout << "PSMOVE : Initialising Controller " << i << "..." << std::endl;
         m_moves[i] = psmove_connect_by_id(i);
         m_items[i] = WIRE_CUBE;
 
@@ -43,10 +49,12 @@ Tracker::Tracker()
         assert(psmove_has_orientation(m_moves[i]));
 
         
+        std::cout << "PSMOVE : Calibrating Controller " << i << "..." << std::endl;
         while (psmove_tracker_enable(m_tracker, m_moves[i]) != Tracker_CALIBRATED);
+        std::cout << "PSMOVE : Controller Calibrated " << i << "..." << std::endl;
     }
     // psmove_tracker_set_dimming(m_tracker,1);
-
+    std::cout << "PSMOVE INITIALISED" << std::endl;
 }
 
 Tracker::~Tracker()
