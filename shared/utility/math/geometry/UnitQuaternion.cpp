@@ -29,103 +29,48 @@ namespace geometry {
     UnitQuaternion::UnitQuaternion() {
         real() = 1;
         imaginary().zeros();
-        // rectify();
     }
 
-    UnitQuaternion::UnitQuaternion(const Rotation3D& a) {
-        // real() = std::sqrt(1.0 + rotation(0,0) + rotation(1,1) + rotation(2,2)) / 2;
-        // double w4 = 4.0 * real();
-        // imaginary() = arma::vec3({
-        //     (rotation(2,1) - rotation(1,2)) / w4,
-        //     (rotation(0,2) - rotation(2,0)) / w4,
-        //     (rotation(1,0) - rotation(0,1)) / w4
-        // });
-
-        // //Code from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-        // float trace = a(0,0) + a(1,1) + a(2,2); // I removed + 1.0f; see discussion with Ethan
-        // if( trace > 0 ) {// I changed M_EPSILON to 0
-        //     float s = 0.5f / sqrtf(trace+ 1.0f);
-        //     kW() = 0.25f / s;
-        //     kX() = ( a(2,1) - a(1,2) ) * s;
-        //     kY() = ( a(0,2) - a(2,0) ) * s;
-        //     kZ() = ( a(1,0) - a(0,1) ) * s;
-        // } else {
-        //     if ( a(0,0) > a(1,1) && a(0,0) > a(2,2) ) {
-        //         float s = 2.0f * sqrtf( 1.0f + a(0,0) - a(1,1) - a(2,2));
-        //         kW() = (a(2,1) - a(1,2) ) / s;
-        //         kX() = 0.25f * s;
-        //         kY() = (a(0,1) + a(1,0) ) / s;
-        //         kZ() = (a(0,2) + a(2,0) ) / s;
-        //     } else if (a(1,1) > a(2,2)) {
-        //         float s = 2.0f * sqrtf( 1.0f + a(1,1) - a(0,0) - a(2,2));
-        //         kW() = (a(0,2) - a(2,0) ) / s;
-        //         kX() = (a(0,1) + a(1,0) ) / s;
-        //         kY() = 0.25f * s;
-        //         kZ() = (a(1,2) + a(2,1) ) / s;
-        //     } else {
-        //         float s = 2.0f * sqrtf( 1.0f + a(2,2) - a(0,0) - a(1,1) );
-        //         kW() = (a(1,0) - a(0,1) ) / s;
-        //         kX() = (a(0,2) + a(2,0) ) / s;
-        //         kY() = (a(1,2) + a(2,1) ) / s;
-        //         kZ() = 0.25f * s;
-        //     }
-        // }
-
-        //From eigen
-        // This algorithm comes from  "Quaternion Calculus and Fast Animation",
-        // Ken Shoemake, 1987 SIGGRAPH course notes
-        float t = arma::trace(a);
-        if (t > 0)
-        {
-          t = std::sqrt(t + 1.0);
-          kW() = 0.5*t;
-          t = (0.5)/t;
-          kX() = (a(2,1) - a(1,2)) * t;
-          kY() = (a(0,2) - a(2,0)) * t;
-          kZ() = (a(1,0) - a(0,1)) * t;
-        }
-        else
-        {
-          int i = 0;
-          if (a(1,1) > a(0,0))
-            i = 1;
-          if (a(2,2) > a(i,i))
-            i = 2;
-          int j = (i+1)%3;
-          int k = (j+1)%3;
-
-          t = sqrt(a(i,i)-a(j,j)-a(k,k) + (1.0));
-          (*this)[i+1] = (0.5) * t;
-          t = (0.5)/t;
-          kW() = (a(k,j)-a(j,k))*t;
-          (*this)[j+1] = (a(j,i)+a(i,j))*t;
-          (*this)[k+1] = (a(k,i)+a(i,k))*t;
-        }
-
-        // rectify();
-        
-        if(!is_finite()){
-            std::cout << "Quaternion is not finite!" << std::endl;
-        }
+    UnitQuaternion::UnitQuaternion(const Rotation3D& rotation) {
+        real() = std::sqrt(1.0 + rotation(0,0) + rotation(1,1) + rotation(2,2)) / 2;
+        double w4 = 4.0 * real();
+        imaginary() = arma::vec3({
+            (rotation(2,1) - rotation(1,2)) / w4,
+            (rotation(0,2) - rotation(2,0)) / w4,
+            (rotation(1,0) - rotation(0,1)) / w4
+        });
     }
-    
 
     UnitQuaternion::UnitQuaternion(double realPart, const arma::vec3& imaginaryPart) {
         real() = realPart;
         imaginary() = imaginaryPart;
-        // rectify();
     }
 
     UnitQuaternion::UnitQuaternion(const arma::vec3& v) {
         real() = 0;
-    	imaginary() = v;
-        // rectify();
+        imaginary() = v;
     }
 
     UnitQuaternion::UnitQuaternion(const arma::vec3& axis, double angle) {
-    	real() = std::cos(angle / 2.0);
-    	imaginary() = std::sin(angle / 2.0) * arma::normalise(axis);
-        // rectify();
+        real() = std::cos(angle / 2.0);
+        imaginary() = std::sin(angle / 2.0) * arma::normalise(axis);
+    }
+
+   UnitQuaternion::UnitQuaternion(double W, double X, double Y, double Z)
+    {
+        real()      = W;
+        imaginary() = arma::vec3({X, Y, Z});
+    }
+
+    UnitQuaternion::UnitQuaternion(const arma::vec3& vec1, const arma::vec3& vec2)
+    {
+        double norm     = arma::norm(vec1) * arma::norm(vec2);
+        double half_cos = std::sqrt(0.5 + arma::dot(vec1, vec2) / (2.0 * norm));
+
+        real()      = half_cos;
+        imaginary() = arma::cross(vec1, vec2) / (2.0 * half_cos * norm);
+
+        this->normalise();
     }
 
     void UnitQuaternion::rectify(){
@@ -135,29 +80,27 @@ namespace geometry {
     }
 
     UnitQuaternion UnitQuaternion::i() const {
-    	UnitQuaternion qi = *this;
+        UnitQuaternion qi = *this;
         // take the congugate, as it is equal to the inverse when a unit vector
-    	qi.imaginary() *= -1;
-    	return qi;
+        qi.imaginary() *= -1;
+        return qi;
     }
 
     arma::vec3 UnitQuaternion::rotateVector(const arma::vec3& v) const {
-    	UnitQuaternion vRotated = *this * UnitQuaternion(v) * i();
-        return vRotated.imaginary();
+        // Do the math
+        const arma::vec3 t = 2*arma::cross(imaginary(),v);
+        return v + real() * t + arma::cross(imaginary(),t);
     }
 
     arma::vec3 UnitQuaternion::getAxis() const {
-    	double angle = getAngle();
-    	double sinThetaOnTwo = std::sin(angle / 2.0);
-        if(sinThetaOnTwo == 0){
-            return arma::zeros(3);
-        }
-    	return imaginary() / sinThetaOnTwo;
+        double angle = getAngle();
+        double sinThetaOnTwo = std::sin(angle / 2.0);
+        return imaginary() / sinThetaOnTwo;
     }
 
     double UnitQuaternion::getAngle() const {
-        float theta = 2 * utility::math::angle::acos_clamped(real());
-    	return theta;
+        //Max and min prevent nand error, presumably due to computational limitations
+        return 2 * utility::math::angle::acos_clamped(std::fmin(1,std::fmax(real(),-1)));
     }
 
     void UnitQuaternion::setAngle(double angle) {
@@ -239,13 +182,12 @@ namespace geometry {
         return kW() * kW() + kX() * kX() + kY() * kY() + kZ() * kZ();
     }
 
-
     UnitQuaternion UnitQuaternion::operator - (const UnitQuaternion& p) const {
         return *this * p.i();
     }
 
-	UnitQuaternion UnitQuaternion::operator * (const UnitQuaternion& p) const {
-		//From http://en.wikipedia.org/wiki/Quaternion#Quaternions_and_the_geometry_of_R3
+    UnitQuaternion UnitQuaternion::operator * (const UnitQuaternion& p) const {
+        //From http://en.wikipedia.org/wiki/Quaternion#Quaternions_and_the_geometry_of_R3
         double realPart = real() * p.real() - arma::dot(imaginary(), p.imaginary());
 
         arma::vec3 imaginaryPart = arma::cross(imaginary(), p.imaginary())
@@ -253,7 +195,7 @@ namespace geometry {
                                  +   real() * p.imaginary();
 
         return UnitQuaternion(realPart, imaginaryPart);
-	}
+    }
 
     UnitQuaternion UnitQuaternion::slerp(const UnitQuaternion& p, const double& t) {
         // See http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/

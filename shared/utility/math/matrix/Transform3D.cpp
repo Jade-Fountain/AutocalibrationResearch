@@ -19,7 +19,6 @@
 
 #include "Transform3D.h"
 
-
 namespace utility {
 namespace math {
 namespace matrix {
@@ -133,6 +132,7 @@ namespace matrix {
         // Transpose the rotation submatrix (top-left 3x3), this is equivalent to taking the inverse of the rotation matrix
         inverseTransform3D.submat(0,0,2,2) = submat(0,0,2,2).t();
         // Multiply translation vector (top-right column vector) by the negated inverse rotation matrix
+
         inverseTransform3D.submat(0,3,2,3) = -inverseTransform3D.submat(0,0,2,2) * submat(0,3,2,3);
         /*if (arma::norm(inverseTransform3D * (*this) - arma::eye(4,4)) > 1e-10){
             NUClear::log<NUClear::WARN>("Inverse failed! Matrix is singular");
@@ -182,7 +182,6 @@ namespace matrix {
         return Transform3D(R, displacement);
     }
 
-
     Transform3D Transform3D::createTranslation(const arma::vec3& translation) {
         Transform3D transform;
         transform.col(3).rows(0,2) = translation;
@@ -229,6 +228,33 @@ namespace matrix {
         TResult.translation() = tResult;
 
         return TResult;
+    }
+
+
+    Transform2D Transform3D::projectTo2D(const arma::vec3& yawAxis, const arma::vec3& forwardAxis) const{
+        Transform2D result;
+
+        //Translation
+        arma::vec3 orthoForwardAxis = arma::normalise(arma::cross(yawAxis,arma::cross(forwardAxis,yawAxis)));
+        arma::vec3 r = translation();
+        Rotation3D newSpaceToWorld;
+        newSpaceToWorld.x() = orthoForwardAxis;
+        newSpaceToWorld.y() = arma::cross(yawAxis,orthoForwardAxis);
+        newSpaceToWorld.z() = yawAxis;
+        Rotation3D worldToNewSpace = newSpaceToWorld.i();
+        arma::vec3 rNewSpace =  worldToNewSpace * r;
+        result.xy() = rNewSpace.rows(0,1);
+        
+        //Rotation
+        Rotation3D rot = rotation();
+        arma::vec3 x = rot.x();
+        arma::vec3 xNew = worldToNewSpace * x; 
+        float theta_x_from_f = std::atan2(xNew[1],xNew[0]);//sin/cos
+        result.angle() = theta_x_from_f; 
+
+        // std::cerr << "in = \n" << *this << std::endl;
+        // std::cerr << "out = \n" << result << std::endl;
+        return result;
     }
 
 }

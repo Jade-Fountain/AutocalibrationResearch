@@ -1,18 +1,18 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
@@ -34,8 +34,8 @@ namespace geometry {
         Vector direction;
         Vector point;
         arma::vec2 tLimits = {-std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-        ParametricLine(){}
-        ParametricLine(const Vector& p1, const Vector& p2, bool segment = false) {
+        ParametricLine() : direction(arma::fill::zeros), point(arma::fill::zeros) {}
+        ParametricLine(const Vector& p1, const Vector& p2, bool segment = false) : direction(arma::fill::zeros), point(arma::fill::zeros) {
             setFromTwoPoints(p1, p2, segment);
         };
 
@@ -79,7 +79,8 @@ namespace geometry {
         }
 
         double distanceToPoint(const Vector& p) const {
-            return arma::norm(vectorToLine(p));
+            //TODO: optimise
+            return arma::norm(vectorToLineFromPoint(p));
         }
 
         Vector intersect(const ParametricLine<n>& l) const{

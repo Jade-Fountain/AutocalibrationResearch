@@ -19,7 +19,6 @@
 
 #include "Transform2D.h"
 
-
 #include "utility/math/angle.h"
 
 namespace utility {
@@ -73,6 +72,12 @@ namespace matrix {
         result.angle() = normalizeAngle(result.angle());
         return result;
     }
+
+    Transform2D Transform2D::i() const {
+        arma::vec2 newDisplacement = -worldToLocal(*this).xy();
+        return Transform2D(newDisplacement,-this->angle());
+    } 
+
 
 }
 }

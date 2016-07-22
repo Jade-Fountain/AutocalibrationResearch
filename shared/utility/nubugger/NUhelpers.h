@@ -1,18 +1,18 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
@@ -24,7 +24,7 @@
 #include <armadillo>
 #include "message/support/nubugger/proto/DataPoint.pb.h"
 #include "message/support/nubugger/proto/DrawObjects.pb.h"
-#include "message/vision/proto/VisionObject.pb.h"
+#include "message/vision/proto/VisionObjects.pb.h"
 #include "utility/math/matrix/Rotation3D.h"
 #include "utility/math/geometry/RotatedRectangle.h"
 #include "utility/math/geometry/Circle.h"
@@ -34,6 +34,7 @@
 namespace utility {
 namespace nubugger {
     using utility::math::geometry::RotatedRectangle;
+    
     using utility::math::geometry::Circle;
     using utility::math::matrix::Transform2D;
     using message::support::nubugger::proto::DrawObjects;

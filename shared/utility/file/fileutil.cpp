@@ -1,18 +1,18 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
@@ -27,6 +27,8 @@ extern "C" {
 #include <sstream>
 #include <system_error>
 #include <stack>
+
+#include "utility/strutil/strutil.h"
 
 namespace utility {
 namespace file {
@@ -45,6 +47,19 @@ namespace file {
         // Shamelessly stolen from: http://stackoverflow.com/a/12774387/1387006
         struct stat buffer;
         return (stat (path.c_str(), &buffer) == 0);
+    }
+
+    std::chrono::system_clock::time_point getModificationTime(const std::string& path) {
+        int status;
+        struct stat st_buf;
+
+        // Get the status of the file system object.
+        status = stat(path.c_str(), &st_buf);
+        if (status != 0) {
+            throw std::system_error(errno, std::system_category(), "Error checking if path is file or directory");
+        }
+
+        return(std::chrono::system_clock::from_time_t(st_buf.st_mtime));
     }
 
     // Test if a passed path is a directory
@@ -97,7 +112,7 @@ namespace file {
 
     std::pair<std::string, std::string> pathSplit(const std::string& input) {
 
-        uint lastSlash = input.rfind('/');
+        size_t lastSlash = input.rfind('/');
 
         // There was no slash
         if(lastSlash == std::string::npos) {
@@ -151,6 +166,49 @@ namespace file {
         }
         // return the list of files
         return files;
+    }
+
+    bool makeDirectory(const std::string& directory, bool parent)
+    {
+        std::vector<std::string> elements;
+
+        // Get elements of the path to create.
+        if (parent == true)
+        {
+            elements = utility::strutil::split(directory, '/');
+        }
+
+        else
+        {
+            elements.push_back(directory);
+        }
+
+        std::string path;
+
+        // Traverse all elements of the path.
+        for (const auto& element : elements)
+        {
+            // Append the next path element. Add a / if the front of the element is missing it.
+            path.append(((element.front() != '/') ? "/" : "") + element);
+
+            // If the current path doesn't exist, create it.
+            if (isDir(path) == false)
+            {
+                // Create the current path element with the following permissions.
+                // U = RWX
+                // G = R_X
+                // O = R_X
+                auto status = mkdir(path.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+
+                // If we fail at any point then bail out.
+                if (status != 0)
+                {
+                    return(false);
+                }
+            }
+        }
+
+        return(true);
     }
 }
 }

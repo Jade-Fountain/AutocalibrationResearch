@@ -1,18 +1,18 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
@@ -73,6 +73,37 @@ namespace YAML {
             else {
                 return false;
             }
+        }
+    };
+
+    template<>
+    struct convert<arma::mat> {
+        // TODO: use arma::vec decoding for each row?
+        static Node encode(const arma::mat& rhs) {
+            Node node;
+
+            for (uint i = 0; i < rhs.n_rows; ++i) {
+                Node row;
+                for (uint j = 0; j < rhs.n_cols; ++j) {
+                    row.push_back(rhs(i,j));
+                }
+                node.push_back(row);
+            }
+
+            return node;
+        }
+
+        static bool decode(const Node& node, arma::mat& rhs) {
+
+            rhs.resize(node.size(), node[0].size());
+
+            for (uint i = 0; i < node.size(); ++i) {
+                for (uint j = 0; j < node[i].size(); ++j) {
+                    rhs(i,j) = node[i][j].as<utility::support::Expression>();
+                }
+            }
+
+            return true;
         }
     };
 

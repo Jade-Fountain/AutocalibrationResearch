@@ -47,6 +47,10 @@ namespace geometry {
 
             UnitQuaternion(const matrix::Rotation3D& rotation);
 
+            UnitQuaternion(double W, double X, double Y, double Z);
+
+            UnitQuaternion(const arma::vec3& vec1, const arma::vec3& vec2);
+
             UnitQuaternion operator - (const UnitQuaternion& p) const;
 
             UnitQuaternion operator * (const UnitQuaternion& p) const;
@@ -113,8 +117,7 @@ namespace geometry {
             inline arma::subview_col<double> imaginary() { return rows(1,3); }
 
             UnitQuaternion slerp(const UnitQuaternion& p, const double& t);
-
-
+            static inline UnitQuaternion Identity() { return(arma::vec4({1.0, 0.0, 0.0, 0.0})); }
     };
 
 }

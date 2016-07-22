@@ -89,6 +89,8 @@ namespace matrix {
              */
             Transform2D interpolate(double t, const Transform2D& target) const;
 
+            Transform2D i() const;
+
             inline double x() const { return at(0); }
             inline double& x() { return at(0); }
 

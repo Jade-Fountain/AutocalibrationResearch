@@ -22,8 +22,8 @@
 
 #include <armadillo>
 
-#include "utility/math/matrix/Transform2D.h"
 #include "utility/math/matrix/Rotation3D.h"
+#include "utility/math/matrix/Transform2D.h"
 #include "utility/math/geometry/UnitQuaternion.h"
 
 namespace utility {
@@ -69,6 +69,7 @@ namespace matrix {
             /**
              * @brief Convert from a Rotation3D matrix
              */
+
             Transform(const Rotation3D& rotation); 
 
             /**
@@ -218,6 +219,7 @@ namespace matrix {
             static Transform3D getRandomU(float max_angle, float max_displacement);
             static Transform3D getRandomN(float stddev_angle, float stddev_disp);
 
+
             /**
              * @brief Creates a translation transform by the given 3D vector
              *
@@ -260,6 +262,11 @@ namespace matrix {
              */
             static Transform3D interpolate(Transform3D T1, Transform3D T2, float alpha);
 
+            /**
+             * @brief Construct transform from a transform 3D assuming the angle is around the yawAxis 
+             * and the translation is projected onto the plane normal to yawAxis
+             */
+            Transform2D projectTo2D(const arma::vec3& yawAxis, const arma::vec3& forwardAxis) const;
 
     };
 

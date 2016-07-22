@@ -22,6 +22,10 @@
 #include "utility/math/comparison.h"
 #include "utility/math/angle.h"
 
+<<<<<<< HEAD
+=======
+#include <nuclear>
+>>>>>>> 7c474e175b5189477d0b6d512f35f7077a3ce36b
 
 namespace utility {
 namespace math {
@@ -38,7 +42,6 @@ namespace matrix {
         *this = m.submat(0,0,2,2);
         *this = this->orthogonalise();
     }
-
 
     Rotation3D::Rotation(const UnitQuaternion& q) {
         // quaternion to rotation conversion
@@ -78,7 +81,6 @@ namespace matrix {
         R.y() = arma::cross(R.z(),R.x());
         return R;
     }
-
 
     Rotation3D Rotation3D::rotateX(double radians) const {
         return *this * createRotationX(radians);
@@ -185,9 +187,31 @@ namespace matrix {
         return rotation;
     }
 
+    Rotation3D Rotation3D::createRotationXJacobian(double radians) {
+        double c = -sin(radians);
+        double s = cos(radians);
+        Rotation rotation;
+        // http://en.wikipedia.org/wiki/Rotation_matrix#Basic_rotations
+        rotation << 1 << 0 <<  0 << arma::endr
+                 << 0 << c << -s << arma::endr
+                 << 0 << s <<  c;
+        return rotation;
+    }
+
     Rotation3D Rotation3D::createRotationY(double radians) {
         double c = cos(radians);
         double s = sin(radians);
+        Rotation rotation;
+        // http://en.wikipedia.org/wiki/Rotation_matrix#Basic_rotations
+        rotation <<  c << 0 << s << arma::endr
+                 <<  0 << 1 << 0 << arma::endr
+                 << -s << 0 << c;
+        return rotation;
+    }
+
+    Rotation3D Rotation3D::createRotationYJacobian(double radians) {
+        double c = -sin(radians);
+        double s = cos(radians);
         Rotation rotation;
         // http://en.wikipedia.org/wiki/Rotation_matrix#Basic_rotations
         rotation <<  c << 0 << s << arma::endr
@@ -205,6 +229,25 @@ namespace matrix {
                  << s <<  c << 0 << arma::endr
                  << 0 <<  0 << 1;
         return rotation;
+    }
+
+    Rotation3D Rotation3D::createRotationZJacobian(double radians) {
+        double c = -sin(radians);
+        double s = cos(radians);
+        Rotation rotation;
+        // http://en.wikipedia.org/wiki/Rotation_matrix#Basic_rotations
+        rotation << c << -s << 0 << arma::endr
+                 << s <<  c << 0 << arma::endr
+                 << 0 <<  0 << 1;
+        return rotation;
+    }
+
+
+    Rotation3D Rotation3D::createFromEulerAngles(const arma::vec3& a){
+        // double roll = a[0];
+        // double pitch = a[1];
+        // double yaw = a[2];
+        return Rotation3D::createRotationZ(a[2]) * Rotation3D::createRotationY(a[1]) * Rotation3D::createRotationX(a[0]); 
     }
 
 }

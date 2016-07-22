@@ -1,18 +1,18 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
@@ -25,9 +25,13 @@
 #include "message/localisation/FieldObject.h"
 #include "message/input/Sensors.h"
 #include "utility/math/matrix/Transform3D.h"
+#include "utility/math/matrix/Transform2D.h"
 #include "utility/math/geometry/Plane.h"
 #include "utility/math/geometry/ParametricLine.h"
 #include "utility/math/angle.h"
+#include "message/vision/VisionObjects.h"
+#include "message/support/FieldDescription.h"
+
 
 namespace utility {
 namespace math {
@@ -48,7 +52,7 @@ namespace vision {
 
         arma::mat cameraToBody_body = sensors.forwardKinematics.at(message::input::ServoID::HEAD_PITCH);
         arma::mat robotToBody_body = arma::eye(4,4);
-        robotToBody_body.submat(0,0,2,2) = sensors.orientation;
+        robotToBody_body.submat(0,0,2,2) = sensors.world.rotation();
 
         auto worldToCamera_camera = cameraToBody_body.i() * robotToBody_body * robotToWorld_world.i();
         //Confirmed to be correct by Jake Fountain 2014
@@ -90,11 +94,11 @@ namespace vision {
         return utility::math::angle::acos_clamped(arma::dot(camSpaceP1,camSpaceP2) / (arma::norm(camSpaceP1) * arma::norm(camSpaceP2)));
     }
 
-    inline double widthBasedDistanceToCircle(const double& circleDiameter, const arma::vec2& s1, const arma::vec2& s2, const double& camFocalLengthPixels){
+    inline double widthBasedDistanceToCircle(const double& radius, const arma::vec2& s1, const arma::vec2& s2, const double& camFocalLengthPixels){
         double parallaxAngle = getParallaxAngle(s1, s2, camFocalLengthPixels);
-        double correctionForClosenessEffect = 0.5 * circleDiameter * std::cos((M_PI - parallaxAngle) / 2.0);
+        double correctionForClosenessEffect = radius * std::sin(parallaxAngle / 2.0);
 
-        return (circleDiameter / 2) / std::tan(parallaxAngle / 2) + correctionForClosenessEffect;
+        return radius / std::tan(parallaxAngle / 2.0) + correctionForClosenessEffect;
     }
 
     /*! @param separation - Known distance between points in camera space
@@ -194,13 +198,138 @@ namespace vision {
         //Assume facing forward st x>0 (which is fine for screen angular)
         x = 1 / std::sqrt(denominator_sqr);
         y = x * tanTheta;
-        z = x * tanPhi;        
+        z = x * tanPhi;
 
         return {x,y,z};
     }
 
     inline arma::vec screenAngularFromObjectDirection(const arma::vec& v){
         return {std::atan2(v[1],v[0]),std::atan2(v[2],v[0])};
+    }
+
+    inline utility::math::matrix::Transform3D getFieldToCam (
+                    const utility::math::matrix::Transform2D& Tft,
+                    //f = field
+                    //t = torso
+                    //c = camera
+                    const utility::math::matrix::Transform3D& Htc
+
+                ) {
+
+        // arma::vec3 rWFf;
+        // rWFf.rows(0,1) = -Twf.rows(0,1);
+        // rWFf[2] = 0.0;
+        // // Hwf = rWFw * Rwf
+        // utility::math::matrix::Transform3D Hwf = 
+        //     utility::math::matrix::Transform3D::createRotationZ(-Twf[2])
+        //     * utility::math::matrix::Transform3D::createTranslation(rWFf);
+
+        utility::math::matrix::Transform3D Htf = utility::math::matrix::Transform3D(Tft).i();
+
+        return Htc.i() * Htf;
+    }
+
+    inline arma::mat::fixed<3,4> cameraSpaceGoalProjection(
+            const arma::vec3& robotPose,
+            const arma::vec3& goalLocation,
+            const message::support::FieldDescription& field, 
+            const utility::math::matrix::Transform3D& camToGround,
+            const bool& failIfNegative = true) //camtoground is either camera to ground or camera to world, depending on application
+    {
+        using message::input::ServoID;
+        using message::vision::Goal;
+
+        utility::math::matrix::Transform3D Hcf = getFieldToCam(robotPose,camToGround);
+        //NOTE: this code assumes that goalposts are boxes with width and high of goalpost_diameter
+        //make the base goal corners
+        arma::mat goalBaseCorners(4,4);
+        goalBaseCorners.row(3).fill(1.0);
+        goalBaseCorners.submat(0,0,2,3).each_col() = goalLocation;
+        goalBaseCorners.submat(0,0,1,3) -= 0.5*field.dimensions.goalpost_diameter;
+        goalBaseCorners.submat(0,0,1,0) += field.dimensions.goalpost_diameter;
+        goalBaseCorners.submat(1,1,2,1) += field.dimensions.goalpost_diameter;
+        //make the top corner points
+        arma::mat goalTopCorners = goalBaseCorners;
+        
+
+        //We create camera world by using camera-torso -> torso-world -> world->field
+        //transform the goals from field to camera
+        goalBaseCorners = arma::mat(Hcf * goalBaseCorners).rows(0,2);
+
+        
+
+        //if the goals are not in front of us, do not return valid normals
+        arma::mat::fixed<3,4> prediction;
+        if (failIfNegative and arma::any(goalBaseCorners.row(0) < 0.0)) {
+            prediction.fill(0);
+            return prediction;
+        }
+
+        goalTopCorners.row(2).fill(field.goalpost_top_height);
+        goalTopCorners = arma::mat(Hcf * goalTopCorners).rows(0,2);
+
+        //Select the (tl, tr, bl, br) corner points for normals
+        arma::ivec4 cornerIndices;
+        cornerIndices.fill(0);
+
+
+        arma::vec pvals = goalBaseCorners.t() * arma::cross(goalBaseCorners.col(0), goalTopCorners.col(0));
+        arma::uvec baseIndices = arma::sort_index(pvals);
+        cornerIndices[2] = baseIndices[0];
+        cornerIndices[3] = baseIndices[3];
+
+
+        pvals = goalTopCorners.t() * arma::cross(goalBaseCorners.col(0), goalTopCorners.col(0));
+        arma::uvec topIndices = arma::sort_index(pvals);
+        cornerIndices[0] = topIndices[0];
+        cornerIndices[1] = topIndices[3];
+
+
+        //Create the quad normal predictions. Order is Left, Right, Top, Bottom
+        
+        prediction.col(0) = arma::normalise(
+                                    arma::cross(
+                                        goalBaseCorners.col(cornerIndices[2]),
+                                        goalTopCorners.col(cornerIndices[0])
+                                        )
+                                );
+        prediction.col(1) = arma::normalise(
+                                    arma::cross(
+                                        goalBaseCorners.col(cornerIndices[1]),
+                                        goalTopCorners.col(cornerIndices[3])
+                                        )
+                                );
+
+        //for the top and bottom, we check the inner lines in case they are a better match (this stabilizes observations and reflects real world)
+        if (goalBaseCorners(2,baseIndices[0]) > goalBaseCorners(2,baseIndices[1])) {
+            cornerIndices[2] = baseIndices[1];
+        }
+        if (goalBaseCorners(2,baseIndices[3]) > goalBaseCorners(2,baseIndices[2])) {
+            cornerIndices[3] = baseIndices[2];
+        }
+        if (goalTopCorners(2,topIndices[0]) > goalTopCorners(2,topIndices[1])) {
+            cornerIndices[0] = topIndices[1];
+        }
+        if (goalTopCorners(2,topIndices[3]) > goalTopCorners(2,topIndices[2])) {
+            cornerIndices[1] = topIndices[2];
+        }
+
+
+        prediction.col(2) = arma::normalise(
+                                    arma::cross(
+                                        goalTopCorners.col(cornerIndices[0]),
+                                        goalTopCorners.col(cornerIndices[1])
+                                        )
+                                );
+        prediction.col(3) = arma::normalise(
+                                    arma::cross(
+                                        goalBaseCorners.col(cornerIndices[3]),
+                                        goalBaseCorners.col(cornerIndices[2])
+                                        )
+                                );
+
+        return prediction;
+
     }
 
 

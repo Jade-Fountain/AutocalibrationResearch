@@ -1,18 +1,18 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
@@ -24,6 +24,7 @@
 #include <array>
 #include <vector>
 #include <fstream>
+#include <chrono>
 
 namespace utility {
     /**
@@ -45,6 +46,8 @@ namespace utility {
         }
 
         bool exists(const std::string& path);
+
+        std::chrono::system_clock::time_point getModificationTime(const std::string& path);
 
         bool isDir(const std::string& path);
 
@@ -71,6 +74,8 @@ namespace utility {
          * @return The list of file paths within a specified directory.
          */
         std::vector<std::string> listFiles(const std::string& directory, bool recursive = false);
+
+        bool makeDirectory(const std::string& directory, bool parent = false);
     }
 }
 #endif
