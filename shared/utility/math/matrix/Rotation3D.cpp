@@ -22,10 +22,6 @@
 #include "utility/math/comparison.h"
 #include "utility/math/angle.h"
 
-<<<<<<< HEAD
-=======
-#include <nuclear>
->>>>>>> 7c474e175b5189477d0b6d512f35f7077a3ce36b
 
 namespace utility {
 namespace math {
