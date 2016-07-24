@@ -23,12 +23,23 @@ INCLUDE_DIRECTORIES(${NUCLEAR_UTILITY_INCLUDE_DIRS})
 #         "${NUCLEAR_UTILITY_DIR}/**.h"
 # )
 
+# Get the relative path to our utility directory
+GET_FILENAME_COMPONENT(utility_path "${NUCLEAR_UTILITY_DIR}" ABSOLUTE)
+FILE(RELATIVE_PATH utility_rel_path ${CMAKE_SOURCE_DIR} ${utility_path})
 
+#Set bin directory to mirror source directory
+UNSET(NUCLEAR_UTILITY_LIBRARIES CACHE)
+
+
+SET(NUCLEAR_UTILITY_LIBRARIES ${NUCLEAR_UTILITY_LIBRARIES} mylibrary INTERNAL CACHE "Library for NUClear utilities" FORCE)
+
+ADD_SUBDIRECTORY(${NUCLEAR_UTILITY_DIR} "${CMAKE_BINARY_DIR}/${utility_rel_path}")
 #Hint to NUtilities where it is. TODO: this is dumb, somehow get rid of the need for this line
-SET(NUTILITIES_DIR ${NUCLEAR_UTILITY_DIR})
+# SET(NUTILITIES_DIR ${NUCLEAR_UTILITY_DIR})
 #Get utility files from NUtilities. Sets NUTILITIES_SRC_FILES
-INCLUDE(${NUCLEAR_UTILITY_DIR}/GetNUtilities.cmake)
+# INCLUDE(${NUCLEAR_UTILITY_DIR}/GetNUtilities.cmake)
 
+MESSAGE("TODO: remov these last lines")
 # Build a library from these files
 ADD_LIBRARY(nuclear_utility utility.cpp ${NUTILITIES_SRC_FILES})
 

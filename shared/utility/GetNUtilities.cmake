@@ -3,32 +3,15 @@ MESSAGE("** Configuring NUtilities...")
 
 SET(NUTILITIES_SRC_FILES "")
 
-#Get all subdirectories recursively
-MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-  SET(dirlist "")
-  #Check for folders
-  FOREACH(child ${children})
-	IF(IS_DIRECTORY ${curdir}/${child})
-		message("Dir ${child} : ${curdir}/${child}")
-		LIST(APPEND dirlist ${child})
-	ENDIF()
-  ENDFOREACH()
-
-  message("dirlist = ${dirlist}")
-  #Do subdirectories
-  SET(subdirlist "")
-  FOREACH(child ${dirlist})
-  	SUBDIRLIST(sub_folders "${curdir}/${child}")
-  	LIST(APPEND subdirlist ${sub_folders})
-  	message("appending ${subdirlist} with ${sub_folders}. current folder ${child}")
-  ENDFOREACH()
-
-  message("subdirlist ${subdirlist}")
-  message("dirlist ${dirlist}")
-  SET(result ${dirlist} ${subdirlist})
-  message("result ${result}")
-ENDMACRO()
+#Experiment
+MACRO(TEST_MACRO var one two three)
+	message(${one})
+	message(${${two}})
+	message(${three})
+	SET(var ${one} ${two})
+ENDMACRO(TEST_MACRO)
+SET(THREE_BS b b b)
+TEST_MACRO(test_result a THREE_BS c)
 
 #Check if a list contains an entry ${value}
 MACRO(LIST_CONTAINS var value)
@@ -39,6 +22,48 @@ MACRO(LIST_CONTAINS var value)
     ENDIF (${value} STREQUAL ${value2})
   ENDFOREACH (value2)
 ENDMACRO(LIST_CONTAINS)
+
+#Get all subdirectories recursively
+MACRO(SELECTIVE_EXPAND result curdir_ref exclude_ref)
+  #Unpack args into new variables
+  SET(curdir ${${curdir_ref}})
+  SET(exclude ${${exclude_ref}})
+
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  
+  #Expand folders
+  FOREACH(child ${children})
+  	#Check item is a directory
+	IF(IS_DIRECTORY ${curdir}/${child})
+		#Check folder is not excluded
+		MESSAGE("TODO: FIX THIS LINE - it doesnt work")
+		LIST_CONTAINS(contains ${child} ${exclude})
+		IF(NOT ${contains})
+			#If not excluded, add to list of valid directories
+			message("Dir ${child} : ${curdir}/${child}")
+			LIST(APPEND dirlist ${child})
+		ENDIF()
+	ENDIF()
+  ENDFOREACH()
+
+  message("dirlist = ${dirlist}")
+  
+  #Expand subdirectories
+  SET(subdirlist "")
+  FOREACH(child ${dirlist})
+  	SET(NEXT_DIR_REF "${curdir}/${child}")
+  	SELECTIVE_EXPAND(sub_folders NEXT_DIR_REF ${exclude_ref})
+  	LIST(APPEND subdirlist ${sub_folders})
+  	message("appending ${subdirlist} with ${sub_folders}. current folder ${child}")
+  ENDFOREACH()
+
+  message("subdirlist ${subdirlist}")
+  message("dirlist ${dirlist}")
+  SET(result ${dirlist} ${subdirlist})
+  message("result ${result}")
+ENDMACRO()
+
 
 #Collect CXX files
 MACRO(GET_CXX_FILES file_list dir)
@@ -109,7 +134,13 @@ IF(INCLUDE_FOLDERS)
 
 #Specify by exclusion
 ELSEIF(EXCLUDE_FOLDERS)
-	SUBDIRLIST(NUTILITIES_FOLDERS ${NUTILITIES_DIR})
+	#Construct Exclude folders
+	SET(EXCLUDE_FOLDERS "")
+	FOREACH(f ${FOLDERS})
+		LIST(APPEND EXCLUDE_FOLDERS "${NUTILITIES_DIR}/${f}")
+	ENDFOREACH()
+	#Selectively expand directory creating a list of folders containing desired
+	SELECTIVE_EXPAND(NUTILITIES_FOLDERS NUTILITIES_DIR EXCLUDE_FOLDERS)
 	FOREACH(dir ${NUTILITIES_FOLDERS})
 		MESSAGE("FINAL DIR : " ${dir})
 	ENDFOREACH()
