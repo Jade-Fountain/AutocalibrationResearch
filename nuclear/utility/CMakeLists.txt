@@ -13,16 +13,6 @@ SET(NUCLEAR_UTILITY_INCLUDE_DIRS
     CACHE INTERNAL "Include directories for the utility folder and generated sources")
 INCLUDE_DIRECTORIES(${NUCLEAR_UTILITY_INCLUDE_DIRS})
 
-# Use a recursive glob to get all c++ files in utility to use
-# FILE(GLOB_RECURSE src
-#         "${NUCLEAR_UTILITY_DIR}/**.cpp"
-#         "${NUCLEAR_UTILITY_DIR}/**.cc"
-#         "${NUCLEAR_UTILITY_DIR}/**.ipp"
-#         "${NUCLEAR_UTILITY_DIR}/**.hpp"
-#         "${NUCLEAR_UTILITY_DIR}/**.c"
-#         "${NUCLEAR_UTILITY_DIR}/**.h"
-# )
-
 # Get the relative path to our utility directory
 GET_FILENAME_COMPONENT(utility_path "${NUCLEAR_UTILITY_DIR}" ABSOLUTE)
 FILE(RELATIVE_PATH utility_rel_path ${CMAKE_SOURCE_DIR} ${utility_path})
