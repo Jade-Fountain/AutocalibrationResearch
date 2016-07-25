@@ -1,5 +1,7 @@
 SET(dependencies 
 	ARMADILLO
+	YAML-CPP
+	muParser
 	)
 
 #Get missing dependencies
