@@ -31,7 +31,6 @@ FILE(RELATIVE_PATH utility_rel_path ${CMAKE_SOURCE_DIR} ${utility_path})
 UNSET(NUCLEAR_UTILITY_LIBRARIES CACHE)
 
 
-SET(NUCLEAR_UTILITY_LIBRARIES ${NUCLEAR_UTILITY_LIBRARIES} mylibrary INTERNAL CACHE "Library for NUClear utilities" FORCE)
 
 ADD_SUBDIRECTORY(${NUCLEAR_UTILITY_DIR} "${CMAKE_BINARY_DIR}/${utility_rel_path}")
 #Hint to NUtilities where it is. TODO: this is dumb, somehow get rid of the need for this line
