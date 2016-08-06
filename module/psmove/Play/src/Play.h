@@ -52,7 +52,7 @@ namespace psmove {
 		float frame_duration;
         bool use_simulation = false;
 
-		sf::Window window;
+		sf::Window* window;
 		// GLFWwindow* window;
 
 		autocal::SensorPlant sensorPlant;
@@ -61,6 +61,7 @@ namespace psmove {
 		int psMoveLatency = -1400;
 		bool paused = false;
 		bool running = true;
+        bool first_iter = true;
 		void handleInput(const sf::Window& w, double time_since_start);
 		
 

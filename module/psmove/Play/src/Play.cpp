@@ -63,7 +63,7 @@ namespace psmove {
         	paused = !paused;
         }
 		// sf::Event event;
-  //       while (window.pollEvent(event))
+  //       while (window->pollEvent(event))
   //       {
   //           if (event.type == sf::Event::Closed)
   //           {
@@ -79,7 +79,7 @@ namespace psmove {
 	}
 
     Play::Play(std::unique_ptr<NUClear::Environment> environment)
-    : Reactor(std::move(environment)),window(sf::VideoMode(640*2, 480*2), "OpenGL", sf::Style::Default, sf::ContextSettings(32)) {
+    : Reactor(std::move(environment)) {
 
         on<Configuration>("Play.yaml").then([this] (const Configuration& config) {
         	psMoveLatency = config["psmove_start_latency"].as<long long int>();
@@ -88,142 +88,146 @@ namespace psmove {
 			video_filename = config["video_filename"].as<std::string>();
 
 		    use_simulation = config["use_simulation"].as<bool>();
+		    log("Play - Configuration Complete");
 
         });
+        
+        on<Always, Single>().then([this]{
+	        if(first_iter){
+	        	window = new sf::Window(sf::VideoMode(640*2, 480*2), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
+	        	//Set window active
+		        window->setActive(true);
 
-        on<Startup>().then([this]{
-        	//Set window active
-	        window.setActive(true);
+		        //Load video file and paramters
+			    std::cout << "Loading video file " << video_filename << std::endl;
+			    video = cvCaptureFromFile(video_filename.c_str());
+			    int fps, width, height;
+			    if(video == NULL){
+			        std::cout << "Video load failed... Exiting" << std::endl;
+			        // return -1;
+			    } else {
+			        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
+			        // fps = 21; 
+			        width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
+			        height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
+			        std::cout << "Video load successful... FPS = " << fps << std::endl;
+			    }
+			    frame_duration = 1.0 / float(fps);
+			    //Start timestamp
+			    std::string timeString = video_filename.substr(0,video_filename.size() - 4); //Remove .avi from filename
+			    videoStartTime = std::stoll(timeString);
+			  
+			  	//Init opengl
+	   		    bool success = setUpOpenGL();
+		  	    if(!success){
+		  	    	std::cout << "OpenGL Setup Failed! Shutting down" << std::endl; 
+				    powerplant.shutdown();
+				}
+				
+			    //Some GL options particular to this role
+			    //enables textures
+			    glEnable(GL_TEXTURE_2D);
+			    GLuint texture;
+			    glGenTextures(1, &texture);
+			    glBindTexture(GL_TEXTURE_2D, texture);
+			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	        //Load video file and paramters
-		    std::cout << "Loading video file " << video_filename << std::endl;
-		    video = cvCaptureFromFile(video_filename.c_str());
-		    int fps, width, height;
-		    if(video == NULL){
-		        std::cout << "Video load failed... Exiting" << std::endl;
-		        // return -1;
-		    } else {
-		        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
-		        // fps = 21; 
-		        width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
-		        height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
-		        std::cout << "Video load successful... FPS = " << fps << std::endl;
-		    }
-		    frame_duration = 1.0 / float(fps);
-		    //Start timestamp
-		    std::string timeString = video_filename.substr(0,video_filename.size() - 4); //Remove .avi from filename
-		    videoStartTime = std::stoll(timeString);
-		  
-		  	//Init opengl
-   		    bool success = setUpOpenGL();
-	  	    if(!success){
-	  	    	std::cout << "OpenGL Setup Failed! Shutting down" << std::endl; 
-			    powerplant.shutdown();
-			}
-			
-		    //Some GL options particular to this role
-		    //enables textures
-		    glEnable(GL_TEXTURE_2D);
-		    GLuint texture;
-		    glGenTextures(1, &texture);
-		    glBindTexture(GL_TEXTURE_2D, texture);
-		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			    //PSmove pose stream
+			    autocal::MocapStream psmoveStream("psmove", true);
 
-		    //PSmove pose stream
-		    autocal::MocapStream psmoveStream("psmove", true);
+			    //Mocap pose stream
+			    autocal::MocapStream optitrackStream("mocap", false, true);
+			    //coordinate system is LH while psmove is RH
+			    std::set<int> mocapAllowedIDs = {1,2};
+			    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), mocapAllowedIDs);
 
-		    //Mocap pose stream
-		    autocal::MocapStream optitrackStream("mocap", false, true);
-		    //coordinate system is LH while psmove is RH
-		    std::set<int> mocapAllowedIDs = {1,2};
-		    optitrackStream.loadMocapData("mocapdata", videoStartTime,std::chrono::system_clock::now(), mocapAllowedIDs);
+			    //Initialise sensor plant
+			    sensorPlant = SensorPlant();
+			    //Optional simulation parameters
+			    if(use_simulation){
+			        //Exp 4 -...
+			        autocal::SimulationParameters a1; 
+			        autocal::SimulationParameters a2;
+			        autocal::SimulationParameters d1; 
+			        autocal::SimulationParameters d2; 
+			        a1.noise.angle_stddev = 0;
+			        // a2.noise.angle_stddev = 1;
+			        d1.noise.disp_stddev = 0;
+			        // d2.noise.disp_stddev = 10;
+			        int aN = 1;
+			        int dN = 1;
+			        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
+			        //set the simulated connections between rigid bodies
+			        std::map<int,int> answers;
+			        answers[1] = 1;
+			        // answers[2] = 2;
+			        sensorPlant.setAnswers("psmove","mocap",answers);
+			        psmoveStream.setupSimulation(optitrackStream, answers);
 
-		    //Initialise sensor plant
-		    sensorPlant = SensorPlant();
-		    //Optional simulation parameters
-		    if(use_simulation){
-		        //Exp 4 -...
-		        autocal::SimulationParameters a1; 
-		        autocal::SimulationParameters a2;
-		        autocal::SimulationParameters d1; 
-		        autocal::SimulationParameters d2; 
-		        a1.noise.angle_stddev = 0;
-		        // a2.noise.angle_stddev = 1;
-		        d1.noise.disp_stddev = 0;
-		        // d2.noise.disp_stddev = 10;
-		        int aN = 1;
-		        int dN = 1;
-		        sensorPlant.setSimParameters(a1,a2,aN,d1,d2,dN);
-		        //set the simulated connections between rigid bodies
-		        std::map<int,int> answers;
-		        answers[1] = 1;
-		        // answers[2] = 2;
-		        sensorPlant.setAnswers("psmove","mocap",answers);
-		        psmoveStream.setupSimulation(optitrackStream, answers);
+			    } else {
+			    	psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
+			        std::map<int,int> answers;
+			        answers[0] = 2;
+			        sensorPlant.setAnswers("psmove","mocap",answers);
+			    }
 
-		    } else {
-		    	psmoveStream.loadMocapData("psmovedata", videoStartTime, std::chrono::system_clock::now());
-		        std::map<int,int> answers;
-		        answers[0] = 2;
-		        sensorPlant.setAnswers("psmove","mocap",answers);
-		    }
+			    //Push back the loaded streams
+			    //Ensure simulation is setup for sensor plant prior to adding
+			    sensorPlant.addStream(psmoveStream);
+			    sensorPlant.addStream(optitrackStream);
 
-		    //Push back the loaded streams
-		    //Ensure simulation is setup for sensor plant prior to adding
-		    sensorPlant.addStream(psmoveStream);
-		    sensorPlant.addStream(optitrackStream);
+			    //Ground Truth computation
+			    Transform3D psmoveToMocap;
 
-		    //Ground Truth computation
-		    Transform3D psmoveToMocap;
+			    arma::vec3 right = { 1.198981,  0.129528, 0.200404};
+			    arma::vec3 left =  { 1.202117,  0.133606,  0.297056};
+			    arma::vec3 centre1 =  { 1.164790,  0.0117017, 0.267929};
+			    arma::vec3 centre2 =   { 1.162927,  0.116876,  0.230719};
+			    arma::vec3 viewPoint =  {-1.835153,  1.196957,  0.274641};
+			    
+			    arma::vec3 centre = 0.5*(centre2 + centre1);
+			    
+			    psmoveToMocap.translation() = centre;
+			    psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
+			    
+			    arma::vec3 psuedoX =  arma::normalise(left - right);
+			    psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
+			    psmoveToMocap.x() = -arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
 
-		    arma::vec3 right = { 1.198981,  0.129528, 0.200404};
-		    arma::vec3 left =  { 1.202117,  0.133606,  0.297056};
-		    arma::vec3 centre1 =  { 1.164790,  0.0117017, 0.267929};
-		    arma::vec3 centre2 =   { 1.162927,  0.116876,  0.230719};
-		    arma::vec3 viewPoint =  {-1.835153,  1.196957,  0.274641};
-		    
-		    arma::vec3 centre = 0.5*(centre2 + centre1);
-		    
-		    psmoveToMocap.translation() = centre;
-		    psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
-		    
-		    arma::vec3 psuedoX =  arma::normalise(left - right);
-		    psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
-		    psmoveToMocap.x() = -arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+				//--------------------------------------------------------------------
+				    // Ground truth exp 1
+				    // arma::vec3 centre =     {   1.0205,    0.6637,  0.025500};
+				    // arma::vec3 frontRight = { 1.007544,  0.662266, -0.141178};
+				    // arma::vec3 frontLeft =  { 1.016013,  0.661523,  0.196680};
+				    // arma::vec3 backRight =  { 1.024875,  0.659862, -0.144267};
+				    // arma::vec3 backLeft =   { 1.032640,  0.658253,  0.191176};
+				    // // arma::vec3 top =        { 1.022050,  0.677163,  0.026080};
+				    // arma::vec3 viewPoint =  {-1.092194,  0.977327,  0.076759};
 
-			//--------------------------------------------------------------------
-			    // Ground truth exp 1
-			    // arma::vec3 centre =     {   1.0205,    0.6637,  0.025500};
-			    // arma::vec3 frontRight = { 1.007544,  0.662266, -0.141178};
-			    // arma::vec3 frontLeft =  { 1.016013,  0.661523,  0.196680};
-			    // arma::vec3 backRight =  { 1.024875,  0.659862, -0.144267};
-			    // arma::vec3 backLeft =   { 1.032640,  0.658253,  0.191176};
-			    // // arma::vec3 top =        { 1.022050,  0.677163,  0.026080};
-			    // arma::vec3 viewPoint =  {-1.092194,  0.977327,  0.076759};
+				    // psmoveToMocap.translation() = centre;
+				    // psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
 
-			    // psmoveToMocap.translation() = centre;
-			    // psmoveToMocap.z() = -arma::normalise(viewPoint - centre);
+				    // arma::vec3 psuedoX =  - (frontRight + backRight) / 2 + (frontLeft + backLeft) / 2;
+				    // psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
+				    // psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
+				//--------------------------------------------------------------------
 
-			    // arma::vec3 psuedoX =  - (frontRight + backRight) / 2 + (frontLeft + backLeft) / 2;
-			    // psmoveToMocap.y() = arma::normalise(arma::cross(psuedoX,psmoveToMocap.z()));
-			    // psmoveToMocap.x() = arma::cross(psmoveToMocap.z(), psmoveToMocap.y());
-			//--------------------------------------------------------------------
+			    std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
 
-		    std::cout << "psmoveToMocap = \n" << psmoveToMocap << std::endl;
+			    //Ground truth pass through to sensor plant
+			    bool useTruthForMatching = false;
+			    sensorPlant.setGroundTruthTransform("mocap","psmove", psmoveToMocap.i(), useTruthForMatching);
 
-		    //Ground truth pass through to sensor plant
-		    bool useTruthForMatching = false;
-		    sensorPlant.setGroundTruthTransform("mocap","psmove", psmoveToMocap.i(), useTruthForMatching);
+			    //Record start parameters
+			    start = std::chrono::steady_clock::now();  
+			    video_frames = 0; 
 
-		    //Record start parameters
-		    start = std::chrono::steady_clock::now();  
-		    video_frames = 0; 
+			    first_iter = false;
 
-        });
+	        } //END FIRST ITER
 
-        on<Every<60,Per<std::chrono::seconds>>, Single>().then([this]{
         	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
@@ -232,10 +236,10 @@ namespace psmove {
 	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
 	        
 	        //Set window active
-	        window.setActive(true);
+	        window->setActive(true);
 
 	        //Check input
-	        handleInput(window, frame_time_since_start);
+	        handleInput(*window, frame_time_since_start);
 
 	        //Check if new frame is ready to be drawn
 	        if(video_frames * frame_duration < frame_time_since_start && !paused){
@@ -264,7 +268,7 @@ namespace psmove {
 	        				  current_timestamp,
 	        				  matches);
 
-	        window.display();
+	        window->display();
 
 		    if(!running){
 			    //Load next sim params, or end if there are none

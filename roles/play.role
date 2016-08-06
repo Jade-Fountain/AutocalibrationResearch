@@ -4,6 +4,5 @@ NUCLEAR_ROLE(
     support::logging::ConsoleLogHandler
     support::extension::FileWatcher
 
-    
     psmove::Play
 )
