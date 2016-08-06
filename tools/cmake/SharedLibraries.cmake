@@ -62,14 +62,14 @@ INCLUDE_DIRECTORIES(SYSTEM ${ARMADILLO_INCLUDE_DIR})
 #PSMOVE AND GRAPHICS
 
 #psmove
-set(PSMOVEAPI_INCLUDE_DIR /usr/local/psmoveapi/include)
-set(PSMOVEAPI_LIBRARY #/usr/local/psmoveapi/lib64/libpsmoveapi.dylib
-                      /usr/local/psmoveapi/lib64/libpsmoveapi_static.a
-                      #/usr/local/psmoveapi/lib64/libpsmoveapi.3.1.0.dylib
+set(PSMOVEAPI_INCLUDE_DIR /usr/local/include)
+set(PSMOVEAPI_LIBRARY #/usr/local/lib64/libpsmoveapi.dylib
+                      /usr/local/lib64/libpsmoveapi_static.a
+                      #/usr/local/lib64/libpsmoveapi.3.1.0.dylib
     ) 
-set(PSMOVEAPI_TRACKER_LIBRARY #/usr/local/psmoveapi/lib64/libpsmoveapi_tracker.dylib
-                              /usr/local/psmoveapi/lib64/libpsmoveapi_tracker_static.a
-                              #/usr/local/psmoveapi/lib64/libpsmoveapi_tracker.3.1.0.dylib
+set(PSMOVEAPI_TRACKER_LIBRARY #/usr/local/lib64/libpsmoveapi_tracker.dylib
+                              /usr/local/lib64/libpsmoveapi_tracker_static.a
+                              #/usr/local/lib64/libpsmoveapi_tracker.3.1.0.dylib
                               )
 
 #soil image lib

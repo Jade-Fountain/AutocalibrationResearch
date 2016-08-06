@@ -76,7 +76,9 @@ namespace autocal {
 			// std::cout << "position:" << r.pose.translation() << std::endl;
 			// std::cout << "rotation:" << r.pose.rotation() << std::endl;
 			if(!r.pose.is_finite()) {
-				std::cout << __FILE__ << " - " << __LINE__ << "Warning: nan data not loaded for RB " << int(data[0]) << std::endl;
+				std::cout << __FILE__ << " - " << __LINE__ << " - Warning: nan data not loaded for RB " << int(data[0]) << std::endl;
+				std::cout <<  "data = " << data.t() << std::endl;
+				std::cout <<  "pose final = " << r.pose << std::endl;
 				continue;
 			}
 			

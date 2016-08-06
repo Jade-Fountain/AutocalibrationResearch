@@ -31,14 +31,44 @@ namespace geometry {
         imaginary().zeros();
     }
 
-    UnitQuaternion::UnitQuaternion(const Rotation3D& rotation) {
-        real() = std::sqrt(1.0 + rotation(0,0) + rotation(1,1) + rotation(2,2)) / 2;
-        double w4 = 4.0 * real();
-        imaginary() = arma::vec3({
-            (rotation(2,1) - rotation(1,2)) / w4,
-            (rotation(0,2) - rotation(2,0)) / w4,
-            (rotation(1,0) - rotation(0,1)) / w4
-        });
+    UnitQuaternion::UnitQuaternion(const Rotation3D& a) {
+        //From eigen
+        // This algorithm comes from  "Quaternion Calculus and Fast Animation",
+        // Ken Shoemake, 1987 SIGGRAPH course notes
+        float t = arma::trace(a);
+        if (t > 0)
+        {
+          t = std::sqrt(t + 1.0);
+          kW() = 0.5*t;
+          t = (0.5)/t;
+          kX() = (a(2,1) - a(1,2)) * t;
+          kY() = (a(0,2) - a(2,0)) * t;
+          kZ() = (a(1,0) - a(0,1)) * t;
+        }
+        else
+        {
+          int i = 0;
+          if (a(1,1) > a(0,0))
+            i = 1;
+          if (a(2,2) > a(i,i))
+            i = 2;
+          int j = (i+1)%3;
+          int k = (j+1)%3;
+
+          t = sqrt(a(i,i)-a(j,j)-a(k,k) + (1.0));
+          (*this)[i+1] = (0.5) * t;
+          t = (0.5)/t;
+          kW() = (a(k,j)-a(j,k))*t;
+          (*this)[j+1] = (a(j,i)+a(i,j))*t;
+          (*this)[k+1] = (a(k,i)+a(i,k))*t;
+        }
+
+        // rectify();
+        
+        if(!is_finite()){
+            std::cout << "Quaternion is not finite!" << std::endl;
+        }
+
     }
 
     UnitQuaternion::UnitQuaternion(double realPart, const arma::vec3& imaginaryPart) {

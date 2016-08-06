@@ -45,7 +45,7 @@ namespace geometry {
         public:
             UnitQuaternion();
 
-            UnitQuaternion(const matrix::Rotation3D& rotation);
+            UnitQuaternion(const matrix::Rotation3D& a);
 
             UnitQuaternion(double W, double X, double Y, double Z);
 

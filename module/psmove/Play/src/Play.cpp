@@ -101,7 +101,7 @@ namespace psmove {
 		    int fps, width, height;
 		    if(video == NULL){
 		        std::cout << "Video load failed... Exiting" << std::endl;
-		        return -1;
+		        // return -1;
 		    } else {
 		        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
 		        // fps = 21; 
@@ -249,7 +249,9 @@ namespace psmove {
 	        glEnable(GL_TEXTURE_2D);
 
 	        //Load next image frame
-	        running = drawCamera(video, PSEYE_FOV_BLUE_DOT) && running;
+	        if(video != NULL){
+	        	running = drawCamera(video, PSEYE_FOV_BLUE_DOT) && running;
+	        }
 
 	        //Match the streams
 	        std::vector<std::pair<int,int>> matches = sensorPlant.matchStreams("psmove","mocap",current_timestamp, psMoveLatency);
