@@ -103,7 +103,10 @@ namespace psmove {
 			    video = cvCaptureFromFile(video_filename.c_str());
 			    int fps, width, height;
 			    if(video == NULL){
-			        std::cout << "Video load failed... Exiting" << std::endl;
+			        std::cout << "Video load failed..." << std::endl;
+			        fps = 60;
+			        width = 640;
+			        height = 480;
 			        // return -1;
 			    } else {
 			        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
@@ -269,6 +272,15 @@ namespace psmove {
 	        				  matches);
 
 	        window->display();
+
+			// check all the window's events that were triggered since the last iteration of the loop
+	        sf::Event event;
+	        while (window->pollEvent(event))
+	        {
+	            // "close requested" event: we close the window
+	            if (event.type == sf::Event::Closed)
+	                powerplant.shutdown();
+	        }
 
 		    if(!running){
 			    //Load next sim params, or end if there are none
