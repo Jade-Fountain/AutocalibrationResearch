@@ -88,6 +88,7 @@ namespace psmove {
 			video_filename = config["video_filename"].as<std::string>();
 
 		    use_simulation = config["use_simulation"].as<bool>();
+		    log("Play - Configuration Complete!");
 
         });
 

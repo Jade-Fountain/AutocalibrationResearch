@@ -1,67 +1,68 @@
 /*
- * This file is part of the Autocalibration Codebase.
+ * This file is part of the NUbots Codebase.
  *
- * The Autocalibration Codebase is free software: you can redistribute it and/or modify
+ * The NUbots Codebase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * The Autocalibration Codebase is distributed in the hope that it will be useful,
+ * The NUbots Codebase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with the Autocalibration Codebase.  If not, see <http://www.gnu.org/licenses/>.
+ * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2015 NUBots <nubots@nubots.net>
  */
 
-#ifndef MESSAGES_SUPPORT_FILEWATCH_H_
-#define MESSAGES_SUPPORT_FILEWATCH_H_
+#ifndef EXTENSION_FILEWATCH_H
+#define EXTENSION_FILEWATCH_H
 
 #include <nuclear>
 
 namespace message {
-    namespace support {
+namespace support {
 
-        struct FileWatch {
-            using FileWatchStore = NUClear::dsl::store::ThreadStore<FileWatch>;
+    struct FileWatch {
+        using FileWatchStore = NUClear::dsl::store::ThreadStore<FileWatch>;
 
-            enum Event {
-                ACCESS        = 1,
-                ATTRIBUTES    = 2,
-                CLOSE_WRITE   = 4,
-                CLOSE_NOWRITE = 8,
-                CREATE        = 16,
-                DELETE        = 32,
-                DELETE_SELF   = 64,
-                MODIFY        = 128,
-                MOVE_SELF     = 256,
-                MOVED_FROM    = 512,
-                MOVED_TO      = 1024,
-                OPEN          = 2048,
-                IGNORED       = 4096,
-                ISDIR         = 8192,
-                UNMOUNT       = 16384
-            };
-
-            std::string path;
-            int events;
-
-            inline operator bool() const {
-                // Empty path is invalid
-                return !path.empty();
-            }
+        enum Event {
+            NO_OP = 0,                     /**< No event has occurred. */
+            PLATFORM_SPECIFIC = (1 << 0),  /**< Platform-specific placeholder for event type that cannot currently be mapped. */
+            CREATED = (1 << 1),            /**< An object was created. */
+            UPDATED = (1 << 2),            /**< An object was updated. */
+            REMOVED = (1 << 3),            /**< An object was removed. */
+            RENAMED = (1 << 4),            /**< An object was renamed. */
+            OWNER_MODIFIED = (1 << 5),     /**< The owner of an object was modified. */
+            ATTRIBUTE_MODIFIED = (1 << 6), /**< The attributes of an object were modified. */
+            MOVED_FROM = (1 << 7),         /**< An object was moved from this location. */
+            MOVED_TO = (1 << 8),           /**< An object was moved to this location. */
+            IS_FILE = (1 << 9),            /**< The object is a file. */
+            IS_DIR = (1 << 10),            /**< The object is a directory. */
+            IS_SYM_LINK = (1 << 11),       /**< The object is a symbolic link. */
+            LINK = (1 << 12),              /**< The link count of an object has changed. */
+            QUEUE_OVERFLOW = (1 << 13)     /**< The event queue has overflowed. */
         };
 
-        struct FileWatchRequest {
-            std::string path;
-            int events;
-            std::shared_ptr<NUClear::threading::Reaction> reaction;
-        };
-    }  // support
-}  // messages
+        std::string path;
+        int events;
+
+        inline operator bool() const {
+            // Empty path is invalid
+            return !path.empty();
+        }
+    };
+
+    struct FileWatchRequest {
+        std::string path;
+        int events;
+        std::shared_ptr<NUClear::threading::Reaction> reaction;
+    };
+
+}  // support
+}  // message
 
 // NUClear configuration extension
 namespace NUClear {
@@ -69,8 +70,6 @@ namespace NUClear {
         namespace operation {
             template <>
             struct DSLProxy<::message::support::FileWatch> {
-
-
 
                 template <typename DSL, typename TFunc>
                 static inline threading::ReactionHandle bind(Reactor& reactor, const std::string& label, TFunc&& callback, const std::string& path, int events) {
@@ -119,4 +118,4 @@ namespace NUClear {
     }
 }
 
-#endif
+#endif //EXTENSION_FILEWATCH_H
