@@ -64,6 +64,10 @@ namespace extension {
     FileWatcher::FileWatcher(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment))
     , monitor(nullptr) {
+        
+        on<Shutdown>().then([this]{
+            monitor->stop();
+        });
 
         // We use an on always here as we can't use on IO due to the library
         on<Always>().then("File Watcher", [this] {

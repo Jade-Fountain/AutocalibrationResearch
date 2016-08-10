@@ -224,7 +224,7 @@ namespace psmove {
 
         });
 
-        on<Every<60,Per<std::chrono::seconds>>, Single>().then("Main Loop",[this]{
+        on<Every<60,Per<std::chrono::seconds>>, Single, MainThread>().then("Main Loop",[this]{
         	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
@@ -281,11 +281,7 @@ namespace psmove {
 		    	powerplant.shutdown();
 
 		    }
-
-        });
-
-        on<Always>().then("event handler",[this]{
-			// check all the window's events that were triggered since the last iteration of the loop
+		    // check all the window's events that were triggered since the last iteration of the loop
 	        sf::Event event;
 	        while (window.pollEvent(event))
 	        {
@@ -293,6 +289,7 @@ namespace psmove {
 	            if (event.type == sf::Event::Closed)
 	                powerplant.shutdown();
 	        }
+
         });
 
 		on<Shutdown>().then("Shutdown",[this]{
@@ -300,7 +297,7 @@ namespace psmove {
 			auto now = std::chrono::steady_clock::now();    
 		    double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);     
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
-		    window.close();
+		    // window.close();
 		    //Release the video
 		    cvReleaseCapture(&video);  
 		});
