@@ -36,6 +36,7 @@
 #include "utility/autocal/PSMoveUtils.h"
 #include "utility/autocal/GraphicsTools.h"
 
+
 namespace module {
 namespace psmove {
 
@@ -98,16 +99,16 @@ namespace psmove {
 
 	        //Load video file and paramters
 		    std::cout << "Loading video file " << video_filename << std::endl;
-		    video = cvCaptureFromFile(video_filename.c_str());
+		    video = std::make_unique<cv::VideoCapture>(video_filename.c_str());
 		    int fps, width, height;
-		    if(video == NULL){
-		        std::cout << "Video load failed... Exiting" << std::endl;
+		    if(video == NULL|| !video->isOpened()){
+		        std::cout << "Video load failed... " << std::endl;
 		        // return -1;
 		    } else {
-		        fps = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FPS );
+		        fps = (int)video->get(CV_CAP_PROP_FPS);
 		        // fps = 21; 
-		        width = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_WIDTH ); 
-		        height = ( int )cvGetCaptureProperty( video, CV_CAP_PROP_FRAME_HEIGHT ); 
+		        width = (int)video->get(CV_CAP_PROP_FRAME_WIDTH); 
+		        height = (int)video->get(CV_CAP_PROP_FRAME_HEIGHT); 
 		        std::cout << "Video load successful... FPS = " << fps << std::endl;
 		    }
 		    frame_duration = 1.0 / float(fps);
@@ -250,8 +251,10 @@ namespace psmove {
 	        glEnable(GL_TEXTURE_2D);
 
 	        //Load next image frame
-	        if(video != NULL){
-	        	running = drawCamera(video, PSEYE_FOV_BLUE_DOT) && running;
+	        if(video != NULL && video->isOpened()){
+	        	cv::Mat image;
+	        	(*video) >> image;
+	        	running = drawCamera(image, PSEYE_FOV_BLUE_DOT) && running;
 	        }
 
 	        //Match the streams
@@ -297,9 +300,8 @@ namespace psmove {
 			auto now = std::chrono::steady_clock::now();    
 		    double finish_time = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);     
 		    std::cout << "average video framerate = " << double(video_frames) / finish_time << " Hz " << std::endl; 
-		    // window.close();
 		    //Release the video
-		    cvReleaseCapture(&video);  
+		    video.release();
 		});
     }
 }

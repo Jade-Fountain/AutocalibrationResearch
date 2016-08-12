@@ -208,15 +208,9 @@ static void drawCrossHair(){
     glEnd();
 }
 
-bool drawCamera(CvCapture* video, float verticalFOV){
-    IplImage* image = cvQueryFrame(video);
-    if(image == NULL){
-        std::cout << "no images left in video file" << std::endl;
-        return false;
-    }
-  
+bool drawCamera(cv::Mat& image, float verticalFOV){
     GLenum format;
-    switch(image->nChannels) {
+    switch(image.dims) {
         case 1:
             format = GL_LUMINANCE;
             break;
@@ -230,8 +224,8 @@ bool drawCamera(CvCapture* video, float verticalFOV){
             break;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
-            0, format, GL_UNSIGNED_BYTE, image->imageData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.size().width, image.size().height,
+            0, format, GL_UNSIGNED_BYTE, image.data);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -265,7 +259,7 @@ bool drawCamera(CvCapture* video, float verticalFOV){
         // image->width, image->height, 0.01f, 10.0f);
 
         glm::perspective(   float(verticalFOV * 3.14159 / 180.0),            //VERTICAL FOV
-                            float(image->width) / float(image->height),  //aspect ratio
+                            float(image.size().width) / float(image.size().height),  //aspect ratio
                             0.01f,         //near plane distance (min z)
                             10.0f           //Far plane distance (max z)
                             );

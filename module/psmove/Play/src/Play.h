@@ -38,6 +38,7 @@
 #include "opencv2/opencv.hpp"
 #include "SFML/Window.hpp"
 
+
 namespace module {
 namespace psmove {
 
@@ -45,7 +46,8 @@ namespace psmove {
     	std::chrono::time_point<std::chrono::steady_clock> start;
     	int video_frames;
     	autocal::TimeStamp videoStartTime;
-    	CvCapture* video;
+        // CvCapture* video;
+    	std::unique_ptr<cv::VideoCapture> video;
 
 		std::string video_filename;
 
