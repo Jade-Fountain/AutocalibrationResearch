@@ -78,7 +78,7 @@ namespace psmove {
         });
 
 		   //Main Loop  
-        on<Every<60,Per<std::chrono::seconds>>, Single>().then("Tracking/Render Loop",[this]{
+        on<Every<60,Per<std::chrono::seconds>>, Single, MainThread>().then("Tracking/Render Loop",[this]{
 	        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
 	        // std::cout << "Frame time = " << frame_time_since_start << std::endl;

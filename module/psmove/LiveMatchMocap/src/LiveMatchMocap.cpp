@@ -151,7 +151,7 @@ namespace psmove {
         });
 
 		   //Main Loop  
-        on<Every<60,Per<std::chrono::seconds>>, Optional<With<RigidBodyFrame>>,Single>().then([this]
+        on<Every<60,Per<std::chrono::seconds>>, Optional<With<RigidBodyFrame>>, Single, MainThread>().then([this]
         	(const std::shared_ptr<const RigidBodyFrame>& mocap){
 	        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start_time).count() / float(std::milli::den);  
