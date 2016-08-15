@@ -251,9 +251,13 @@ namespace psmove {
 	        glEnable(GL_TEXTURE_2D);
 
 	        //Load next image frame
-	        if(video != NULL && video->isOpened()){
+	        if(video != NULL && video->isOpened() && video){
 	        	cv::Mat image;
 	        	(*video) >> image;
+	        	if(image.size().width == 0){
+	        		powerplant.shutdown();
+	        		return;
+	        	}
 	        	running = drawCamera(image, PSEYE_FOV_BLUE_DOT) && running;
 	        }
 

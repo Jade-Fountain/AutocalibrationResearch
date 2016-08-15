@@ -210,19 +210,20 @@ static void drawCrossHair(){
 
 bool drawCamera(cv::Mat& image, float verticalFOV){
     GLenum format;
-    switch(image.dims) {
-        case 1:
-            format = GL_LUMINANCE;
-            break;
-        case 2:
-            format = GL_LUMINANCE_ALPHA;
-            break;
-        case 3:
-            format = GL_BGR;
-            break;
-        default:
-            break;
-    }
+    // switch(image.dims) {
+    //     case 1:
+    //         format = GL_LUMINANCE;
+    //         break;
+    //     case 2:
+    //         format = GL_LUMINANCE_ALPHA;
+    //         break;
+    //     case 3:
+    //         format = GL_BGR;
+    //         break;
+    //     default:
+    //         break;
+    // }
+    format = GL_BGR;
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.size().width, image.size().height,
             0, format, GL_UNSIGNED_BYTE, image.data);
