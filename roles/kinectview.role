@@ -1,9 +1,9 @@
-#NUCLEAR_ROLE(
-    ##Support
-    #support::SignalCatcher
-    #support::logging::ConsoleLogHandler
-    #support::extension::FileWatcher
-#
-#    
-    #input::OpenNI
-#)
+NUCLEAR_ROLE(
+    #Support
+    support::SignalCatcher
+    support::logging::ConsoleLogHandler
+    support::extension::FileWatcher
+
+    
+    input::OpenNI
+)

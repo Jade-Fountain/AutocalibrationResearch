@@ -29,12 +29,6 @@ namespace input {
 
     	on<Startup>().then("OpenNI Start",[this](){
 	    	//Startup
-	    	auto nRetVal = xnContext.Init();
-			CHECK_RC(nRetVal, "Init");
-			nRetVal = xnContext.OpenFileRecording(".oni", xnPlayer);
-			CHECK_RC(nRetVal, "Load file");
-
-			log("OpenNI Initialised");
 
     	});
 
@@ -44,20 +38,8 @@ namespace input {
     }
     
     OpenNI::~OpenNI(){
-    	xnContext.Release();
-		xnScriptNode.Release();
-		xnDepthGenerator.Release();
-		xnUserGenerator.Release();
-		xnPlayer.Release();
+    	
     }
 
-
-	XnStatus OpenNI::CHECK_RC(XnStatus nRetVal, std::string what){
-		if (nRetVal != XN_STATUS_OK)
-		{
-			log(what, "failed: ", xnGetStatusString(nRetVal));
-		}
-		return nRetVal;
-	}
 }
 }

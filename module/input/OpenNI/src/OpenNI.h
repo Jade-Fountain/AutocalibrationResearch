@@ -20,8 +20,8 @@
 #ifndef MODULES_INPUT_OPENNI_H
 #define MODULES_INPUT_OPENNI_H
 
-#include <ni/XnOpenNI.h>
-#include <ni/XnCppWrapper.h>
+
+#include "NiTE.h"
 
 #include <nuclear>
 #include <string>
@@ -30,14 +30,6 @@ namespace module {
 namespace input {
 
     class OpenNI : public NUClear::Reactor {
-
-		xn::Context xnContext;
-		xn::ScriptNode xnScriptNode;
-		xn::DepthGenerator xnDepthGenerator;
-		xn::UserGenerator xnUserGenerator;
-		xn::Player xnPlayer;
-
-		XnStatus CHECK_RC(XnStatus nRetVal, std::string what);
 
     public:
         /// @brief Called by the powerplant to build and setup the OpenNI reactor.
