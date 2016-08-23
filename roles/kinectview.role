@@ -5,5 +5,5 @@ NUCLEAR_ROLE(
     support::extension::FileWatcher
 
     
-    input::OpenNI
+    input::OpenNIManager
 )

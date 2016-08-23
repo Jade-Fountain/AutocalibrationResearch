@@ -17,29 +17,37 @@
  * Copyright 2016 Autocalibration <nubots@nubots.net>
  */
 
-#include "OpenNI.h"
+#ifndef MODULES_INPUT_OPENNI_MANAGER_H
+#define MODULES_INPUT_OPENNI_MANAGER_H
 
+
+#include <OpenNI.h>
+#include "NiTE.h"
+
+#include <nuclear>
+#include <string>
 
 namespace module {
 namespace input {
 
-    OpenNI::OpenNI(std::unique_ptr<NUClear::Environment> environment)
-    : Reactor(std::move(environment))
-    {
+    class OpenNIManager : public NUClear::Reactor {
 
-    	on<Startup>().then("OpenNI Start",[this](){
-	    	//Startup
+		static const int MAX_USERS = 10;
+		bool g_visibleUsers[MAX_USERS] = {false};
+		nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
+        
+        nite::UserTracker userTracker;
 
-    	});
-
-		on<Every<30, Per<std::chrono::seconds>>>().then("OpenNI Read loop",[this](){
-			log("main loop running");
-		});
-    }
-    
-    OpenNI::~OpenNI(){
-    	
-    }
+		void updateUserState(const nite::UserData& user, unsigned long long ts);
+   		void userMessage(std::string message, const nite::UserData& user,  unsigned long long ts);
+    public:
+        /// @brief Called by the powerplant to build and setup the OpenNIManager reactor.
+        explicit OpenNIManager(std::unique_ptr<NUClear::Environment> environment);
+        ~OpenNIManager();
+		
+    };
 
 }
 }
+
+#endif  // MODULES_INPUT_OPENNI_MANAGER_H
