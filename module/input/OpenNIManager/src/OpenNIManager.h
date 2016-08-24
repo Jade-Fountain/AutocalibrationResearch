@@ -32,11 +32,19 @@ namespace input {
 
     class OpenNIManager : public NUClear::Reactor {
 
+
+		float Colors[4][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 1, 1}};
+		int colorCount = 3;
+
 		static const int MAX_USERS = 10;
 		bool g_visibleUsers[MAX_USERS] = {false};
 		nite::SkeletonState g_skeletonStates[MAX_USERS] = {nite::SKELETON_NONE};
         
         nite::UserTracker userTracker;
+
+		openni::RGB888Pixel*		m_pTexMap;
+		unsigned int		m_nTexMapX;
+		unsigned int		m_nTexMapY;
 
 		void updateUserState(const nite::UserData& user, unsigned long long ts);
    		void userMessage(std::string message, const nite::UserData& user,  unsigned long long ts);

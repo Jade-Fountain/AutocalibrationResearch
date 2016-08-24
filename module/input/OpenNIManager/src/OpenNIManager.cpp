@@ -69,10 +69,88 @@ namespace input {
                     const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
                     if (head.getPositionConfidence() > .5)
                         log("User", user.getId(), "(",head.getPosition().x, head.getPosition().y, head.getPosition().z, ")");
+                        log("User", user.getId(), "(",head.getOrientation().x, head.getOrientation().y, head.getOrientation().z, head.getOrientation().w, ")");
+                }
+            }
+
+            //Depth frame output
+            openni::VideoFrameRef depthFrame;
+            depthFrame = userTrackerFrame.getDepthFrame();
+
+            // if (m_pTexMap == NULL)
+            // {
+            //     // Texture map init
+            //     m_nTexMapX = MIN_CHUNKS_SIZE(depthFrame.getVideoMode().getResolutionX(), TEXTURE_SIZE);
+            //     m_nTexMapY = MIN_CHUNKS_SIZE(depthFrame.getVideoMode().getResolutionY(), TEXTURE_SIZE);
+            //     m_pTexMap = new openni::RGB888Pixel[m_nTexMapX * m_nTexMapY];
+            // }
+
+            const nite::UserMap& userLabels = userTrackerFrame.getUserMap();
+
+            if (!depthFrame.isValid())
+            {
+                return;
+            }
+
+            auto texOut = std::make_unique<std::vector<openni::RGB888Pixel>>(depthFrame.getHeight()*depthFrame.getWidth());
+
+            // memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(openni::RGB888Pixel));
+
+            float factor[3] = {1, 1, 1};
+            // check if we need to draw depth frame to texture
+            if (depthFrame.isValid())
+            {
+                const nite::UserId* pLabels = userLabels.getPixels();
+
+                const openni::DepthPixel* pDepthRow = (const openni::DepthPixel*)depthFrame.getData();
+                openni::RGB888Pixel* pTexRow = &(*texOut)[0];// + depthFrame.getCropOriginY() * m_nTexMapX;
+                int rowSize = depthFrame.getStrideInBytes() / sizeof(openni::DepthPixel);
+
+                for (int y = 0; y < depthFrame.getHeight(); ++y)
+                {
+                    const openni::DepthPixel* pDepth = pDepthRow;
+                    openni::RGB888Pixel* pTex = pTexRow;// + depthFrame.getCropOriginX();
+
+                    for (int x = 0; x < depthFrame.getWidth(); ++x, ++pDepth, ++pTex, ++pLabels)
+                    {
+                        if (*pDepth != 0)
+                        {
+                            if (*pLabels == 0)
+                            {
+                                // if (!g_drawBackground)
+                                // {
+                                //     factor[0] = factor[1] = factor[2] = 0;
+
+                                // }
+                                // else
+                                // {
+                                    factor[0] = Colors[colorCount][0];
+                                    factor[1] = Colors[colorCount][1];
+                                    factor[2] = Colors[colorCount][2];
+                                // }
+                            }
+                            else
+                            {
+                                factor[0] = Colors[*pLabels % colorCount][0];
+                                factor[1] = Colors[*pLabels % colorCount][1];
+                                factor[2] = Colors[*pLabels % colorCount][2];
+                            }
+
+                            pTex->r = (*pDepth) * factor[0];
+                            pTex->g = (*pDepth) * factor[1];
+                            pTex->b = (*pDepth) * factor[2];
+
+                            factor[0] = factor[1] = factor[2] = 1;
+                        }
+                    }
+
+                    pDepthRow += rowSize;
+                    pTexRow += rowSize;
                 }
             }
 
 
+            emit(texOut);
 		});
     }
     
