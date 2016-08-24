@@ -1,12 +1,12 @@
 #include "OpenNIViewer.h"
 
-#include "extension/Configuration.h"
+#include "message/support/Configuration.h"
 #include "message/input/OpenNIImage.h"
 
 namespace module {
 namespace graphics {
 
-    using extension::Configuration;
+    using message::support::Configuration;
     using message::input::OpenNIImage;
 
     //Define the key input callback  
@@ -26,19 +26,16 @@ namespace graphics {
             // Use configuration here from file OpenNIViewer.yaml
         });
 
-        on<Startup>.then([this]{
+        on<Startup>().then([this]{
 		    start = std::chrono::steady_clock::now();  
         });
 
-        on<Trigger<std::vector<openni::RGB888Pixel>>, Single, MainThread>().then("Main Loop",
+        on<Trigger<OpenNIImage>, Single, MainThread>().then("Main Loop",
         	[this](const OpenNIImage& image){
 	       	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
-	        
-	        //Compute timestamp in microseconds
-	        autocal::TimeStamp current_timestamp = videoStartTime + std::chrono::duration_cast<std::chrono::microseconds>(now-start).count();
-	        
+	        	        
 	        //Set window active
 	        window.setActive(true);
 

@@ -20,7 +20,10 @@ namespace module {
 namespace graphics {
 
     class OpenNIViewer : public NUClear::Reactor {
+		void handleInput(const sf::Window& w, double time_since_start);
 		sf::Window window;
+		bool running = true;
+		NUClear::clock::time_point start;
 
     public:
         /// @brief Called by the powerplant to build and setup the OpenNIViewer reactor.

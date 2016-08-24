@@ -18,9 +18,12 @@
  */
 
 #include "OpenNIManager.h"
+#include "message/input/OpenNIImage.h"
 
 namespace module {
 namespace input {
+
+    using message::input::OpenNIImage;
 
     OpenNIManager::OpenNIManager(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment))
@@ -92,7 +95,7 @@ namespace input {
                 return;
             }
 
-            auto texOut = std::make_unique<std::vector<openni::RGB888Pixel>>(depthFrame.getHeight()*depthFrame.getWidth());
+            auto texOut = std::make_unique<OpenNIImage>(depthFrame.getWidth(),depthFrame.getHeight());
 
             // memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(openni::RGB888Pixel));
 
@@ -103,7 +106,7 @@ namespace input {
                 const nite::UserId* pLabels = userLabels.getPixels();
 
                 const openni::DepthPixel* pDepthRow = (const openni::DepthPixel*)depthFrame.getData();
-                openni::RGB888Pixel* pTexRow = &(*texOut)[0];// + depthFrame.getCropOriginY() * m_nTexMapX;
+                openni::RGB888Pixel* pTexRow = texOut->data();// + depthFrame.getCropOriginY() * m_nTexMapX;
                 int rowSize = depthFrame.getStrideInBytes() / sizeof(openni::DepthPixel);
 
                 for (int y = 0; y < depthFrame.getHeight(); ++y)

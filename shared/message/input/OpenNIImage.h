@@ -27,10 +27,12 @@ namespace input{
 
 	class OpenNIImage{
 	public:
+		OpenNIImage(int w, int h) : width(w), height(h), imageData(w*h) {}
 		std::vector<openni::RGB888Pixel> imageData;
 		int width;
 		int height;
-		openni::RGB888Pixel* data(){return &imageData[0]};
+		const openni::RGB888Pixel* data() const {return (const openni::RGB888Pixel*)&imageData[0];}
+		openni::RGB888Pixel* data() {return &imageData[0];}
 
 	};
 	
