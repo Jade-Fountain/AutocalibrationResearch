@@ -19,11 +19,19 @@
 
 #include "OpenNIManager.h"
 #include "message/input/OpenNIImage.h"
+#include "message/input/MotionCapture.h"
+
+#include "utility/math/matrix/Transform3D.h"
+#include "utility/math/geometry/UnitQuaternion.h"
 
 namespace module {
 namespace input {
 
     using message::input::OpenNIImage;
+    using message::input::RigidBodyFrame;
+
+    using utility::math::matrix::Transform3D;
+    using utility::math::geometry::UnitQuaternion;
 
     OpenNIManager::OpenNIManager(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment))
@@ -49,6 +57,8 @@ namespace input {
 		on<Every<30, Per<std::chrono::seconds>>, Single>().then("OpenNIManager Read loop",[this](){
         
             nite::UserTrackerFrameRef userTrackerFrame;
+            auto mocap = std::make_unique<RigidBodyFrame>();
+
 
             nite::Status niteRc;
             niteRc = userTracker.readFrame(&userTrackerFrame);
@@ -69,12 +79,24 @@ namespace input {
                 }
                 else if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
                 {
-                    const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
-                    if (head.getPositionConfidence() > .5)
-                        log("User", user.getId(), "(",head.getPosition().x, head.getPosition().y, head.getPosition().z, ")");
-                        log("User", user.getId(), "(",head.getOrientation().x, head.getOrientation().y, head.getOrientation().z, head.getOrientation().w, ")");
+                    // const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
+                    // if (head.getPositionConfidence() > .5)
+                    //     log("User", user.getId(), "(",head.getPosition().x, head.getPosition().y, head.getPosition().z, ")");
+                    //     log("User", user.getId(), "(",head.getOrientation().x, head.getOrientation().y, head.getOrientation().z, head.getOrientation().w, ")");
+                    for(int i = 0; i < NITE_JOINT_COUNT; i++){
+                        auto& joint = user.getSkeleton().getJoint((nite::JointType)i);
+                        UnitQuaternion q(joint.getOrientation().w,
+                                         joint.getOrientation().x,
+                                         joint.getOrientation().y,
+                                         joint.getOrientation().z);
+                        Transform3D pose(q);
+                        pose.translation() = arma::vec3{joint.getPosition().x,joint.getPosition().y,joint.getPosition().z};
+
+                        mocap->poses[i] = pose;
+                    }
                 }
             }
+            emit(mocap);
 
             //Depth frame output
             openni::VideoFrameRef depthFrame;
