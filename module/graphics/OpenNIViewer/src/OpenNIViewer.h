@@ -13,6 +13,8 @@
   #include <GL/glut.h>
 #endif 
 
+#include "utility/autocal/GraphicsTools.h"
+
 #include "opencv2/opencv.hpp"
 #include "SFML/Window.hpp"
 
@@ -24,6 +26,7 @@ namespace graphics {
 		sf::Window window;
 		bool running = true;
 		NUClear::clock::time_point start;
+		glm::mat4 proj;
 
     public:
         /// @brief Called by the powerplant to build and setup the OpenNIViewer reactor.

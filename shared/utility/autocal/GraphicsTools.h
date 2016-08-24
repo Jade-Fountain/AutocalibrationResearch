@@ -1,3 +1,7 @@
+
+#ifndef UTILITY_AUTOCAL_GRAPHICS_TOOLS_H
+#define UTILITY_AUTOCAL_GRAPHICS_TOOLS_H
+
 #ifdef __APPLE__
     // #include <OpenGL/gl.h>
     #include <GL/glew.h>  
@@ -112,6 +116,8 @@ static void drawBasis(float scale){
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);    
     // glLightfv(GL_LIGHT0, GL_AMBIENT, diff);
     // glLightfv(GL_LIGHT0, GL_SPECULAR, diff);
+    // GLfloat pos[4] = {0.0, 0.0, 0.0, 0.0};
+    // glLightfv(GL_LIGHT0, GL_POSITION, pos);
     //mat x
     GLfloat x_diff[4] = {1.0, 0.0, 0.0, 1.0};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, x_diff);
@@ -287,11 +293,11 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
     auto rangeFrame = sensorPlant.getGroundTruth(matchStreamRange, referenceFrame, t);
     std::cout << t << " ";
     for(auto& pair : refFrame.rigidBodies){
-        Transform3D refPose = pair.second.pose;
+        utility::math::matrix::Transform3D refPose = pair.second.pose;
         for(auto& rb : rangeFrame.rigidBodies){
             auto& res = results[rb.first];
             auto& rigidBodyID = rb.first;
-            Transform3D pose = rb.second.pose;
+            utility::math::matrix::Transform3D pose = rb.second.pose;
 
             res.distance = arma::norm(pose.translation() - refPose.translation());
             res.groundMatched = int(res.distance < 0.2);
@@ -315,7 +321,7 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
             auto& rigidBodyID = pair.first;
             auto& rigidBody = pair.second;
             //4x4 matrix pose
-            Transform3D pose = rigidBody.pose;
+            utility::math::matrix::Transform3D pose = rigidBody.pose;
             // std::cout << "pose " << rigidBodyID << " = \n" << pose << std::endl;
             //Load pose into opengl as view matrix
             glMatrixMode(GL_MODELVIEW);
@@ -339,3 +345,4 @@ void drawSensorStreams(autocal::SensorPlant& sensorPlant, std::string referenceF
     }
 }
 
+#endif
