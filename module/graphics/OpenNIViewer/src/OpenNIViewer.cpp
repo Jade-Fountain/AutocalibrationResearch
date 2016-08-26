@@ -137,7 +137,7 @@ namespace graphics {
 		            drawBasis(basisScale);
 		        }	
 	        } else {
-	        	std::cout << "NO MOCAP RECEIVED" << std::endl;
+	        	std::cout << "NO Kinect RECEIVED" << std::endl;
 	        }
 
 

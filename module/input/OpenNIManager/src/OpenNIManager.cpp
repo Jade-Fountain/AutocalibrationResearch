@@ -177,12 +177,13 @@ namespace input {
 
             emit(texOut);
 		});
+
+        on<Trigger<Shutdown>>().then([this]{
+            std::cout << "Shutting down openni..." << std::endl;
+            nite::NiTE::shutdown();
+        });
     }
     
-    OpenNIManager::~OpenNIManager(){
-        nite::NiTE::shutdown();
-    }
-
     void OpenNIManager::updateUserState(const nite::UserData& user, unsigned long long ts){
         if (user.isNew())
             userMessage("New", user, ts);

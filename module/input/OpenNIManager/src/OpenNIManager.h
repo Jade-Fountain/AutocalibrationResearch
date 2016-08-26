@@ -51,7 +51,6 @@ namespace input {
     public:
         /// @brief Called by the powerplant to build and setup the OpenNIManager reactor.
         explicit OpenNIManager(std::unique_ptr<NUClear::Environment> environment);
-        ~OpenNIManager();
 		
     };
 
