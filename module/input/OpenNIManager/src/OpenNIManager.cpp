@@ -29,6 +29,7 @@ namespace input {
 
     using message::input::OpenNIImage;
     using message::input::OpenNIData;
+    using message::input::RigidBodyFrame;
 
     using utility::math::matrix::Transform3D;
     using utility::math::geometry::UnitQuaternion;
@@ -71,6 +72,7 @@ namespace input {
             const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
             for (int i = 0; i < users.getSize(); ++i)
             {
+                mocap->users[i] = RigidBodyFrame();
                 const nite::UserData& user = users[i];
                 updateUserState(user,userTrackerFrame.getTimestamp());
                 if (user.isNew())
@@ -79,12 +81,8 @@ namespace input {
                 }
                 else if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
                 {
-                    // const nite::SkeletonJoint& head = user.getSkeleton().getJoint(nite::JOINT_HEAD);
-                    // if (head.getPositionConfidence() > .5)
-                    //     log("User", user.getId(), "(",head.getPosition().x, head.getPosition().y, head.getPosition().z, ")");
-                    //     log("User", user.getId(), "(",head.getOrientation().x, head.getOrientation().y, head.getOrientation().z, head.getOrientation().w, ")");
-                    for(int i = 0; i < NITE_JOINT_COUNT; i++){
-                        auto& joint = user.getSkeleton().getJoint((nite::JointType)i);
+                    for(int j = 0; j < NITE_JOINT_COUNT; j++){
+                        auto& joint = user.getSkeleton().getJoint((nite::JointType)j);
                         UnitQuaternion q(joint.getOrientation().w,
                                          joint.getOrientation().x,
                                          joint.getOrientation().y,
@@ -92,7 +90,7 @@ namespace input {
                         Transform3D pose(q);
                         pose.translation() = arma::vec3{joint.getPosition().x,joint.getPosition().y,joint.getPosition().z};
 
-                        mocap->rigidBodies.poses[i] = pose;
+                        mocap->users[i].poses[j] = pose;
                     }
                 }
             }

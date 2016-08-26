@@ -59,7 +59,11 @@ namespace graphics {
         });
 
         on<Trigger<OpenNIImage>, Optional<With<OpenNIData>>, Single, MainThread>().then("Main Loop",
-        	[this](const OpenNIImage& image, const std::shared_ptr<const OpenNIData> openniData){
+        	[this](const OpenNIImage& image, 
+    			   const std::shared_ptr<const OpenNIData> openniData
+    			   //TODO:
+    			   // const std::shared_ptr<const MatchData> matchData
+    			   ){
 	       	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
@@ -120,21 +124,26 @@ namespace graphics {
 			float basisScale = 0.1;
 	        //Draw mocap rigid bodies
 	        if(openniData){
-		        for(auto& rigidBody : openniData->rigidBodies.poses){
-		        	int id = rigidBody.first;
-		        	//4x4 matrix pose
-		            Transform3D pose = rigidBody.second;
-		            //Convert to m from mm?
-		            pose.translation() = pose.translation() * 0.001;
-		            // pose = Transform3D::createRotationY(M_PI) * pose;
-		            pose = Transform3D::createScale(arma::vec3{1,1,-1}) * pose;
-		            if(id == 0)
-		            // std::cout << "pose " << id << " = \n" << pose << std::endl;
-		            //Load pose into opengl as view matrix
-		            glMatrixMode(GL_MODELVIEW);
-		            glLoadMatrixd(pose.memptr());
-		            
-		            drawBasis(basisScale);
+		        for(auto& user : openniData->users){
+			        for(auto& rigidBody : user.second.poses){
+			        	//Extract ID
+			        	int id = rigidBody.first;
+			        	
+			        	//4x4 matrix pose
+			            Transform3D pose = rigidBody.second;
+			            
+			            //Convert to m from mm
+			            pose.translation() = pose.translation() * 0.001;
+			            
+			            // pose = Transform3D::createRotationY(M_PI) * pose;
+			            pose = Transform3D::createScale(arma::vec3{1,1,-1}) * pose;
+			            
+			            //Load pose into opengl as view matrix
+			            glMatrixMode(GL_MODELVIEW);
+			            glLoadMatrixd(pose.memptr());
+			            
+			            drawBasis(basisScale);
+			        }
 		        }	
 	        } else {
 	        	std::cout << "NO Kinect RECEIVED" << std::endl;

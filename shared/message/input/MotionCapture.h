@@ -31,7 +31,7 @@ namespace message {
         };
 
         struct OpenNIData{
-            RigidBodyFrame rigidBodies;
+            std::map<int, RigidBodyFrame> users;
         };
 
         struct MotionCapture {

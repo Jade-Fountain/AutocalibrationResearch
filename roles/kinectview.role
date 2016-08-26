@@ -7,4 +7,5 @@ NUCLEAR_ROLE(
     
     input::OpenNIManager
     graphics::OpenNIViewer
+    fusion::SensorCorrelator
 )
