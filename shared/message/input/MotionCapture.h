@@ -30,6 +30,10 @@ namespace message {
             std::map<int, utility::math::matrix::Transform3D> poses;
         };
 
+        struct OpenNIData{
+            RigidBodyFrame rigidBodies;
+        };
+
         struct MotionCapture {
 
             struct Marker {

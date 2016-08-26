@@ -11,7 +11,7 @@ namespace module {
 namespace graphics {
 
     using utility::math::matrix::Transform3D;
-    using message::input::RigidBodyFrame;
+    using message::input::OpenNIData;
 
     using message::support::Configuration;
     using message::input::OpenNIImage;
@@ -58,8 +58,8 @@ namespace graphics {
 		    checkGLError();
         });
 
-        on<Trigger<OpenNIImage>, Optional<With<RigidBodyFrame>>, Single, MainThread>().then("Main Loop",
-        	[this](const OpenNIImage& image, const std::shared_ptr<const RigidBodyFrame> rigidBodies){
+        on<Trigger<OpenNIImage>, Optional<With<OpenNIData>>, Single, MainThread>().then("Main Loop",
+        	[this](const OpenNIImage& image, const std::shared_ptr<const OpenNIData> openniData){
 	       	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
 	        double frame_time_since_start = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count() / float(std::milli::den);  
@@ -119,8 +119,8 @@ namespace graphics {
 
 			float basisScale = 0.1;
 	        //Draw mocap rigid bodies
-	        if(rigidBodies){
-		        for(auto& rigidBody : rigidBodies->poses){
+	        if(openniData){
+		        for(auto& rigidBody : openniData->rigidBodies.poses){
 		        	int id = rigidBody.first;
 		        	//4x4 matrix pose
 		            Transform3D pose = rigidBody.second;

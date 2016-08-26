@@ -28,7 +28,7 @@ namespace module {
 namespace input {
 
     using message::input::OpenNIImage;
-    using message::input::RigidBodyFrame;
+    using message::input::OpenNIData;
 
     using utility::math::matrix::Transform3D;
     using utility::math::geometry::UnitQuaternion;
@@ -57,7 +57,7 @@ namespace input {
 		on<Every<30, Per<std::chrono::seconds>>, Single>().then("OpenNIManager Read loop",[this](){
         
             nite::UserTrackerFrameRef userTrackerFrame;
-            auto mocap = std::make_unique<RigidBodyFrame>();
+            auto mocap = std::make_unique<OpenNIData>();
 
 
             nite::Status niteRc;
@@ -92,7 +92,7 @@ namespace input {
                         Transform3D pose(q);
                         pose.translation() = arma::vec3{joint.getPosition().x,joint.getPosition().y,joint.getPosition().z};
 
-                        mocap->poses[i] = pose;
+                        mocap->rigidBodies.poses[i] = pose;
                     }
                 }
             }
