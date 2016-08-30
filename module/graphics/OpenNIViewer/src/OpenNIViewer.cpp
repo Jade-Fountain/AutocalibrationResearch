@@ -19,6 +19,7 @@ namespace graphics {
 
     using message::input::OpenNIData;
     using message::input::OpenNIImage;
+    using message::input::RigidBodyFrame;
 
     //Define the key input callback  
 	void OpenNIViewer::handleInput(const sf::Window& w, double time_since_start){
@@ -64,11 +65,13 @@ namespace graphics {
 
         on<Trigger<OpenNIImage>, 
         Optional<With<OpenNIData>>,
+        Optional<With<RigidBodyFrame>>,
         Optional<With<MatchResults>>, 
         Single, 
         MainThread>().then("Main Loop",
         	[this](const OpenNIImage& image, 
     			   const std::shared_ptr<const OpenNIData> openniData,
+    			   const std::shared_ptr<const RigidBodyFrame> mocapData,
     			   const std::shared_ptr<const MatchResults> matchResults
     			   ){
 	       	//Get current time
@@ -141,13 +144,7 @@ namespace graphics {
 			        	
 			        	//4x4 matrix pose
 			            Transform3D pose = rigidBody.second;
-			            
-			            //Convert to m from mm
-			            pose.translation() = pose.translation() * 0.001;
-			            
-			            // pose = Transform3D::createRotationY(M_PI) * pose;
-			            pose = Transform3D::createScale(arma::vec3{1,1,-1}) * pose;
-			            
+			            			            
 			            //Load pose into opengl as view matrix
 			            glMatrixMode(GL_MODELVIEW);
 			            glLoadMatrixd(pose.memptr());

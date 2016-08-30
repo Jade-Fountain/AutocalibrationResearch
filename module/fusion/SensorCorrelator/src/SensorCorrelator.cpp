@@ -24,7 +24,7 @@ namespace fusion {
         on<Startup>().then([this]{
 		    //Optional simulation parameters
 		    autocal::MocapStream openniStream(OPENNI_STREAM);
-		    autocal::MocapStream mocapStream(MOCAP_STREAM);
+		    autocal::MocapStream mocapStream(MOCAP_STREAM, true);
 
 		    sensorPlant.addStream(openniStream);
 		    sensorPlant.addStream(mocapStream);
@@ -53,6 +53,7 @@ namespace fusion {
     			for(auto& user : openniData->users){
 					// log("OpenNIData Data Received for User ", user.first, " : ", user.second.poses.size(), "rigid bodies");
     				addData(OPENNI_STREAM, user.second, current_timestamp, user.first);
+
     			}
     		}
 			
@@ -80,6 +81,7 @@ namespace fusion {
 
     void SensorCorrelator::addData(std::string stream, const RigidBodyFrame& rigidBodies, autocal::TimeStamp t, int id_offset){
 		for(auto& pose : rigidBodies.poses){
+			// std::cout << stream << " pose " << pose.second << std::endl;
 			sensorPlant.mocapRecording.addMeasurement(stream, t, pose.first + id_offset, pose.second);
 		}
     }

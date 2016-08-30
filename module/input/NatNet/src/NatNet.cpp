@@ -110,7 +110,6 @@ namespace input {
                 rigidBodies->poses[id] = pose;
 
             }   
-            log("Rigid bodies emitting -", rigidBodies->poses.size());
             emit(std::move(rigidBodies));
         });
     }

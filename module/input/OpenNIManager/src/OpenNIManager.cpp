@@ -88,7 +88,14 @@ namespace input {
                                          joint.getOrientation().y,
                                          joint.getOrientation().z);
                         Transform3D pose(q);
-                        pose.translation() = arma::vec3{joint.getPosition().x,joint.getPosition().y,joint.getPosition().z};
+                        
+                        //Convert to m from mm
+                        pose.translation() = 1e-3 * (arma::vec3{joint.getPosition().x,joint.getPosition().y,joint.getPosition().z});
+                        
+                        //Reflect to RHS OpenGL coordinate system
+                        auto refl = Transform3D::createScale(arma::vec3{1,1,-1});
+                        pose = refl * pose * refl;
+                        // pose = Transform3D::createRotationY(M_PI) * pose;
 
                         mocap->users[i].poses[j] = pose;
                     }

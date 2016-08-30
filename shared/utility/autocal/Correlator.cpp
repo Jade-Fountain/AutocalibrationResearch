@@ -53,7 +53,6 @@ namespace autocal {
 					}
 					if(std::fabs(arma::det(R2) - 1) > 0.1){
 						std::cout << __FILE__ << " : Det R2 = " << arma::det(R2) << std::endl;
-
 					}
 
 					// std::cout << "Recording Sample..." << std::endl; 
