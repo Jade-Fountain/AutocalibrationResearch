@@ -26,13 +26,38 @@
 namespace message {
     namespace input {
 
+        enum DataSource{
+            DEFAULT,
+            OPEN_NI,
+            PS_MOVE,
+            OPTITRACK
+        };
+
+        // template <DataSource T>
+        // struct RBFrame{
+        //     std::map<int, utility::math::matrix::Transform3D> poses;
+        //     const static DataSource source = T;
+        // };
+
+        // using RigidBodyFrame = RBFrame<DEFAULT>;
+        // using OpenNIFrame = RBFrame<OPEN_NI>;
+        // using PSMoveFrame = RBFrame<PS_MOVE>;
+        // using OptiTrackFrame = RBFrame<OPTITRACK>;
+
         struct RigidBodyFrame{
             std::map<int, utility::math::matrix::Transform3D> poses;
         };
 
-        struct OpenNIData{
-            std::map<int, RigidBodyFrame> users;
+        template <DataSource T>
+        struct DataFrame{
+            std::vector<RigidBodyFrame> users;
+            const static DataSource source = T;
         };
+
+        using OpenNIData = DataFrame<OPEN_NI>;
+        using PSMoveData = DataFrame<PS_MOVE>;
+        using OptiTrackData = DataFrame<OPTITRACK>;
+        using RigidBodyData = DataFrame<DEFAULT>;
 
         struct MotionCapture {
 

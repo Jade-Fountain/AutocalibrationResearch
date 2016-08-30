@@ -71,7 +71,8 @@ namespace graphics {
         MainThread>().then("Main Loop",
         	[this](const OpenNIImage& image, 
     			   const std::shared_ptr<const OpenNIData> openniData,
-    			   const std::shared_ptr<const RigidBodyFrame> mocapData,
+    			   const std::shared_ptr<const OptiTrackData> mocapData,
+    			   const std::shared_ptr<const PSMoveData> psMoveData,
     			   const std::shared_ptr<const MatchResults> matchResults
     			   ){
 	       	//Get current time
@@ -173,12 +174,16 @@ namespace graphics {
 	        	std::cout << "NO Kinect RECEIVED" << std::endl;
 	        }
 
-	        if(mocapData){
+	        if(mocapData && mocapData->users.size() > 0){
+	        	//Draw first user only
+	        	auto& user0 = mocapData->users[0];
+	        	//Extract modelview matrix
 	        	Transform3D mocapViewMatrix;
-	        	if(mocapData->poses.count(1) != 0){
-					mocapViewMatrix = mocapData->poses.at(1);
+	        	if(user0.poses.count(1) != 0){
+					mocapViewMatrix = user0.poses.at(1);
 	        	}
-		        for(auto& rigidBody : mocapData->poses){
+	        	//Draw rigid bodies
+		        for(auto& rigidBody : user0.poses){
 		        	//Extract ID
 		        	int id = rigidBody.first;
 		        	if(id == 1) {
