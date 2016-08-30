@@ -48,7 +48,7 @@ namespace fusion {
         	}
         	//No match found
         	return -1;
-        };	
+        }	
     };
 
 }
