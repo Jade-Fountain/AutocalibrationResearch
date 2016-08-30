@@ -38,13 +38,12 @@ namespace input {
     NatNet::NatNet(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)) {
 
-        on<Configuration>("NatNet.yaml").then([this] (const Configuration& config) {
+        on<Configuration>("NatNet.yaml").then("NatnetConfig",[this] (const Configuration& config) {
 
             // We are updating to a new multicast address
             if (multicastAddress != config["multicast_address"].as<std::string>()
                 || dataPort != config["data_port"].as<uint32_t>()
                 || commandPort != config["command_port"].as<uint32_t>()) {
-
                 if (commandHandle) {
                     commandHandle.unbind();
                 }
@@ -66,7 +65,6 @@ namespace input {
 
                 // Create a listening UDP port for data
                 std::tie(dataHandle, std::ignore, std::ignore) = on<UDP::Multicast>(multicastAddress, dataPort).then("NatNet Data", [this] (UDP::Packet packet) {
-
                     // Test if we are "connected" to this remote
                     // And if we are we can use the data
                     if (remote == packet.remote.address && version != 0) {
@@ -78,6 +76,7 @@ namespace input {
                     }
                     // We haven't connected to anything yet
                     else if (remote == 0) {
+
                         // This is now our remote
                         remote = packet.remote.address;
 
@@ -91,26 +90,27 @@ namespace input {
             }
         });
 
-        on<Trigger<MotionCapture>>().then([this](const MotionCapture& mocap){
+        on<Trigger<MotionCapture>>().then("NatNet - RigidBodies",[this](const MotionCapture& mocap){
             auto rigidBodies = std::make_unique<RigidBodyFrame>();
             for(auto& rigidBody : mocap.rigidBodies){
-                    int id = rigidBody.id;
-                    Transform3D pose;
-                    pose.translation() = arma::vec3({double(rigidBody.position[0]),
-                                                     double(rigidBody.position[1]),
-                                                     double(rigidBody.position[2])});
-                    UnitQuaternion q(rigidBody.rotation[3], // real part
-                                     arma::vec3({
-                                        double(rigidBody.rotation[0]),//imaginary part
-                                        double(rigidBody.rotation[1]),
-                                        double(rigidBody.rotation[2])
-                                                })
-                                     );
-                    pose.rotation() = Rotation3D(q);
-                    
-                    rigidBodies->poses[id] = pose;
+                int id = rigidBody.id;
+                Transform3D pose;
+                pose.translation() = arma::vec3({double(rigidBody.position[0]),
+                                                 double(rigidBody.position[1]),
+                                                 double(rigidBody.position[2])});
+                UnitQuaternion q(rigidBody.rotation[3], // real part
+                                 arma::vec3({
+                                    double(rigidBody.rotation[0]),//imaginary part
+                                    double(rigidBody.rotation[1]),
+                                    double(rigidBody.rotation[2])
+                                            })
+                                 );
+                pose.rotation() = Rotation3D(q);
+                
+                rigidBodies->poses[id] = pose;
 
-                }   
+            }   
+            log("Rigid bodies emitting -", rigidBodies->poses.size());
             emit(std::move(rigidBodies));
         });
     }

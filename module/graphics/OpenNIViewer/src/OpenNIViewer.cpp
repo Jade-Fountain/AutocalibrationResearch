@@ -6,14 +6,18 @@
 
 #include "utility/autocal/GraphicsTools.h"
 #include "utility/math/matrix/Transform3D.h"
+#include "message/fusion/Fusion.h"
 
 namespace module {
 namespace graphics {
 
     using utility::math::matrix::Transform3D;
-    using message::input::OpenNIData;
-
+    
     using message::support::Configuration;
+    
+    using message::fusion::MatchResults;
+
+    using message::input::OpenNIData;
     using message::input::OpenNIImage;
 
     //Define the key input callback  
@@ -27,7 +31,7 @@ namespace graphics {
 
     OpenNIViewer::OpenNIViewer(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)),
-    window(sf::VideoMode(640*2, 480*2), "OpenGL", sf::Style::Default, sf::ContextSettings(32)) {
+    window(sf::VideoMode(640*4, 480*4), "OpenGL", sf::Style::Default, sf::ContextSettings(32)) {
 
         on<Configuration>("OpenNIViewer.yaml").then([this] (const Configuration& config) {
             // Use configuration here from file OpenNIViewer.yaml
@@ -58,11 +62,14 @@ namespace graphics {
 		    checkGLError();
         });
 
-        on<Trigger<OpenNIImage>, Optional<With<OpenNIData>>, Single, MainThread>().then("Main Loop",
+        on<Trigger<OpenNIImage>, 
+        Optional<With<OpenNIData>>,
+        Optional<With<MatchResults>>, 
+        Single, 
+        MainThread>().then("Main Loop",
         	[this](const OpenNIImage& image, 
-    			   const std::shared_ptr<const OpenNIData> openniData
-    			   //TODO:
-    			   // const std::shared_ptr<const MatchData> matchData
+    			   const std::shared_ptr<const OpenNIData> openniData,
+    			   const std::shared_ptr<const MatchResults> matchResults
     			   ){
 	       	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
@@ -73,6 +80,9 @@ namespace graphics {
 
 	        //Check input
 	        handleInput(window, frame_time_since_start);
+
+	        //Check if we have matches relevant to our data
+	        bool matchesValid = matchResults && matchResults->stream1 == "openni";
 
 
 	        glMatrixMode(GL_PROJECTION);
@@ -141,7 +151,24 @@ namespace graphics {
 			            //Load pose into opengl as view matrix
 			            glMatrixMode(GL_MODELVIEW);
 			            glLoadMatrixd(pose.memptr());
-			            
+
+			            //Draw matches
+			            if(matchesValid){
+				            bool draw_match = false;
+				            for(auto& m : matchResults->matches){
+				                if(m.first == id){
+				                	draw_match = true;
+				                	break;
+				                }
+				            }
+			                if(draw_match) {
+			                	std::cout << "Drawing Match" << std::endl;
+			                    glEnable(GL_LIGHTING);
+			                    GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
+			                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+			                    glutSolidSphere(0.5 * basisScale, 10, 10);
+			                }
+				        }
 			            drawBasis(basisScale);
 			        }
 		        }	
