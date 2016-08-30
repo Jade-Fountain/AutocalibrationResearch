@@ -159,7 +159,7 @@ namespace graphics {
 				                }
 				            }
 			                if(draw_match) {
-			                	std::cout << "Drawing Match" << std::endl;
+			                	// std::cout << "Drawing Match" << std::endl;
 			                    glEnable(GL_LIGHTING);
 			                    GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
 			                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
@@ -171,6 +171,30 @@ namespace graphics {
 		        }	
 	        } else {
 	        	std::cout << "NO Kinect RECEIVED" << std::endl;
+	        }
+
+	        if(mocapData){
+	        	Transform3D mocapViewMatrix;
+	        	if(mocapData->poses.count(1) != 0){
+					mocapViewMatrix = mocapData->poses.at(1);
+	        	}
+		        for(auto& rigidBody : mocapData->poses){
+		        	//Extract ID
+		        	int id = rigidBody.first;
+		        	if(id == 1) {
+		        		continue;
+		        	}
+		        	
+		        	//4x4 matrix pose
+		            Transform3D pose = mocapViewMatrix.i() * rigidBody.second;
+		            			            
+		            //Load pose into opengl as view matrix
+		            glMatrixMode(GL_MODELVIEW);
+		            glLoadMatrixd(pose.memptr());
+
+			        drawBasis(basisScale);
+		        }
+
 	        }
 
 

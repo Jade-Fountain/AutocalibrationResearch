@@ -60,6 +60,7 @@ namespace autocal {
 		computeTimes(double(std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() * 1e-6));
 		
 		//Compute correct guesses:
+		//TODO: remove this from in here
 		auto answers = correctMatchings[hypothesisKey];
 		for (auto& cor : correlations){
 			if(correctGuesses.count(cor.first) == 0) correctGuesses[cor.first] = 0;

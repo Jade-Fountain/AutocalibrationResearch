@@ -71,9 +71,9 @@ namespace fusion {
 	        results->matches = sensorPlant.matchStreams(OPENNI_STREAM, MOCAP_STREAM, current_timestamp, 0);
 
 	        //Debug:
-	        for(auto& match : results->matches){
-	        	std::cout << "Matched: " << match.first << " with " << match.second << std::endl;
-	        }
+	        // for(auto& match : results->matches){
+	        // 	std::cout << "Matched: " << match.first << " with " << match.second << std::endl;
+	        // }
 	        //Send to visualiser
 	        emit(results);
     	});
