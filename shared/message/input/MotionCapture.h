@@ -17,8 +17,8 @@
  * Copyright 2013 NUBots <nubots@nubots.net>
  */
 
-#ifndef MESSAGES_INPUT_SERVOID_H
-#define MESSAGES_INPUT_SERVOID_H
+#ifndef MESSAGES_INPUT_MOTION_CAPTURE_H
+#define MESSAGES_INPUT_MOTION_CAPTURE_H
 
 #include <string>
 #include "utility/math/matrix/Transform3D.h"

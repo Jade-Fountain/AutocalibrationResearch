@@ -6,6 +6,10 @@ NUCLEAR_ROLE(
 
     
     input::OpenNIManager
+    input::NatNet
+
     graphics::OpenNIViewer
+
     fusion::SensorCorrelator
+
 )

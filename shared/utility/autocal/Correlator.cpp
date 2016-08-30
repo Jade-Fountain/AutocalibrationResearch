@@ -56,7 +56,7 @@ namespace autocal {
 
 					}
 
-					std::cout << "Recording Sample..." << std::endl; 
+					// std::cout << "Recording Sample..." << std::endl; 
 
 					if(recordedStates[key].first.size() >= number_of_samples){
 						recordedStates[key].first.erase(recordedStates[key].first.begin());

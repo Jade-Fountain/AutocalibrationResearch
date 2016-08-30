@@ -5,6 +5,7 @@
 #include "utility/autocal/SensorPlant.h"
 #include "message/input/MotionCapture.h"
 
+
 namespace module {
 namespace fusion {
 
