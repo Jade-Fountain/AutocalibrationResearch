@@ -26,11 +26,29 @@
 namespace message {
 namespace fusion {
 
-    struct MatchResults{
+    class MatchResults{
+    public:
         std::string stream1;
         std::string stream2;
 
         std::vector<std::pair<int, int>> matches;
+
+        //Returns 
+        int getMatchFor(std::string stream, int id){
+        	if(stream == stream1){
+        		for(auto& match : matches){
+        			if(id == match.first) return match.second;
+        		}
+        	} else if(stream == stream2){
+        		for(auto& match : matches){
+        			if(id == match.second) return match.first;
+        		}
+        	} else {
+        		std::cout << "WARNING: Matches not found for stream " << stream << std::endl;
+        	}
+        	//No match found
+        	return -1;
+        };	
     };
 
 }
