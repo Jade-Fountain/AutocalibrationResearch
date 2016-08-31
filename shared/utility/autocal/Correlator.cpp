@@ -28,47 +28,48 @@ namespace autocal {
 			if(recordedStates.count(key) == 0){
 				//Initialise if key missing. (true => calculate cov)
 				recordedStates[key] = StreamPair();
-			} else {
+			} 
+			
 				
-				// std::cout << "number of samples = " << recordedStates[key].first.size() << std::endl;
-				// std::cout << "diff1 = " << diff1 << std::endl; 
-				// if( id1 == 1 && id2 == 18) std::cout << "T2 = " << T2 << std::endl; 
-				// std::cout << "diff2 = " << diff2 << std::endl; 
-				// std::cout << "T2 = " << T2 << std::endl; 
+			// std::cout << "number of samples = " << recordedStates[key].first.size() << std::endl;
+			// std::cout << "diff1 = " << diff1 << std::endl; 
+			// if( id1 == 1 && id2 == 18) std::cout << "T2 = " << T2 << std::endl; 
+			// std::cout << "diff2 = " << diff2 << std::endl; 
+			// std::cout << "T2 = " << T2 << std::endl; 
 
-				//If we have no recorded states yet, or the new states differ significantly from the previous, add the new states
-				if( stateIsNew(T1, recordedStates[key].first) 
-					|| stateIsNew(T2, recordedStates[key].second) )
-				{
-					//Check if bad sample (for the particular solver we are using):	
-					Rotation3D R1 = T1.rotation();
-					UnitQuaternion q1(R1);
-					Rotation3D R2 = T2.rotation();
-					UnitQuaternion q2(R2);
-					if(q1.kW() == 0 || q2.kW() == 0) return;
+			//If we have no recorded states yet, or the new states differ significantly from the previous, add the new states
+			if( stateIsNew(T1, recordedStates[key].first) 
+				|| stateIsNew(T2, recordedStates[key].second) )
+			{
+				//Check if bad sample (for the particular solver we are using):	
+				Rotation3D R1 = T1.rotation();
+				UnitQuaternion q1(R1);
+				Rotation3D R2 = T2.rotation();
+				UnitQuaternion q2(R2);
+				if(q1.kW() == 0 || q2.kW() == 0) return;
 
-					//Check det
-					if(std::fabs(arma::det(R1) - 1) > 0.1){
-						std::cout << __FILE__ << " : Det R1 = " << arma::det(R1) << std::endl;
-					}
-					if(std::fabs(arma::det(R2) - 1) > 0.1){
-						std::cout << __FILE__ << " : Det R2 = " << arma::det(R2) << std::endl;
-					}
-
-					// std::cout << "Recording Sample..." << std::endl; 
-
-					if(recordedStates[key].first.size() >= number_of_samples){
-						recordedStates[key].first.erase(recordedStates[key].first.begin());
-						recordedStates[key].first.push_back(T1);
-						recordedStates[key].second.erase(recordedStates[key].second.begin());
-						recordedStates[key].second.push_back(T2);
-						//Now we are ready to compute
-						computableStreams.insert(key);
-					} else {
-						recordedStates[key].first.push_back(T1);
-						recordedStates[key].second.push_back(T2);
-					}
+				//Check det
+				if(std::fabs(arma::det(R1) - 1) > 0.1){
+					std::cout << __FILE__ << " : Det R1 = " << arma::det(R1) << std::endl;
 				}
+				if(std::fabs(arma::det(R2) - 1) > 0.1){
+					std::cout << __FILE__ << " : Det R2 = " << arma::det(R2) << std::endl;
+				}
+
+				// std::cout << "Recording Sample..." << std::endl; 
+
+				if(recordedStates[key].first.size() >= number_of_samples){
+					recordedStates[key].first.erase(recordedStates[key].first.begin());
+					recordedStates[key].first.push_back(T1);
+					recordedStates[key].second.erase(recordedStates[key].second.begin());
+					recordedStates[key].second.push_back(T2);
+					//Now we are ready to compute
+					computableStreams.insert(key);
+				} else {
+					recordedStates[key].first.push_back(T1);
+					recordedStates[key].second.push_back(T2);
+				}
+				
 
 			}
 		}
@@ -92,33 +93,46 @@ namespace autocal {
 				}
 			}
 			//If all eliminated			
-			if(eliminatedHypotheses.size() == scores.size()){
+			if(eliminatedHypotheses.size() == recordedStates.size()){
 				reset();
 			}
 		}
 
-		bool Correlator::sufficientData(){
-			if(computableStreams.size() == 0) return false;
-			for(auto& hypothesis : recordedStates){
+		std::map<int, bool> Correlator::sufficientData(){
+			std::map<int, bool> streamsReady; 
+			if(computableStreams.size() == 0) return streamsReady;
+			for(const auto& hypothesis : recordedStates){
 				const auto& key = hypothesis.first;
-				// std::cout << "computableStreams.count(key) = " << computableStreams.count(key) << std::endl;
+				if(streamsReady.count(key.first) == 0){
+					streamsReady[key.first] = true;
+				}
 				if(eliminatedHypotheses.count(key) != 0) continue;
-				if(computableStreams.count(key) == 0) return false;
+				if(computableStreams.count(key) == 0) {
+					streamsReady[key.first] = false;
+				}
 			}
-			return true;
+			return streamsReady;
 		}
 
-		void Correlator::compute(){
-			std::cout << "\nComputing matches..." << std::endl;
+		void Correlator::compute(const std::map<int, bool>& streamsReady){
+			// std::cout << "Keys ready:" << std::endl;
+			// for(auto& x : streamsReady){
+			// 	std::cout << x.first << " - " << (x.second ? "READY" : "NOT") << std::endl;
+			// }
+
 			std::map<MocapStream::RigidBodyID,float> totalScores;
-			for(auto& hypothesis : recordedStates){
-				//Extract data from its confusing encrypted data structure
+			// std::cout << "\nComputing matches..." << std::endl;
+			for(const auto& hypothesis : recordedStates){
+				//Extract data from its confusing data structure
 				const auto& key = hypothesis.first;
 				const auto& id1 = key.first;
 				const auto& id2 = key.second;
 				const Correlator::Stream& states1 = hypothesis.second.first;
 				const Correlator::Stream& states2 = hypothesis.second.second;
 				
+				//Check there is enough data for this stream
+				if(streamsReady.count(id1) == 0 || !streamsReady.at(id1)) continue;
+
 				//Check whether or not we need to check this hypothesis anymore
 				if(eliminatedHypotheses.count(key) != 0) continue;
 
@@ -128,9 +142,9 @@ namespace autocal {
 				}
 				//CONFIG HERE: 
 				//CE METHOD
-				// float score = getSylvesterScore(states1, states2, key);
+				float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				float score = getRotationScore(states1, states2, key);
+				// float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -163,6 +177,7 @@ namespace autocal {
 			eliminatedHypotheses.clear();
 			scores.clear();
 			firstRotationReadings.clear();
+			std::cout << "Correlator RESET" << std::endl; 
 		}
 
 		void Correlator::resetRecordedStates(){

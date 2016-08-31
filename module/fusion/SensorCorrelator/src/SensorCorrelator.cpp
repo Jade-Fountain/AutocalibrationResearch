@@ -56,7 +56,6 @@ namespace fusion {
     			if(openniData->users.count(0) > 0){
 					// log("OpenNIData Data Received for User ", user.first, " : ", user.second.poses.size(), "rigid bodies");
     				addData(OPENNI_STREAM, openniData->users.at(0), current_timestamp, 0);
-
     			}
     		}
 			

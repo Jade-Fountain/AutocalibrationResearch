@@ -21,6 +21,7 @@ namespace autocal {
 		MocapStream& stream2 = mocapRecording.getStream(stream_name_2);
 		
 		NamePair hypothesisKey({stream_name_1,stream_name_2});
+		// std::cout << "stream1 = " << stream_name_1 << " stream2 = " << stream_name_2 << std::endl;
 
 		//Initialise eliminated hypotheses if necessary
 		if(correlators.count(hypothesisKey) == 0){
@@ -50,9 +51,7 @@ namespace autocal {
 		}
 
 		//Compute correlations
-		if(correlator.sufficientData()){
-			correlator.compute();
-		}
+		correlator.compute(correlator.sufficientData());
 
 		std::vector<SensorPlant::Hypothesis> correlations = correlator.getBestCorrelations();
 

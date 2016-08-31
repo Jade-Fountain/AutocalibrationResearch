@@ -67,9 +67,9 @@ namespace autocal {
 
 		void eliminateAndNormalise(std::map<MocapStream::RigidBodyID,float> totalScores);
 
-		bool sufficientData();
+		std::map<int, bool> sufficientData();
 
-		void compute();
+		void compute(const std::map<int, bool>& streamsReady);
 
 		void reset();
 
