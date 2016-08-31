@@ -11,6 +11,8 @@ namespace fusion {
     using message::input::RigidBodyFrame;
     
     using message::fusion::MatchResults;
+    using message::fusion::MOCAP_STREAM;
+    using message::fusion::OPENNI_STREAM;
 
     using autocal::MocapStream;
 
@@ -50,9 +52,10 @@ namespace fusion {
     		
 	        //Add openni data
     		if(openniData){
-    			for(auto& user : openniData->users){
+    			// for(auto& user : openniData->users){
+    			if(openniData->users.count(0) > 0){
 					// log("OpenNIData Data Received for User ", user.first, " : ", user.second.poses.size(), "rigid bodies");
-    				addData(OPENNI_STREAM, user.second, current_timestamp, user.first);
+    				addData(OPENNI_STREAM, openniData->users.at(0), current_timestamp, 0);
 
     			}
     		}
@@ -65,10 +68,10 @@ namespace fusion {
 
     		//Init message:
     		auto results = std::make_unique<MatchResults>();
-    		results->stream1 = OPENNI_STREAM;
-    		results->stream2 = MOCAP_STREAM;
+    		results->stream1 = MOCAP_STREAM;
+    		results->stream2 = OPENNI_STREAM;
     		//Match streams
-	        results->matches = sensorPlant.matchStreams(OPENNI_STREAM, MOCAP_STREAM, current_timestamp, 0);
+	        results->matches = sensorPlant.matchStreams(MOCAP_STREAM, OPENNI_STREAM, current_timestamp, 0);
 
 	        //Debug:
 	        // for(auto& match : results->matches){

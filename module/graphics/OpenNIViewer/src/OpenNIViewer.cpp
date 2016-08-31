@@ -16,6 +16,9 @@ namespace graphics {
     using message::support::Configuration;
     
     using message::fusion::MatchResults;
+    using message::fusion::OPENNI_STREAM;
+    using message::fusion::MOCAP_STREAM;
+    using message::fusion::MatchResults;
 
     using message::input::OpenNIData;
     using message::input::OpenNIImage;
@@ -84,9 +87,6 @@ namespace graphics {
 	        //Check input
 	        handleInput(window, frame_time_since_start);
 
-	        //Check if we have matches relevant to our data
-	        bool matchesValid = matchResults && matchResults->stream1 == "openni";
-
 
 	        glMatrixMode(GL_PROJECTION);
 	        glLoadIdentity();
@@ -150,16 +150,16 @@ namespace graphics {
 			            glLoadMatrixd(pose.memptr());
 
 			            //Draw matches
-			            if(matchesValid){
-				            bool draw_match = false;
-				            for(auto& m : matchResults->matches){
-				                if(m.first == id){
-				                	draw_match = true;
-				                	break;
-				                }
-				            }
-			                if(draw_match) {
-			                	// std::cout << "Drawing Match" << std::endl;
+			            //TODO: make its own loop maybe?
+			            if(matchResults){
+				            int match = matchResults->getMatchFor(OPENNI_STREAM, id);
+				       //      std::cout << "MATCHES:" << std::endl;
+				       //      for(auto& match : matchResults->matches){
+    							// std::cout << "match: " << match.first << ", " << match.second << std::endl;
+				       //      }
+				            //If we have decided that this body corresponds to another (but not the camera pose)
+			                if(match >= 2) {
+			                	// std::cout << " Drawing Match" << std::endl;
 			                    glEnable(GL_LIGHTING);
 			                    GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
 			                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);

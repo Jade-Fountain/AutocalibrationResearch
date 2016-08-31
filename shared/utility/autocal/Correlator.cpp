@@ -17,7 +17,7 @@ namespace autocal {
 			score_inclusion_threshold = 0.5;
 		}
 
-
+		//TODO: make space efficient - dont store streams multiple times
 		void Correlator::addData(MocapStream::RigidBodyID id1, Transform3D T1, MocapStream::RigidBodyID id2, Transform3D T2){
 			//Generate key for the map of correlationStats
 			std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID> key = {id1,id2};
@@ -179,19 +179,6 @@ namespace autocal {
 			float diff = Transform3D::norm(lastTransform * T);
 			return diff > difference_threshold;
 
-			//New method
-			// float minDiffAngle = std::numeric_limits<float>::max();
-			// float minDiffPos = std::numeric_limits<float>::max();
-			// for(auto& S : states){
-			// 	float diffAngle = Rotation3D::norm(S.rotation().t() * T.rotation());
-			// 	float diffPos = arma::norm(T.translation() - S.translation());
-			// 	if(diffAngle < minDiffAngle && diffPos < minDiffPos ){
-			// 		minDiffAngle = diffAngle;
-			// 		minDiffPos = diffPos;
-			// 	}
-			// }
-			// // std::cout << "angle = " << minDiffAngle << " pos = " << minDiffPos << std::endl;
-			// return minDiffAngle > difference_threshold && minDiffPos > difference_threshold;
 		}
 
 

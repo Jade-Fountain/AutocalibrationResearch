@@ -11,9 +11,6 @@ namespace fusion {
 
     class SensorCorrelator : public NUClear::Reactor {
 		autocal::SensorPlant sensorPlant;
-
-		const std::string OPENNI_STREAM = "openni";
-		const std::string MOCAP_STREAM = "mocap";
 	    
 	    std::chrono::time_point<std::chrono::system_clock> start_time;    
 
