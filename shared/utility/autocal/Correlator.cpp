@@ -74,7 +74,7 @@ namespace autocal {
 			}
 		}
 
-		void Correlator::eliminateAndNormalise(std::map<MocapStream::RigidBodyID,float> totalScores){
+		void Correlator::eliminateAndNormalise(std::map<MocapStream::RigidBodyID,float> totalScores, const std::map<int, bool>& streamsReady){
 			//Normalise scores and eliminate low scores
 			for (auto& s : scores){
 				const auto& pairID = s.first;
@@ -92,8 +92,9 @@ namespace autocal {
 					}						
 				}
 			}
+			//HACK!! 
 			//If all eliminated			
-			if(eliminatedHypotheses.size() == recordedStates.size()){
+			if(eliminatedHypotheses.size() == scores.size()){
 				reset();
 			}
 		}
@@ -165,9 +166,11 @@ namespace autocal {
 				totalScores[id1] += scores[key];
 			}
 			// std::cout << std::endl;
-			computableStreams.clear();
+			if(totalScores.size() > 0){
+				computableStreams.clear();
 
-			eliminateAndNormalise(totalScores);
+				eliminateAndNormalise(totalScores, streamsReady);
+			}
 
 			// resetRecordedStates();
 		}
