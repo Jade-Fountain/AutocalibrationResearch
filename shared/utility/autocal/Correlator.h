@@ -32,30 +32,39 @@ namespace autocal {
 		float elimination_score_threshold; 
 
 		float score_inclusion_threshold;
+		
 		//STATE
-
-		using Hypothesis = std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID>;
 		using Stream = std::vector<utility::math::matrix::Transform3D>;
-		using StreamPair = std::pair<Stream, Stream>;
 
-		//States for matchStreams
-		std::map<Hypothesis, StreamPair> recordedStates;
-		//Stores scores for the matchings
-		std::map<Hypothesis, float> scores;
-		//Stores the matches which have been deduced incorrect
-		std::set<Hypothesis> eliminatedHypotheses;
-		
-		std::set<Hypothesis> computableStreams;
+		class RigidBodyInfo{
+		public:
+			RigidBodyInfo(int id_) : id(id_){
 
-		//For rotation scoring:
-		std::map<Hypothesis, std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> >
-				 firstRotationReadings;
-		
-		float getSylvesterScore(const Stream& states1, const Stream& states2, 
-								Hypothesis key);
+			}
 
-		float getRotationScore(const Stream& states1, const Stream& states2, 
-								Hypothesis key);
+			//Details of the stream which links to one of the hypotheses
+			int id;
+			Stream states;
+
+			//Hypothesis streams
+			std::map<int, Stream> hypotheses;
+
+			//Latest scores
+			std::map<int, float> scores;
+
+			//Ready for scoring?
+			bool computable = false;
+
+			//Flag for reset
+			std::vector<bool> initialised;
+		};
+
+		//Central state of correlator
+		std::map<int, RigidBodyInfo> rigidBodies;
+
+		float getSylvesterScore(const Stream& states1, const Stream& states2);
+
+		float getRotationScore(const Stream& states1, const Stream& states2);
 		
 		void resetRecordedStates();
 
@@ -63,9 +72,9 @@ namespace autocal {
 		
 	public:
 
-		void addData(MocapStream::RigidBodyID id1, utility::math::matrix::Transform3D T1, MocapStream::RigidBodyID id2, utility::math::matrix::Transform3D T2);
+		void addData(int id1, utility::math::matrix::Transform3D T1, int id2, utility::math::matrix::Transform3D T2);
 
-		void eliminateAndNormalise(std::map<MocapStream::RigidBodyID,float> totalScores);
+		void eliminateAndNormalise(std::map<int,float> totalScores);
 
 		std::map<int, bool> sufficientData();
 

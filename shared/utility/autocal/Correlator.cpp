@@ -10,7 +10,7 @@ namespace autocal {
 	using utility::math::matrix::Rotation3D;
 	using utility::math::geometry::UnitQuaternion;
 
-		Correlator::Correlator():firstRotationReadings(){
+		Correlator::Correlator(){
 			number_of_samples = 10;
 			difference_threshold = 0.1;
 			elimination_score_threshold = 0.1;
@@ -18,28 +18,26 @@ namespace autocal {
 		}
 
 		//TODO: make space efficient - dont store streams multiple times
-		void Correlator::addData(MocapStream::RigidBodyID id1, Transform3D T1, MocapStream::RigidBodyID id2, Transform3D T2){
-			//Generate key for the map of correlationStats
-			std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID> key = {id1,id2};
-
+		void Correlator::addData(int id1, Transform3D T1, int id2, Transform3D T2){
 			//Check if this hypothesis has been eliminated
 			if(eliminatedHypotheses.count(key) != 0) return;
 
-			if(recordedStates.count(key) == 0){
-				//Initialise if key missing. (true => calculate cov)
-				recordedStates[key] = StreamPair();
+			//Initialise if not initialised yet
+			if(rigidBodies.count(id1) == 0){
+				rigidBodies[id1] = RigidBodyInfo(id1);
+				rigidBodies[id1].addHypothesis(id2,T2);
+				rigidBodies[id1].addState(id2,T2);
+
+				//JUST REALISED THAT THIS METHOD DOESNT SUPPORT ADDING MEASUREMENTS PER CHANGE OF second sensors
+				return;
 			} 
 			
-				
-			// std::cout << "number of samples = " << recordedStates[key].first.size() << std::endl;
-			// std::cout << "diff1 = " << diff1 << std::endl; 
-			// if( id1 == 1 && id2 == 18) std::cout << "T2 = " << T2 << std::endl; 
-			// std::cout << "diff2 = " << diff2 << std::endl; 
-			// std::cout << "T2 = " << T2 << std::endl; 
+			//Get handle for convenience
+			RigidBodyInfo& rigidBody = rigidBodies[id1];
 
 			//If we have no recorded states yet, or the new states differ significantly from the previous, add the new states
-			if( stateIsNew(T1, recordedStates[key].first) 
-				|| stateIsNew(T2, recordedStates[key].second) )
+			if( stateIsNew(T1, rigidBody.first) 
+				|| stateIsNew(T2, rigidBody.second) )
 			{
 				//Check if bad sample (for the particular solver we are using):	
 				Rotation3D R1 = T1.rotation();
@@ -74,7 +72,7 @@ namespace autocal {
 			}
 		}
 
-		void Correlator::eliminateAndNormalise(std::map<MocapStream::RigidBodyID,float> totalScores){
+		void Correlator::eliminateAndNormalise(std::map<int,float> totalScores){
 			//Normalise scores and eliminate low scores
 			for (auto& s : scores){
 				const auto& pairID = s.first;
@@ -121,7 +119,7 @@ namespace autocal {
 			// 	std::cout << x.first << " - " << (x.second ? "READY" : "NOT") << std::endl;
 			// }
 
-			std::map<MocapStream::RigidBodyID,float> totalScores;
+			std::map<int,float> totalScores;
 			// std::cout << "\nComputing matches..." << std::endl;
 			for(const auto& hypothesis : recordedStates){
 				//Extract data from its confusing data structure
@@ -179,7 +177,6 @@ namespace autocal {
 			resetRecordedStates();
 			eliminatedHypotheses.clear();
 			scores.clear();
-			firstRotationReadings.clear();
 			std::cout << "Correlator RESET" << std::endl; 
 		}
 
@@ -200,8 +197,7 @@ namespace autocal {
 		}
 
 
-		float Correlator::getSylvesterScore(const Correlator::Stream& states1, const Correlator::Stream& states2, 
-											Correlator::Hypothesis key){
+		float Correlator::getSylvesterScore(const Correlator::Stream& states1, const Correlator::Stream& states2){
 			//Fit data
 			bool success = true;
 			// auto result = CalibrationTools::solveZhuang1994(states1,states2,success);
@@ -254,15 +250,7 @@ namespace autocal {
 			return likelihood(totalError / float(number_of_samples));
 		}
 
-		float Correlator::getRotationScore(const Correlator::Stream& states1, const Correlator::Stream& states2,
-										   Correlator::Hypothesis key){
-			
-			if(firstRotationReadings.count(key) == 0){
-				std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> val = {states1.front().rotation(), states2.front().rotation()};
-				firstRotationReadings[key] = val;
-				return 1;
-			}
-
+		float Correlator::getRotationScore(const Correlator::Stream& states1, const Correlator::Stream& states2){
 			//Fit data
 			Rotation3D R1 = states1.back().rotation().t() * states1.front().rotation();
 			Rotation3D R2 = states2.back().rotation().t() * states2.front().rotation();
@@ -280,8 +268,8 @@ namespace autocal {
 
 		std::vector<std::pair<int,int>> Correlator::getBestCorrelations(){
 			//TODO: this
-			std::map<MocapStream::RigidBodyID,MocapStream::RigidBodyID> bestMatches;
-			std::map<MocapStream::RigidBodyID,float> bestScores;
+			std::map<int,int> bestMatches;
+			std::map<int,float> bestScores;
 
 			for(const auto& s : scores){
 				const auto& key = s.first;
