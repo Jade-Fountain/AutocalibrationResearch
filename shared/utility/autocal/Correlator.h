@@ -46,10 +46,6 @@ namespace autocal {
 		std::set<Hypothesis> eliminatedHypotheses;
 		
 		std::set<Hypothesis> computableStreams;
-
-		//For rotation scoring:
-		std::map<Hypothesis, std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> >
-				 firstRotationReadings;
 		
 		float getSylvesterScore(const Stream& states1, const Stream& states2, 
 								Hypothesis key);
@@ -59,6 +55,8 @@ namespace autocal {
 		
 		void resetRecordedStates();
 
+		void resetStates(int id);
+
 		bool stateIsNew(const utility::math::matrix::Transform3D& T, const Stream& states);
 		
 	public:
@@ -67,9 +65,9 @@ namespace autocal {
 
 		void eliminateAndNormalise(std::map<MocapStream::RigidBodyID,float> totalScores);
 
-		bool sufficientData();
+		std::map<int, bool> sufficientData();
 
-		void compute();
+		void compute(const std::map<int, bool>& streamsReady);
 
 		void reset();
 

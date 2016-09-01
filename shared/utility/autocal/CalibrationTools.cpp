@@ -267,7 +267,7 @@ namespace autocal{
 	// solves AX=YB for X,Y and A in sampleA, B in sampleB
 	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveKronecker_Shah2013(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
 		if(samplesA.size() < 3 || samplesB.size() < 3){
-			std::cout << "CalibrationTools - NEED MORE THAN 2 SAMPLES" << std::endl;
+			std::cout << "CalibrationTools - solveKronecker_Shah2013 - NEED MORE THAN 2 SAMPLES" << std::endl;
 			throw std::domain_error("CalibrationTools - NEED MORE THAN 2 SAMPLES");
 		}
 		std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> result;
@@ -338,6 +338,10 @@ namespace autocal{
 
 		result.first.translation() = translation.first;
 		result.second.translation() = translation.second;
+
+		success = success &&
+				  result.first.is_finite() &&
+				  result.second.is_finite();
 
 		return result;
 

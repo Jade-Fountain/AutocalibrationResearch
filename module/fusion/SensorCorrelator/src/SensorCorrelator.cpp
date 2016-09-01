@@ -11,6 +11,9 @@ namespace fusion {
     using message::input::RigidBodyFrame;
     
     using message::fusion::MatchResults;
+    using message::message::DataSource::OPEN_NI
+	using message::message::DataSource::PS_MOVE;
+	using message::message::DataSource::OPTITRACK;
 
     using autocal::MocapStream;
 
@@ -35,11 +38,13 @@ namespace fusion {
         on<Every<30, 
         Per<std::chrono::seconds>>,
         Optional<With<OpenNIData>>,
-        Optional<With<RigidBodyFrame>>,
+        Optional<With<OptiTrackData>>,
+        Optional<With<PSMoveData>>,
         Single>().then("SensorCorrelator - Sensor Matching Loop",
     	[this](
-    		const std::shared_ptr<const OpenNIData> openniData,
-    		const std::shared_ptr<const RigidBodyFrame> mocapData
+			   const std::shared_ptr<const OpenNIData> openniData,
+			   const std::shared_ptr<const OptiTrackData> optitrackData,
+			   const std::shared_ptr<const PSMoveData> psMoveData,
     		){
 
     		//Compute timestamp
@@ -50,25 +55,25 @@ namespace fusion {
     		
 	        //Add openni data
     		if(openniData){
-    			for(auto& user : openniData->users){
+    			// for(auto& user : openniData->users){
+    			if(openniData->users.size() > 0){
 					// log("OpenNIData Data Received for User ", user.first, " : ", user.second.poses.size(), "rigid bodies");
-    				addData(OPENNI_STREAM, user.second, current_timestamp, user.first);
-
+    				addData(OPENNI_STREAM, openniData->users[0], current_timestamp);
     			}
     		}
 			
 			//Add mocap data
-			if(mocapData){
-				// log("Mocap Data Received :", mocapData->poses.size(), "rigid bodies");
-				addData(MOCAP_STREAM, *mocapData, current_timestamp);
+			if(optitrackData && optitrackData->users.size() > 0){
+				// log("Mocap Data Received :", optitrackData->poses.size(), "rigid bodies");
+				addData(MOCAP_STREAM, *optitrackData->users[0], current_timestamp);
     		}
 
     		//Init message:
     		auto results = std::make_unique<MatchResults>();
-    		results->stream1 = OPENNI_STREAM;
-    		results->stream2 = MOCAP_STREAM;
+    		results->stream1 = MOCAP_STREAM;
+    		results->stream2 = OPENNI_STREAM;
     		//Match streams
-	        results->matches = sensorPlant.matchStreams(OPENNI_STREAM, MOCAP_STREAM, current_timestamp, 0);
+	        results->matches = sensorPlant.matchStreams(MOCAP_STREAM, OPENNI_STREAM, current_timestamp, 0);
 
 	        //Debug:
 	        // for(auto& match : results->matches){

@@ -22,19 +22,21 @@
 
 #include <string>
 #include "utility/math/matrix/Transform3D.h"
+#include "message/input/MotionCapture.h"
 
 namespace message {
 namespace fusion {
 
     class MatchResults{
     public:
-        std::string stream1;
-        std::string stream2;
+        message::input::DataSource stream1;
+        message::input::DataSource stream2;
 
         std::vector<std::pair<int, int>> matches;
 
+
         //Returns 
-        int getMatchFor(std::string stream, int id){
+        int getMatchFor(message::input::DataSource stream, int id) const{
         	if(stream == stream1){
         		for(auto& match : matches){
         			if(id == match.first) return match.second;

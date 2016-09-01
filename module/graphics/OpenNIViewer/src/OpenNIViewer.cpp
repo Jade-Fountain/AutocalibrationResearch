@@ -19,7 +19,8 @@ namespace graphics {
 
     using message::input::OpenNIData;
     using message::input::OpenNIImage;
-    using message::input::RigidBodyFrame;
+    using message::input::OptiTrackImage;
+    using message::input::PSMoveData;
 
     //Define the key input callback  
 	void OpenNIViewer::handleInput(const sf::Window& w, double time_since_start){
@@ -65,13 +66,14 @@ namespace graphics {
 
         on<Trigger<OpenNIImage>, 
         Optional<With<OpenNIData>>,
-        Optional<With<RigidBodyFrame>>,
+        Optional<With<OptiTrackData>>,
+        Optional<With<PSMoveData>>,
         Optional<With<MatchResults>>, 
         Single, 
         MainThread>().then("Main Loop",
         	[this](const OpenNIImage& image, 
     			   const std::shared_ptr<const OpenNIData> openniData,
-    			   const std::shared_ptr<const OptiTrackData> mocapData,
+    			   const std::shared_ptr<const OptiTrackData> optitrackData,
     			   const std::shared_ptr<const PSMoveData> psMoveData,
     			   const std::shared_ptr<const MatchResults> matchResults
     			   ){
@@ -84,9 +86,6 @@ namespace graphics {
 
 	        //Check input
 	        handleInput(window, frame_time_since_start);
-
-	        //Check if we have matches relevant to our data
-	        bool matchesValid = matchResults && matchResults->stream1 == "openni";
 
 
 	        glMatrixMode(GL_PROJECTION);
@@ -151,16 +150,12 @@ namespace graphics {
 			            glLoadMatrixd(pose.memptr());
 
 			            //Draw matches
-			            if(matchesValid){
-				            bool draw_match = false;
-				            for(auto& m : matchResults->matches){
-				                if(m.first == id){
-				                	draw_match = true;
-				                	break;
-				                }
-				            }
-			                if(draw_match) {
-			                	// std::cout << "Drawing Match" << std::endl;
+			            //TODO: make its own loop maybe?
+			            if(matchResults){
+				            int match = matchResults->getMatchFor(openNIData->source, id);
+				            //If we have decided that this body corresponds to another (but not the camera pose)
+			                if(match >= 2) {
+			                	// std::cout << " Drawing Match" << std::endl;
 			                    glEnable(GL_LIGHTING);
 			                    GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
 			                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
@@ -174,9 +169,9 @@ namespace graphics {
 	        	std::cout << "NO Kinect RECEIVED" << std::endl;
 	        }
 
-	        if(mocapData && mocapData->users.size() > 0){
+	        if(optitrackData && optitrackData->users.size() > 0){
 	        	//Draw first user only
-	        	auto& user0 = mocapData->users[0];
+	        	auto& user0 = optitrackData->users[0];
 	        	//Extract modelview matrix
 	        	Transform3D mocapViewMatrix;
 	        	if(user0.poses.count(1) != 0){

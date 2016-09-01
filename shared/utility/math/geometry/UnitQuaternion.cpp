@@ -66,7 +66,8 @@ namespace geometry {
         // rectify();
         
         if(!is_finite()){
-            std::cout << "Quaternion is not finite!" << std::endl;
+            std::cout << "UnitQuaternion(const Rotation3D& a) : Quaternion is not finite! Culprit Rotation Matrix:" << std::endl;
+            std::cout << a << std::endl;
         }
 
     }
