@@ -10,7 +10,7 @@ namespace autocal {
 	using utility::math::matrix::Rotation3D;
 	using utility::math::geometry::UnitQuaternion;
 
-		Correlator::Correlator():firstRotationReadings(){
+		Correlator::Correlator(){
 			number_of_samples = 10;
 			difference_threshold = 0.1;
 			elimination_score_threshold = 0.1;
@@ -92,10 +92,28 @@ namespace autocal {
 					}						
 				}
 			}
-			//HACK!! 
+			//Determine which need resetting
+			for(auto& s : totalScores){
+				if(s.second == 0){
+					resetStates(s.first);
+				}
+			}
 			//If all eliminated			
-			if(eliminatedHypotheses.size() == scores.size()){
-				reset();
+			// if(eliminatedHypotheses.size() == scores.size()){
+			// 	reset();
+			// }
+		}
+
+		void Correlator::resetStates(int id){
+			//remove states and scores
+			std::cout << "Correlator resetStates(" << id << ")" << std::endl;
+			for(auto s = recordedStates.begin(); s != recordedStates.end(); s++){
+				if(s->first.first == id){
+					scores.erase(s->first);
+					eliminatedHypotheses.erase(s->first);
+					computableStreams.erase(s->first);
+					recordedStates.erase(s);
+				}
 			}
 		}
 
@@ -131,21 +149,25 @@ namespace autocal {
 				const Correlator::Stream& states1 = hypothesis.second.first;
 				const Correlator::Stream& states2 = hypothesis.second.second;
 				
-				//Check there is enough data for this stream
-				if(streamsReady.count(id1) == 0 || !streamsReady.at(id1)) continue;
-
-				//Check whether or not we need to check this hypothesis anymore
-				if(eliminatedHypotheses.count(key) != 0) continue;
-
 				//Init total scores if necessary
 				if(totalScores.count(id1) == 0){
 					totalScores[id1] = 0;
 				}
+
+				//Check there is enough data for this stream
+				if(streamsReady.count(id1) == 0 || !streamsReady.at(id1)) {
+					totalScores[id1] = -1;
+                    continue;
+				}
+
+				//Check whether or not we need to check this hypothesis anymore
+				if(eliminatedHypotheses.count(key) != 0) continue;
+
 				//CONFIG HERE: 
 				//CE METHOD
-				float score = getSylvesterScore(states1, states2, key);
+				// float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				// float score = getRotationScore(states1, states2, key);
+				float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero
@@ -179,7 +201,6 @@ namespace autocal {
 			resetRecordedStates();
 			eliminatedHypotheses.clear();
 			scores.clear();
-			firstRotationReadings.clear();
 			std::cout << "Correlator RESET" << std::endl; 
 		}
 
@@ -251,17 +272,16 @@ namespace autocal {
 				// std::cout << "det(Y.rotation()) = " << arma::det(Y.rotation()) << std::endl;
 			}
 			std::cout <<  "error = " << totalError / float(number_of_samples) << " per sample"<< std::endl;
-			return likelihood(totalError / float(number_of_samples));
+            if(std::isnan(totalError)){
+                return 0;
+            } else {
+                return likelihood(totalError / float(number_of_samples));
+            }
 		}
 
 		float Correlator::getRotationScore(const Correlator::Stream& states1, const Correlator::Stream& states2,
 										   Correlator::Hypothesis key){
 			
-			if(firstRotationReadings.count(key) == 0){
-				std::pair<utility::math::matrix::Rotation3D,utility::math::matrix::Rotation3D> val = {states1.front().rotation(), states2.front().rotation()};
-				firstRotationReadings[key] = val;
-				return 1;
-			}
 
 			//Fit data
 			Rotation3D R1 = states1.back().rotation().t() * states1.front().rotation();
