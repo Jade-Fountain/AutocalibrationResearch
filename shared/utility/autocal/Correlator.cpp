@@ -165,9 +165,9 @@ namespace autocal {
 
 				//CONFIG HERE: 
 				//CE METHOD
-				// float score = getSylvesterScore(states1, states2, key);
+				float score = getSylvesterScore(states1, states2, key);
 				//IF METHOD
-				float score = getRotationScore(states1, states2, key);
+				// float score = getRotationScore(states1, states2, key);
 
 
 				//Init score to 1 if not recorded or set at zero

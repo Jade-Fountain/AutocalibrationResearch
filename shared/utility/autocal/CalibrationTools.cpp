@@ -339,6 +339,10 @@ namespace autocal{
 		result.first.translation() = translation.first;
 		result.second.translation() = translation.second;
 
+		success = success &&
+				  result.first.is_finite() &&
+				  result.second.is_finite();
+
 		return result;
 
 	}
