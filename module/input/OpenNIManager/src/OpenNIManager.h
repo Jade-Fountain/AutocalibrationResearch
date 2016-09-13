@@ -46,6 +46,8 @@ namespace input {
 		unsigned int		m_nTexMapX;
 		unsigned int		m_nTexMapY;
 
+		std::set<int> excludedJoints;
+
 		void updateUserState(const nite::UserData& user, unsigned long long ts);
    		void userMessage(std::string message, const nite::UserData& user,  unsigned long long ts);
     public:

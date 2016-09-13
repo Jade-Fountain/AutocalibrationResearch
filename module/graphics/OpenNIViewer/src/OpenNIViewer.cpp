@@ -23,6 +23,7 @@ namespace graphics {
     using message::input::OpenNIData;
     using message::input::OpenNIImage;
     using message::input::RigidBodyFrame;
+    using message::fusion::MeasuredTransforms;
 
     //Define the key input callback  
 	void OpenNIViewer::handleInput(const sf::Window& w, double time_since_start){
@@ -70,12 +71,14 @@ namespace graphics {
         Optional<With<OpenNIData>>,
         Optional<With<RigidBodyFrame>>,
         Optional<With<MatchResults>>, 
+        Optional<With<MeasuredTransforms<RigidBodyFrame, OpenNIData>>>, 
         Single, 
         MainThread>().then("Main Loop",
         	[this](const OpenNIImage& image, 
     			   const std::shared_ptr<const OpenNIData> openniData,
     			   const std::shared_ptr<const RigidBodyFrame> mocapData,
-    			   const std::shared_ptr<const MatchResults> matchResults
+    			   const std::shared_ptr<const MatchResults> matchResults,
+    			   const std::shared_ptr<const MeasuredTransforms<RigidBodyFrame, OpenNIData>> mocapToOpenNIMeasured
     			   ){
 	       	//Get current time
 	        auto now = std::chrono::steady_clock::now();    
@@ -174,10 +177,19 @@ namespace graphics {
 	        }
 
 	        if(mocapData){
-	        	Transform3D mocapViewMatrix;
-	        	if(mocapData->poses.count(1) != 0){
-					mocapViewMatrix = mocapData->poses.at(1);
+	        	Transform3D mocapToOpenNI;
+	        	
+	        	if(mocapToOpenNIMeasured && mocapToOpenNIMeasured->transforms.size() > 0){
+	        		mocapToOpenNI = mocapToOpenNIMeasured->transforms[0];
+					Transform3D groundTruthInv = mocapData->poses.at(1);
+	        		log("Using measured pose from fusion");
+	        		Transform3D error = groundTruthInv * mocapToOpenNI;
+	        		log("Error", Transform3D::norm(error), "\n", groundTruthInv.i(), mocapToOpenNI, error,"-----------------");
+	        	}else if(mocapData->poses.count(1) != 0){
+					mocapToOpenNI = mocapData->poses.at(1).i();
+	        		// log("Using mocap ground truth");
 	        	}
+	        	// log(mocapToOpenNI);
 		        for(auto& rigidBody : mocapData->poses){
 		        	//Extract ID
 		        	int id = rigidBody.first;
@@ -186,7 +198,7 @@ namespace graphics {
 		        	}
 		        	
 		        	//4x4 matrix pose
-		            Transform3D pose = mocapViewMatrix.i() * rigidBody.second;
+		            Transform3D pose = mocapToOpenNI * rigidBody.second;
 		            			            
 		            //Load pose into opengl as view matrix
 		            glMatrixMode(GL_MODELVIEW);

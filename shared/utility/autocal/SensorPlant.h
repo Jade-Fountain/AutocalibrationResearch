@@ -52,7 +52,11 @@ namespace autocal {
 			return !getStream(name).isEmpty();
 		}
 								
-		std::vector<Hypothesis> matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1 = 0);
+		std::vector<Hypothesis> matchStreams(std::string stream_name_1,
+											 std::string stream_name_2,
+											 TimeStamp now, 
+											 TimeStamp latencyOfStream1 = 0, 
+											 std::vector<utility::math::matrix::Transform3D>* transforms = NULL);
 
 		std::map<MocapStream::RigidBodyID,float> multiply(std::map<MocapStream::RigidBodyID,float> m1, std::map<MocapStream::RigidBodyID,float> m2);
 

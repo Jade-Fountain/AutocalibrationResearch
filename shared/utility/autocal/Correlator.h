@@ -27,7 +27,8 @@ namespace autocal {
 		//CONFIG
 		int number_of_samples;
 
-		float difference_threshold;
+		float difference_threshold_angle;
+		float difference_threshold_pos;
 
 		float elimination_score_threshold; 
 
@@ -37,6 +38,10 @@ namespace autocal {
 		using Hypothesis = std::pair<MocapStream::RigidBodyID, MocapStream::RigidBodyID>;
 		using Stream = std::vector<utility::math::matrix::Transform3D>;
 		using StreamPair = std::pair<Stream, Stream>;
+
+
+		//Results of sylvester calibrations
+		std::map<Hypothesis, utility::math::matrix::Transform3D> bestTransforms;
 
 		//States for matchStreams
 		std::map<Hypothesis, StreamPair> recordedStates;
@@ -71,7 +76,7 @@ namespace autocal {
 
 		void reset();
 
-		std::vector<std::pair<int,int>> getBestCorrelations();
+		std::vector<std::pair<int,int>> getBestCorrelations(std::vector<utility::math::matrix::Transform3D>* transforms = NULL);
 
 		float likelihood(float error){
 			return std::exp(-error * error);

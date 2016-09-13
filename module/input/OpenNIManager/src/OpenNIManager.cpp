@@ -53,6 +53,14 @@ namespace input {
             }
             log("\nStart moving around to get detected...\n(PSI pose may be required for skeleton calibration, depending on the configuration)\n");
 
+            excludedJoints.insert(int(nite::JOINT_LEFT_HAND));
+            excludedJoints.insert(int(nite::JOINT_RIGHT_HAND));
+            excludedJoints.insert(int(nite::JOINT_RIGHT_FOOT));
+            excludedJoints.insert(int(nite::JOINT_LEFT_FOOT));
+            excludedJoints.insert(int(nite::JOINT_NECK));
+
+
+
     	});
 
 		on<Every<30, Per<std::chrono::seconds>>, Single>().then("OpenNIManager Read loop",[this](){
@@ -82,6 +90,8 @@ namespace input {
                 else if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
                 {
                     for(int j = 0; j < NITE_JOINT_COUNT; j++){
+                        //Skip irrelevant joints
+                        if(excludedJoints.count(j) > 0) continue;
                         auto& joint = user.getSkeleton().getJoint((nite::JointType)j);
                         UnitQuaternion q(joint.getOrientation().w,
                                          joint.getOrientation().x,

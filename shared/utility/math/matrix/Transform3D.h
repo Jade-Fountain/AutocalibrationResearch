@@ -138,6 +138,8 @@ namespace matrix {
              */
             Transform3D rotateY(double radians) const;
 
+            Transform3D swapHandedness() const;
+
             /**
              * @brief Rotates basis matrix around the local Z axis
              *
@@ -253,6 +255,7 @@ namespace matrix {
             static Transform3D createRotationZ(double radians);
             
             static Transform3D createScale(const arma::vec3& v);
+
             
             /**
              * @brief Interpolates between two transforms

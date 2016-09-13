@@ -124,6 +124,11 @@ namespace matrix {
         arma::vec4 result4 = *this * p4;
         return result4.rows(0,2);
     }
+    
+    Transform3D Transform3D::swapHandedness() const{
+        Transform3D L = Transform3D::createScale(arma::vec3({-1,1,1}));
+        return L * (*this) * L;//last L is actually L.i() = L;
+    }
 
 
     Transform3D Transform3D::i() const {

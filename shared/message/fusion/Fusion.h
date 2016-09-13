@@ -31,6 +31,13 @@ namespace fusion {
 	const std::string MOCAP_STREAM = "mocap";
 	const std::string PSMOVE_STREAM = "psmove";
 
+
+    template <typename S1, typename S2>
+    struct MeasuredTransforms{
+        //each maps from S1 -> S2
+        std::vector<utility::math::matrix::Transform3D> transforms;
+    };
+
     class MatchResults{
     public:
         std::string stream1;

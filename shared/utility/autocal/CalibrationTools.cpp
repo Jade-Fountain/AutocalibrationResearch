@@ -264,7 +264,7 @@ namespace autocal{
 	// 	file = {Full Text PDF:/Users/jake/Library/Application Support/Zotero/Profiles/3jsx8rgb.default/zotero/storage/ZBI8MGZA/Shah - 2013 - Solving the Robot-WorldHand-Eye Calibration Probl.pdf:application/pdf}
 	// }
 
-	// solves AX=YB for X,Y and A in sampleA, B in sampleB
+	// solves AX=YB for X,Y given A in sampleA, B in sampleB
 	std::pair<utility::math::matrix::Transform3D, utility::math::matrix::Transform3D> CalibrationTools::solveKronecker_Shah2013(const std::vector<utility::math::matrix::Transform3D>& samplesA,const std::vector<utility::math::matrix::Transform3D>& samplesB, bool& success){
 		if(samplesA.size() < 3 || samplesB.size() < 3){
 			std::cout << "CalibrationTools - solveKronecker_Shah2013 - NEED MORE THAN 2 SAMPLES" << std::endl;

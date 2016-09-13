@@ -2,6 +2,7 @@
 
 #include "message/support/Configuration.h"
 #include "message/fusion/Fusion.h"
+#include "utility/math/matrix/Transform3D.h"
 
 namespace module {
 namespace fusion {
@@ -10,9 +11,11 @@ namespace fusion {
     using message::input::OpenNIData;
     using message::input::RigidBodyFrame;
     
+    using message::fusion::MeasuredTransforms;
     using message::fusion::MatchResults;
     using message::fusion::MOCAP_STREAM;
     using message::fusion::OPENNI_STREAM;
+	using utility::math::matrix::Transform3D;
 
     using autocal::MocapStream;
 
@@ -70,13 +73,16 @@ namespace fusion {
     		results->stream1 = MOCAP_STREAM;
     		results->stream2 = OPENNI_STREAM;
     		//Match streams
-	        results->matches = sensorPlant.matchStreams(MOCAP_STREAM, OPENNI_STREAM, current_timestamp, 0);
+
+    		auto transforms = std::make_unique<MeasuredTransforms<RigidBodyFrame, OpenNIData>>();
+	        results->matches = sensorPlant.matchStreams(MOCAP_STREAM, OPENNI_STREAM, current_timestamp, 0, &(transforms->transforms));
 
 	        //Debug:
 	        // for(auto& match : results->matches){
 	        // 	std::cout << "Matched: " << match.first << " with " << match.second << std::endl;
 	        // }
 	        //Send to visualiser
+	        emit(transforms);
 	        emit(results);
     	});
     }

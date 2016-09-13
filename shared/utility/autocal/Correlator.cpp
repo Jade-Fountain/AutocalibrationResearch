@@ -12,7 +12,8 @@ namespace autocal {
 
 		Correlator::Correlator(){
 			number_of_samples = 10;
-			difference_threshold = 0.1;
+			difference_threshold_angle = 0.1;
+			difference_threshold_pos = 0.1;
 			elimination_score_threshold = 0.1;
 			score_inclusion_threshold = 0.5;
 		}
@@ -214,9 +215,10 @@ namespace autocal {
 
 			//OLD METHOD
 			//Add current stats to the vector			
-			const Transform3D& lastTransform = states.back().i();
-			float diff = Transform3D::norm(lastTransform * T);
-			return diff > difference_threshold;
+			const Transform3D& difference = states.back().i() * T;
+			float diffAngle = Rotation3D::norm(difference.rotation());
+			float diffPos = arma::norm(difference.translation());
+			return diffAngle > difference_threshold_angle && diffPos > difference_threshold_pos;
 
 		}
 
@@ -250,6 +252,8 @@ namespace autocal {
 			/////////////////////
 			auto X = result.first;
 			auto Y = result.second;
+
+			bestTransforms[key] = Y.i(); //Y: B -> A
 
 			//Calculate reprojection error as score
 			float totalError = 0;
@@ -298,7 +302,7 @@ namespace autocal {
 			return likelihood(error);
 		}
 
-		std::vector<std::pair<int,int>> Correlator::getBestCorrelations(){
+		std::vector<std::pair<int,int>> Correlator::getBestCorrelations(std::vector<Transform3D>* transforms){
 			//TODO: this
 			std::map<MocapStream::RigidBodyID,MocapStream::RigidBodyID> bestMatches;
 			std::map<MocapStream::RigidBodyID,float> bestScores;
@@ -325,6 +329,9 @@ namespace autocal {
 			for(auto& match : bestMatches){
 				if(bestScores[match.first] > score_inclusion_threshold){
 					result.push_back(std::make_pair(int(match.first),int(match.second)));
+					if(transforms != NULL){
+						transforms->push_back(bestTransforms[match]);
+					}
 				}
 			}
 			return result;

@@ -11,7 +11,11 @@ namespace autocal {
 	using utility::math::matrix::Transform3D;
 
 	//match each rigid body in stream 1 with a rigid body in stream 2
-	std::vector<SensorPlant::Hypothesis> SensorPlant::matchStreams(std::string stream_name_1, std::string stream_name_2, TimeStamp now, TimeStamp latencyOfStream1){
+	std::vector<SensorPlant::Hypothesis> SensorPlant::matchStreams(std::string stream_name_1, 
+																   std::string stream_name_2, 
+																   TimeStamp now, 
+																   TimeStamp latencyOfStream1, 
+																   std::vector<Transform3D>* transforms){
 		// std::cout << "FRAME BEGIN"  << std::endl;
 		auto start = std::chrono::high_resolution_clock::now();
 
@@ -53,7 +57,7 @@ namespace autocal {
 		//Compute correlations
 		correlator.compute(correlator.sufficientData());
 
-		std::vector<SensorPlant::Hypothesis> correlations = correlator.getBestCorrelations();
+		std::vector<SensorPlant::Hypothesis> correlations = correlator.getBestCorrelations(transforms);
 
 		auto finish = std::chrono::high_resolution_clock::now();
 		computeTimes(double(std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() * 1e-6));
