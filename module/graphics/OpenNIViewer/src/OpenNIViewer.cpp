@@ -169,7 +169,7 @@ namespace graphics {
 			                    glutSolidSphere(0.5 * basisScale, 10, 10);
 			                }
 				        }
-			            drawBasis(basisScale);
+			            // drawBasis(basisScale);
 			        }
 		        }	
 	        } else {
@@ -182,30 +182,30 @@ namespace graphics {
 	        	if(mocapToOpenNIMeasured && mocapToOpenNIMeasured->transforms.size() > 0){
 	        		mocapToOpenNI = mocapToOpenNIMeasured->transforms[0];
 					Transform3D groundTruthInv = mocapData->poses.at(1);
-	        		log("Using measured pose from fusion");
+	        		// log("Using measured pose from fusion");
 	        		Transform3D error = groundTruthInv * mocapToOpenNI;
-	        		log("Error", Transform3D::norm(error), "\n", groundTruthInv.i(), mocapToOpenNI, error,"-----------------");
+	        		// log("Error", Transform3D::norm(error), "\n", groundTruthInv.i(), mocapToOpenNI, error,"-----------------");
+		        	// log(mocapToOpenNI);
+			        for(auto& rigidBody : mocapData->poses){
+			        	//Extract ID
+			        	int id = rigidBody.first;
+			        	if(id == 1) {
+			        		continue;
+			        	}
+			        	
+			        	//4x4 matrix pose
+			            Transform3D pose = mocapToOpenNI * rigidBody.second;
+			            			            
+			            //Load pose into opengl as view matrix
+			            glMatrixMode(GL_MODELVIEW);
+			            glLoadMatrixd(pose.memptr());
+
+				        drawBasis(basisScale);
+			        }
 	        	}else if(mocapData->poses.count(1) != 0){
-					mocapToOpenNI = mocapData->poses.at(1).i();
+					// mocapToOpenNI = mocapData->poses.at(1).i();
 	        		// log("Using mocap ground truth");
 	        	}
-	        	// log(mocapToOpenNI);
-		        for(auto& rigidBody : mocapData->poses){
-		        	//Extract ID
-		        	int id = rigidBody.first;
-		        	if(id == 1) {
-		        		continue;
-		        	}
-		        	
-		        	//4x4 matrix pose
-		            Transform3D pose = mocapToOpenNI * rigidBody.second;
-		            			            
-		            //Load pose into opengl as view matrix
-		            glMatrixMode(GL_MODELVIEW);
-		            glLoadMatrixd(pose.memptr());
-
-			        drawBasis(basisScale);
-		        }
 
 	        }
 

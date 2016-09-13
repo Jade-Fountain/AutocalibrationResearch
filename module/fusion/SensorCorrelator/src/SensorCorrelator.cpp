@@ -29,7 +29,7 @@ namespace fusion {
         on<Startup>().then([this]{
 		    //Optional simulation parameters
 		    autocal::MocapStream openniStream(OPENNI_STREAM);
-		    autocal::MocapStream mocapStream(MOCAP_STREAM, true);
+		    autocal::MocapStream mocapStream(MOCAP_STREAM);//, true);
 
 		    sensorPlant.addStream(openniStream);
 		    sensorPlant.addStream(mocapStream);
