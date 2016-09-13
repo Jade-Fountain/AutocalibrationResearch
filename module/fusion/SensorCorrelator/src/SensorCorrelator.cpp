@@ -76,6 +76,7 @@ namespace fusion {
 
     		auto transforms = std::make_unique<MeasuredTransforms<RigidBodyFrame, OpenNIData>>();
 	        results->matches = sensorPlant.matchStreams(MOCAP_STREAM, OPENNI_STREAM, current_timestamp, 0, &(transforms->transforms));
+	        results->remainingHypotheses = sensorPlant.getRemainingHypotheses(MOCAP_STREAM, OPENNI_STREAM);
 
 	        //Debug:
 	        // for(auto& match : results->matches){

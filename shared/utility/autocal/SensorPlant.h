@@ -76,6 +76,8 @@ namespace autocal {
 
 		void setCurrentSimParameters(const SimulationParameters& sim);
 
+		std::vector<std::pair<int,int>> getRemainingHypotheses(std::string stream1, std::string stream2);
+
 
 	};
 

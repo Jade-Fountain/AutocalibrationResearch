@@ -228,6 +228,9 @@ namespace autocal {
 		}	
 	}	
 
+	std::vector<std::pair<int,int>> SensorPlant::getRemainingHypotheses(std::string stream1, std::string stream2){
+		return correlators[std::make_pair(stream1,stream2)].getRemainingHypotheses();
+	}
 
 
 

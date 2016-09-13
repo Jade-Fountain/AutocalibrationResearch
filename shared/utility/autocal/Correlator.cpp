@@ -12,8 +12,8 @@ namespace autocal {
 
 		Correlator::Correlator(){
 			number_of_samples = 10;
-			difference_threshold_angle = 0.1;
-			difference_threshold_pos = 0.1;
+			difference_threshold_angle = 0.05;
+			difference_threshold_pos = 0.05;
 			elimination_score_threshold = 0.1;
 			score_inclusion_threshold = 0.5;
 		}
@@ -307,6 +307,7 @@ namespace autocal {
 			std::map<MocapStream::RigidBodyID,MocapStream::RigidBodyID> bestMatches;
 			std::map<MocapStream::RigidBodyID,float> bestScores;
 
+			//Find best match for each first id
 			for(const auto& s : scores){
 				const auto& key = s.first;
 				const float& score = s.second;
@@ -326,6 +327,7 @@ namespace autocal {
 				}
 			}
 			std::vector<std::pair<int,int>> result;
+			//Return any of the best matches which exceed the score_inclusion_threshold
 			for(auto& match : bestMatches){
 				if(bestScores[match.first] > score_inclusion_threshold){
 					result.push_back(std::make_pair(int(match.first),int(match.second)));
@@ -336,6 +338,21 @@ namespace autocal {
 			}
 			return result;
 		}
+
+		std::vector<std::pair<int,int>> Correlator::getRemainingHypotheses(){
+			
+			std::vector<std::pair<int,int>> result;
+			
+			for(const auto& s : scores){
+				const auto& key = s.first;
+				if(eliminatedHypotheses.count(key) != 0) continue;
+				result.push_back(key);
+			}
+
+			return result;
+				
+		}
+
 
 }
 

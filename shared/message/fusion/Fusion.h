@@ -44,23 +44,41 @@ namespace fusion {
         std::string stream2;
 
         std::vector<std::pair<int, int>> matches;
+        std::vector<std::pair<int, int>> remainingHypotheses;
 
 
         //Returns 
         int getMatchFor(std::string stream, int id) const{
+            if(stream == stream1){
+                for(auto& match : matches){
+                    if(id == match.first) return match.second;
+                }
+            } else if(stream == stream2){
+                for(auto& match : matches){
+                    if(id == match.second) return match.first;
+                }
+            } else {
+                std::cout << "WARNING: Matches not found for stream " << stream << std::endl;
+            }
+            //No match found
+            return -1;
+        }   
+        //Returns 
+        bool isHypothesis(std::string stream, int id) const{
         	if(stream == stream1){
-        		for(auto& match : matches){
-        			if(id == match.first) return match.second;
+        		for(auto& match : remainingHypotheses){
+        			if(id == match.first) return true;
         		}
         	} else if(stream == stream2){
-        		for(auto& match : matches){
-        			if(id == match.second) return match.first;
+        		for(auto& match : remainingHypotheses){
+                    // std::cout << "isHypothesis2: " << match.second << " ?= " << id << std::endl;
+        			if(id == match.second) return true;
         		}
         	} else {
-        		std::cout << "WARNING: Matches not found for stream " << stream << std::endl;
+        		std::cout << "WARNING: Hypotheses not found for stream " << stream << std::endl;
         	}
         	//No match found
-        	return -1;
+        	return false;
         }	
     };
 

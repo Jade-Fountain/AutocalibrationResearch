@@ -77,6 +77,7 @@ namespace autocal {
 		void reset();
 
 		std::vector<std::pair<int,int>> getBestCorrelations(std::vector<utility::math::matrix::Transform3D>* transforms = NULL);
+		std::vector<std::pair<int,int>> getRemainingHypotheses();
 
 		float likelihood(float error){
 			return std::exp(-error * error);

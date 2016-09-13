@@ -162,13 +162,20 @@ namespace graphics {
 				       //      }
 				            //If we have decided that this body corresponds to another (but not the camera pose)
 			                if(match >= 2) {
-			                	// std::cout << " Drawing Match" << std::endl;
 			                    glEnable(GL_LIGHTING);
 			                    GLfloat diff[4] = {1.0, 1.0, 1.0, 1.0};
 			                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 			                    glutSolidSphere(0.5 * basisScale, 10, 10);
+			                    glDisable(GL_LIGHTING);
+			                } else if(matchResults->isHypothesis(OPENNI_STREAM,id)) {
+			                    glEnable(GL_LIGHTING);
+			                    GLfloat diff[4] = {0.75, 0.75, 0.75, 1.0};
+			                    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+			                    glutSolidSphere(0.25 * basisScale, 10, 10);
+			                    glDisable(GL_LIGHTING);
 			                }
 				        }
+				        //Debug: see entire skeleton with orientations
 			            // drawBasis(basisScale);
 			        }
 		        }	
@@ -179,33 +186,36 @@ namespace graphics {
 	        if(mocapData){
 	        	Transform3D mocapToOpenNI;
 	        	
-	        	if(mocapToOpenNIMeasured && mocapToOpenNIMeasured->transforms.size() > 0){
+	        	//FOR NOW: do not use calibrated result. needs more work. hence false &&
+	        	if(false && mocapToOpenNIMeasured && mocapToOpenNIMeasured->transforms.size() > 0){
 	        		mocapToOpenNI = mocapToOpenNIMeasured->transforms[0];
 					Transform3D groundTruthInv = mocapData->poses.at(1);
 	        		// log("Using measured pose from fusion");
 	        		Transform3D error = groundTruthInv * mocapToOpenNI;
 	        		// log("Error", Transform3D::norm(error), "\n", groundTruthInv.i(), mocapToOpenNI, error,"-----------------");
 		        	// log(mocapToOpenNI);
-			        for(auto& rigidBody : mocapData->poses){
-			        	//Extract ID
-			        	int id = rigidBody.first;
-			        	if(id == 1) {
-			        		continue;
-			        	}
-			        	
-			        	//4x4 matrix pose
-			            Transform3D pose = mocapToOpenNI * rigidBody.second;
-			            			            
-			            //Load pose into opengl as view matrix
-			            glMatrixMode(GL_MODELVIEW);
-			            glLoadMatrixd(pose.memptr());
-
-				        drawBasis(basisScale);
-			        }
 	        	}else if(mocapData->poses.count(1) != 0){
-					// mocapToOpenNI = mocapData->poses.at(1).i();
+					mocapToOpenNI = mocapData->poses.at(1).i();
+					
 	        		// log("Using mocap ground truth");
 	        	}
+
+		        for(auto& rigidBody : mocapData->poses){
+		        	//Extract ID
+		        	int id = rigidBody.first;
+		        	if(id == 1) {
+		        		continue;
+		        	}
+		        	
+		        	//4x4 matrix pose
+		            Transform3D pose = mocapToOpenNI * rigidBody.second;
+		            			            
+		            //Load pose into opengl as view matrix
+		            glMatrixMode(GL_MODELVIEW);
+		            glLoadMatrixd(pose.memptr());
+
+			        drawBasis(basisScale);
+		        }
 
 	        }
 
