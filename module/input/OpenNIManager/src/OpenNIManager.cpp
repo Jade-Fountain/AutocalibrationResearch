@@ -167,18 +167,20 @@ namespace input {
                                     factor[0] = Colors[colorCount][0];
                                     factor[1] = Colors[colorCount][1];
                                     factor[2] = Colors[colorCount][2];
+
                                 // }
+
                             }
                             else
                             {
                                 factor[0] = Colors[*pLabels % colorCount][0];
                                 factor[1] = Colors[*pLabels % colorCount][1];
                                 factor[2] = Colors[*pLabels % colorCount][2];
-                            }
 
-                            pTex->r = (*pDepth) * factor[0];
-                            pTex->g = (*pDepth) * factor[1];
-                            pTex->b = (*pDepth) * factor[2];
+                            }
+                            pTex->r = (*pDepth * 255 / 5000) * factor[0];
+                            pTex->g = (*pDepth * 255 / 5000) * factor[1];
+                            pTex->b = (*pDepth * 255 / 5000) * factor[2];
 
                             factor[0] = factor[1] = factor[2] = 1;
                         }
